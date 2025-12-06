@@ -1,18 +1,12 @@
-import { useState } from 'react'
+/**
+ * Main App Component
+ * Top-level component that wraps AppRouter
+ */
+
+import { AppRouter } from './routes/AppRouter';
 
 function App() {
-
-  return (
-    <>
-      <div>
-        <h1 class="text-3xl font-bold underline text-cyan-600">
-          Hello world!
-        </h1>
-      </div>
-
-
-    </>
-  )
+  return <AppRouter />;
 }
 
-export default App
+export default App;
