@@ -1,1 +1,68 @@
 @import "tailwindcss";
+
+/* ========================================
+   KhwanThong-Card Font Family
+   ======================================== */
+
+/* Regular (400) */
+@font-face {
+    font-family: 'KhwanThongCard';
+    src: url('/src/assets/fonts/KhwanThong-Card-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Bold (700) */
+@font-face {
+    font-family: 'KhwanThongCard';
+    src: url('/src/assets/fonts/KhwanThong-Card-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Italic (400) */
+@font-face {
+    font-family: 'KhwanThongCard';
+    src: url('/src/assets/fonts/KhwanThong-Card-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* Bold Italic (700) */
+@font-face {
+    font-family: 'KhwanThongCard';
+    src: url('/src/assets/fonts/KhwanThong-Card-BoldItalic.ttf') format('truetype');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* Light (300) */
+@font-face {
+    font-family: 'KhwanThongCard';
+    src: url('/src/assets/fonts/KhwanThong-Card-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Light Italic (300) */
+@font-face {
+    font-family: 'KhwanThongCard';
+    src: url('/src/assets/fonts/KhwanThong-Card-LightItalic.ttf') format('truetype');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* ========================================
+   Global Default Font
+   ======================================== */
+
+body {
+    font-family: 'KhwanThongCard', system-ui, -apple-system, BlinkMacSystemFont,
+        'Segoe UI', sans-serif;
+}

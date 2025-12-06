@@ -9,6 +9,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/common/Button';
 import { TextInput } from '../../components/common/TextInput';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
+import sci_logo from '../../assets/sci_logo.svg';
 
 export const LoginPage = () => {
     const navigate = useNavigate();
@@ -20,6 +21,7 @@ export const LoginPage = () => {
     });
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -63,8 +65,8 @@ export const LoginPage = () => {
 
         try {
             await login(formData.username, formData.password);
-            // Login สำเร็จ - navigate ไป dashboard
-            navigate('/dashboard');
+            // Login สำเร็จ - navigate ไป home
+            navigate('/home');
         } catch (error) {
             // Error จะแสดงผ่าน authError จาก context
             console.error('Login failed:', error);
@@ -74,33 +76,30 @@ export const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 px-4">
-            <div className="max-w-md w-full">
+        <div className="min-h-screen flex items-center justify-center bg-[#F9F9F9] px-4">
+            <div className="max-w-xl w-full">
                 {/* Login Card */}
-                <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="bg-white rounded-2xl shadow-md p-8 px-32">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                        <h1 className="text-[36px] font-bold text-gray-900 mb-6">
                             เข้าสู่ระบบ
                         </h1>
-                        <p className="text-gray-600">
-                            Student Workload Management System
-                        </p>
                     </div>
 
                     {/* Error Alert */}
                     {authError && (
                         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                            <p className="text-sm text-red-800 text-center">
+                            <p className="text-[16px] text-red-800 text-center">
                                 {authError}
                             </p>
                         </div>
                     )}
 
                     {/* Login Form */}
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-4 text-[20px] text-[#818181]">
                         <TextInput
-                            label="ชื่อผู้ใช้"
+                            label="เลขทะเบียนนักศึกษา / รหัสผู้ใช้"
                             name="username"
                             type="text"
                             value={formData.username}
@@ -111,22 +110,34 @@ export const LoginPage = () => {
                             autoComplete="username"
                         />
 
-                        <TextInput
-                            label="รหัสผ่าน"
-                            name="password"
-                            type="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            placeholder="รหัสผ่าน"
-                            required
-                            error={errors.password}
-                            autoComplete="current-password"
-                        />
+                        <div className="relative">
+                            <TextInput
+                                label="รหัสผ่าน"
+                                name="password"
+                                type={showPassword ? "text" : "password"}
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="รหัสผ่าน"
+                                required
+                                error={errors.password}
+                                autoComplete="current-password"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-[47px] text-gray-400 hover:text-gray-500 focus:outline-none"
+                                aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+                            >
+                                <span className="material-symbols-outlined text-[24px]">
+                                    {showPassword ? 'visibility_off' : 'visibility'}
+                                </span>
+                            </button>
+                        </div>
 
                         <Button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full mt-6"
+                            className="w-full mt-6 bg-[#050C9C] text-white text-[20px]"
                         >
                             {isSubmitting ? (
                                 <span className="flex items-center justify-center">
@@ -137,22 +148,14 @@ export const LoginPage = () => {
                                 'เข้าสู่ระบบ'
                             )}
                         </Button>
+                        <div className="flex justify-center mt-6">
+                            <img src={sci_logo} alt="SCITU" className="h-18" />
+                        </div>
                     </form>
 
-                    {/* Footer */}
-                    <div className="mt-6 text-center">
-                        <p className="text-sm text-gray-600">
-                            ใช้ชื่อผู้ใช้และรหัสผ่านของมหาวิทยาลัยธรรมศาสตร์
-                        </p>
-                    </div>
+
                 </div>
 
-                {/* Info Card */}
-                <div className="mt-4 text-center text-sm text-gray-600">
-                    <p>
-                        หากมีปัญหาในการเข้าสู่ระบบ กรุณาติดต่อ IT Support
-                    </p>
-                </div>
             </div>
         </div>
     );

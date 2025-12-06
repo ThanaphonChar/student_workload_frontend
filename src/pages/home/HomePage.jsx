@@ -1,12 +1,7 @@
-/**
- * DashboardPage Component
- * หน้า Dashboard หลังจาก login สำเร็จ
- */
-
 import { useAuth } from '../../hooks/useAuth';
 import { AppShell } from '../../components/layout/AppShell';
 
-export const DashboardPage = () => {
+export const HomePage = () => {
     const { user } = useAuth();
 
     return (
