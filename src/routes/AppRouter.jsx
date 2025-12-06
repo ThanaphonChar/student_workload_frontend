@@ -5,7 +5,8 @@
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from '../pages/auth/LoginPage';
-import { DashboardPage } from '../pages/dashboard/DashboardPage';
+import { HomePage } from '../pages/home/HomePage';
+import { FontTestPage } from '../pages/test/FontTestPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../hooks/useAuth';
 
@@ -15,29 +16,32 @@ export const AppRouter = () => {
     return (
         <BrowserRouter>
             <Routes>
-                {/* Login Route - ถ้า login แล้วให้ redirect ไป dashboard */}
+                {/* Login Route - ถ้า login แล้วให้ redirect ไป home */}
                 <Route
                     path="/login"
                     element={
-                        isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />
+                        isAuthenticated ? <Navigate to="/home" replace /> : <LoginPage />
                     }
                 />
 
                 {/* Protected Routes */}
                 <Route
-                    path="/dashboard"
+                    path="/home"
                     element={
                         <ProtectedRoute>
-                            <DashboardPage />
+                            <HomePage />
                         </ProtectedRoute>
                     }
                 />
 
-                {/* Default Route - redirect ไป dashboard หรือ login */}
+                {/* Font Test Route - Public route for testing */}
+                <Route path="/font-test" element={<FontTestPage />} />
+
+                {/* Default Route - redirect ไป home หรือ login */}
                 <Route
                     path="/"
                     element={
-                        <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
+                        <Navigate to={isAuthenticated ? "/home" : "/login"} replace />
                     }
                 />
 
