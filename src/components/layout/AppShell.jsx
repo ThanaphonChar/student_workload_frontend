@@ -1,13 +1,13 @@
 /**
  * AppShell Component
- * Layout wrapper สำหรับ authenticated pages
+ * Layout wrapper สำหรับทุกหน้าที่ต้องการ Navbar
  */
 
 import { Navbar } from './Navbar';
 
 export const AppShell = ({ children }) => {
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[#F5F5F5]">
             <Navbar />
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {children}
@@ -15,3 +15,5 @@ export const AppShell = ({ children }) => {
         </div>
     );
 };
+
+export default AppShell;

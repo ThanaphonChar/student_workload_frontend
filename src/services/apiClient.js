@@ -91,6 +91,6 @@ export const put = (path, body, options = {}) => {
     });
 };
 
-export const del = (path, options = {}) => {
+export const deleteRequest = (path, options = {}) => {
     return apiRequest(path, { ...options, method: 'DELETE' });
 };

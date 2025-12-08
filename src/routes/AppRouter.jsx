@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from '../pages/auth/LoginPage';
 import { HomePage } from '../pages/home/HomePage';
 import { FontTestPage } from '../pages/test/FontTestPage';
+import { SubjectListPage } from '../pages/subjects/SubjectListPage';
+import { SubjectCreatePage } from '../pages/subjects/SubjectCreatePage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../hooks/useAuth';
 
@@ -30,6 +32,24 @@ export const AppRouter = () => {
                     element={
                         <ProtectedRoute>
                             <HomePage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Subject Routes */}
+                <Route
+                    path="/subjects"
+                    element={
+                        <ProtectedRoute>
+                            <SubjectListPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/subjects/create"
+                    element={
+                        <ProtectedRoute>
+                            <SubjectCreatePage />
                         </ProtectedRoute>
                     }
                 />
