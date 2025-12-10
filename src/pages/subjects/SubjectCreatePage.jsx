@@ -66,16 +66,16 @@ export const SubjectCreatePage = () => {
 
     return (
         <AppShell>
-            <div className="max-w-5xl mx-auto space-y-6">
+            <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6 px-4">
                 {/* Breadcrumb */}
-                <div className="flex items-center gap-2 text-[14px] text-gray-600">
+                <div className="flex items-center gap-2 text-sm sm:text-base text-gray-600">
                     <button
                         onClick={() => navigate('/subjects')}
                         className="hover:text-[#050C9C] transition-colors"
                     >
                         ข้อมูลรายวิชา
                     </button>
-                    <span className="material-symbols-outlined text-[16px]">
+                    <span className="material-symbols-outlined text-base sm:text-lg">
                         chevron_right
                     </span>
                     <span className="text-gray-900 font-medium">เพิ่มรายวิชา</span>
@@ -83,18 +83,15 @@ export const SubjectCreatePage = () => {
 
                 {/* Page Title */}
                 <div>
-                    <h1 className="text-[32px] font-bold text-gray-900">
+                    <h1 className="text-xl sm:text-4xl font-bold text-gray-900">
                         เพิ่มรายวิชาใหม่
                     </h1>
-                    <p className="text-[14px] text-gray-600 mt-1">
-                        กรอกข้อมูลรายวิชาให้ครบถ้วน (* จำเป็นต้องกรอก)
-                    </p>
                 </div>
 
                 {/* Success Alert */}
                 {successMessage && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <p className="text-[16px] text-green-800 font-medium">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
+                        <p className="text-sm sm:text-base text-green-800 font-medium">
                             {successMessage}
                         </p>
                     </div>
@@ -102,16 +99,16 @@ export const SubjectCreatePage = () => {
 
                 {/* Error Alert */}
                 {errorMessage && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <p className="text-[16px] text-red-800 font-medium">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
+                        <p className="text-sm sm:text-base text-red-800 font-medium">
                             ❌ {errorMessage}
                         </p>
                     </div>
                 )}
 
                 {/* Form Card */}
-                <div className="bg-white rounded-lg shadow-md p-8">
-                    <h2 className="text-[24px] font-semibold text-gray-900 mb-6">
+                <div className="bg-white rounded-lg shadow-md p-4 sm:p-8">
+                    <h2 className="text-lg sm:text-3xl font-semibold text-gray-900 mb-4 sm:mb-6">
                         ข้อมูลรายวิชา
                     </h2>
 

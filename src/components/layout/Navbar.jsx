@@ -5,6 +5,7 @@
 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import sci_logo from '../../assets/sci_logo.svg';
 
 export const Navbar = () => {
     const navigate = useNavigate();
@@ -32,10 +33,8 @@ export const Navbar = () => {
                     {/* Left side - Logo & Menu */}
                     <div className="flex items-center space-x-8">
                         {/* Logo */}
-                        <div className="shrink-0 flex items-center">
-                            <span className="text-2xl font-bold text-[#050C9C]">
-                                SCITU
-                            </span>
+                        <div className="flex justify-center">
+                            <img src={sci_logo} alt="SCITU" className="h-16" />
                         </div>
 
                         {/* Desktop Menu */}
@@ -44,9 +43,9 @@ export const Navbar = () => {
                                 <button
                                     key={item.path}
                                     onClick={() => navigate(item.path)}
-                                    className={`px-3 py-2 text-[16px] font-medium transition-colors relative ${isActive(item.path)
-                                            ? 'text-[#050C9C]'
-                                            : 'text-gray-600 hover:text-[#050C9C]'
+                                    className={`px-3 py-2 text-xl font-medium transition-colors relative ${isActive(item.path)
+                                        ? 'text-[#050C9C]'
+                                        : 'text-gray-600 hover:text-[#050C9C]'
                                         }`}
                                 >
                                     {item.label}
@@ -62,7 +61,7 @@ export const Navbar = () => {
                     <div className="flex items-center space-x-4">
                         {/* Notification Bell */}
                         <button className="relative p-2 text-gray-600 hover:text-gray-900">
-                            <span className="material-symbols-outlined text-[24px]">
+                            <span className="material-symbols-outlined">
                                 notifications
                             </span>
                             {/* Badge */}
@@ -77,7 +76,7 @@ export const Navbar = () => {
                                 <div className="w-8 h-8 bg-[#050C9C] rounded-full flex items-center justify-center text-white font-semibold">
                                     {user?.displayname_th?.charAt(0) || user?.username?.charAt(0) || 'U'}
                                 </div>
-                                <span className="hidden md:block text-[14px] text-gray-700">
+                                <span className="hidden md:block text-xl text-gray-700">
                                     {user?.displayname_th || user?.username}
                                 </span>
                             </button>
@@ -86,20 +85,20 @@ export const Navbar = () => {
                             <div className="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
                                 <button
                                     onClick={() => navigate('/profile')}
-                                    className="block w-full text-left px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-100"
+                                    className="block w-full text-left px-4 py-2 text-xl text-gray-700 hover:bg-gray-100"
                                 >
                                     โปรไฟล์
                                 </button>
                                 <button
                                     onClick={() => navigate('/settings')}
-                                    className="block w-full text-left px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-100"
+                                    className="block w-full text-left px-4 py-2 text-xl text-gray-700 hover:bg-gray-100"
                                 >
                                     ตั้งค่า
                                 </button>
                                 <hr className="my-2" />
                                 <button
                                     onClick={logout}
-                                    className="block w-full text-left px-4 py-2 text-[14px] text-red-600 hover:bg-gray-100"
+                                    className="block w-full text-left px-4 py-2 text-xl text-red-600 hover:bg-gray-100"
                                 >
                                     ออกจากระบบ
                                 </button>
@@ -116,9 +115,9 @@ export const Navbar = () => {
                         <button
                             key={item.path}
                             onClick={() => navigate(item.path)}
-                            className={`block w-full text-left px-3 py-2 text-[14px] font-medium rounded-md ${isActive(item.path)
-                                    ? 'bg-[#050C9C] text-white'
-                                    : 'text-gray-600 hover:bg-gray-100'
+                            className={`block w-full text-left px-3 py-2 text-xl font-medium rounded-md ${isActive(item.path)
+                                ? 'bg-[#050C9C] text-white'
+                                : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
                             {item.label}
