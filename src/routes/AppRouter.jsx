@@ -9,6 +9,7 @@ import { HomePage } from '../pages/home/HomePage';
 import { FontTestPage } from '../pages/test/FontTestPage';
 import { SubjectListPage } from '../pages/subjects/SubjectListPage';
 import { SubjectCreatePage } from '../pages/subjects/SubjectCreatePage';
+import { SubjectEditPage } from '../pages/subjects/SubjectEditPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../hooks/useAuth';
 
@@ -50,6 +51,14 @@ export const AppRouter = () => {
                     element={
                         <ProtectedRoute>
                             <SubjectCreatePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/subjects/edit/:id"
+                    element={
+                        <ProtectedRoute>
+                            <SubjectEditPage />
                         </ProtectedRoute>
                     }
                 />

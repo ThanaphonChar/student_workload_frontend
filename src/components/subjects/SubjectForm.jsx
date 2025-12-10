@@ -8,7 +8,13 @@ import { TextInput } from '../common/TextInput';
 import { Button } from '../common/Button';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 
-export const SubjectForm = ({ initialData = {}, onSubmit, onCancel, isSubmitting = false }) => {
+export const SubjectForm = ({
+    initialData = {},
+    onSubmit,
+    onCancel,
+    isSubmitting = false,
+    submitButtonText = 'บันทึก'
+}) => {
     // Form state
     const [formData, setFormData] = useState({
         code_th: initialData.code_th || '',
@@ -119,7 +125,7 @@ export const SubjectForm = ({ initialData = {}, onSubmit, onCancel, isSubmitting
                         name="code_th"
                         value={formData.code_th}
                         onChange={handleChange}
-                        placeholder="เช่น ท123"
+                        placeholder="เช่น ดท101"
                         required
                         error={errors.code_th}
                     />
@@ -129,7 +135,7 @@ export const SubjectForm = ({ initialData = {}, onSubmit, onCancel, isSubmitting
                         name="code_eng"
                         value={formData.code_eng}
                         onChange={handleChange}
-                        placeholder="เช่น CS101"
+                        placeholder="เช่น DTI101"
                     />
 
                     <TextInput
@@ -153,7 +159,7 @@ export const SubjectForm = ({ initialData = {}, onSubmit, onCancel, isSubmitting
                             name="program_id"
                             value={formData.program_id}
                             onChange={handleChange}
-                            className={`w-full px-4 py-3 text-[16px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#050C9C] ${errors.program_id ? 'border-red-500' : 'border-gray-300'
+                            className={`w-full px-4 py-3 text-[16px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4c50a3] ${errors.program_id ? 'border-red-500' : 'border-gray-300'
                                 }`}
                         >
                             <option value="">-- เลือกหลักสูตร --</option>
@@ -219,13 +225,13 @@ export const SubjectForm = ({ initialData = {}, onSubmit, onCancel, isSubmitting
                     {/* Outline */}
                     <div>
                         <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                            โครงร่างรายวิชา
+                            โครงสร้างรายวิชา
                         </label>
                         <textarea
                             name="outline"
                             value={formData.outline}
                             onChange={handleChange}
-                            placeholder="outline-01"
+                            placeholder="3 (3-0-6)"
                             rows="3"
                             className="w-full px-4 py-3 text-[16px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#050C9C] resize-none"
                         />
@@ -280,7 +286,7 @@ export const SubjectForm = ({ initialData = {}, onSubmit, onCancel, isSubmitting
                             <span>กำลังบันทึก...</span>
                         </span>
                     ) : (
-                        'บันทึก'
+                        submitButtonText
                     )}
                 </Button>
             </div>
