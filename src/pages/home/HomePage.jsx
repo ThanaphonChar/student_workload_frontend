@@ -41,6 +41,12 @@ export const HomePage = () => {
                                 {user?.email || '-'}
                             </p>
                         </div>
+                        <div className="md:col-span-2">
+                            <p className="text-sm text-gray-600">บทบาท</p>
+                            <p className="text-lg font-medium text-gray-900">
+                                {user?.roles ? user.roles.join(', ') : '-'}
+                            </p>
+                        </div>
                         {user?.type === 'student' ? (
                             <>
                                 <div>

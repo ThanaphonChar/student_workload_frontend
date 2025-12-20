@@ -1,6 +1,7 @@
 /**
  * AppRouter Component
  * กำหนด routes ทั้งหมดของ application
+ * รองรับ role-based access control
  */
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
@@ -10,8 +11,10 @@ import { FontTestPage } from '../pages/test/FontTestPage';
 import { SubjectListPage } from '../pages/subjects/SubjectListPage';
 import { SubjectCreatePage } from '../pages/subjects/SubjectCreatePage';
 import { SubjectEditPage } from '../pages/subjects/SubjectEditPage';
+import { UnauthorizedPage } from '../pages/UnauthorizedPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../hooks/useAuth';
+import { ROLES } from '../config/roleConfig';
 
 export const AppRouter = () => {
     const { isAuthenticated } = useAuth();
@@ -37,11 +40,11 @@ export const AppRouter = () => {
                     }
                 />
 
-                {/* Subject Routes */}
+                {/* Subject Routes - Role-based Protection */}
                 <Route
                     path="/subjects"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
                             <SubjectListPage />
                         </ProtectedRoute>
                     }
@@ -49,7 +52,7 @@ export const AppRouter = () => {
                 <Route
                     path="/subjects/create"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={[ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
                             <SubjectCreatePage />
                         </ProtectedRoute>
                     }
@@ -57,11 +60,14 @@ export const AppRouter = () => {
                 <Route
                     path="/subjects/edit/:id"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={[ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
                             <SubjectEditPage />
                         </ProtectedRoute>
                     }
                 />
+
+                {/* Unauthorized Page */}
+                <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
                 {/* Font Test Route - Public route for testing */}
                 <Route path="/font-test" element={<FontTestPage />} />

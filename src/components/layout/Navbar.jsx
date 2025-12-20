@@ -1,25 +1,25 @@
 /**
  * Navbar Component
  * แถบเมนูด้านบนของระบบ
+ * รองรับการกรอง menu items ตาม role ของผู้ใช้
  */
 
+import { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { getFilteredMenu } from '../../config/roleConfig';
 import sci_logo from '../../assets/sci_logo.svg';
 
 export const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, logout } = useAuth();
+    const { user, roles, logout } = useAuth();
 
-    // เมนูหลัก
-    const menuItems = [
-        { label: 'ข้อมูลรายวิชา', path: '/subjects' },
-        { label: 'ปีการศึกษา', path: '/programs' },
-        { label: 'สถานะรายวิชา', path: '/status' },
-        { label: 'แดชบอร์ด', path: '/dashboard' },
-        { label: 'การจัดการสิทธิ์', path: '/permissions' },
-    ];
+    // กรอง menu items ตาม roles ของผู้ใช้
+    // ส่ง roles ทั้งหมดไปเพื่อให้ menu แสดงตาม roles ที่มี
+    const menuItems = useMemo(() => {
+        return getFilteredMenu(roles);
+    }, [roles]);
 
     // ตรวจสอบว่าเมนูไหน active
     const isActive = (path) => {
