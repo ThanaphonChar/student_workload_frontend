@@ -1,11 +1,17 @@
 /**
  * Authentication Context
  * จัดการ state และ logic ของ authentication ทั้งหมด
+ * 
+ * หมายเหตุ:
+ * - เก็บ token เป็น single source of truth
+ * - Decode roles จาก JWT เมื่อต้องใช้งาน
+ * - ไม่เก็บ user data ที่มาจาก backend response (ป้องกัน tampering)
  */
 
 import { createContext, useState, useEffect } from 'react';
 import * as authService from '../services/authService';
 import { getAuth, saveAuth, clearAuth } from '../utils/storage';
+import { getUserIdFromToken, getRolesFromToken, isTokenExpired } from '../utils/jwt';
 
 export const AuthContext = createContext(null);
 
@@ -15,17 +21,24 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [authError, setAuthError] = useState(null);
 
-    // โหลด auth data จาก localStorage ตอน mount
+    // โหลด token และ user จาก localStorage ตอน mount
     useEffect(() => {
         const initAuth = () => {
             try {
                 const authData = getAuth();
-                if (authData) {
-                    setUser(authData.user);
-                    setToken(authData.token);
+                if (authData?.token) {
+                    // ตรวจสอบว่า token หมดอายุหรือยัง
+                    if (!isTokenExpired(authData.token)) {
+                        setToken(authData.token);
+                        setUser(authData.user || null);
+                    } else {
+                        console.log('[Auth] Token expired, clearing storage');
+                        clearAuth();
+                    }
                 }
             } catch (error) {
                 console.error('Failed to initialize auth:', error);
+                clearAuth();
             } finally {
                 setLoading(false);
             }
@@ -45,14 +58,11 @@ export const AuthProvider = ({ children }) => {
             setAuthError(null);
             setLoading(true);
 
-            // เรียก auth service
-            const { user, token, expiresIn } = await authService.login(username, password);
+            // เรียก auth service (จะได้ token และ user กลับมา)
+            const { user, token } = await authService.login(username, password);
 
-            // คำนวณเวลาหมดอายุ
-            const expiresAt = Date.now() + expiresIn * 1000;
-
-            // บันทึกลง localStorage
-            saveAuth({ user, token, expiresAt });
+            // บันทึก token และ user ลง localStorage
+            saveAuth({ user, token });
 
             // อัพเดท state
             setUser(user);
@@ -85,15 +95,28 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // คำนวณ isAuthenticated
-    const isAuthenticated = !!user && !!token;
+    // Derived state จาก token
+    const isAuthenticated = !!token && !isTokenExpired(token);
+    const userId = token ? getUserIdFromToken(token) : null;
+    const roles = token ? getRolesFromToken(token) : [];
 
     const value = {
+        // User data (from API response)
         user,
+
+        // Token
         token,
-        isAuthenticated: !!user,
+
+        // Derived from JWT
+        userId,
+        roles,
+        isAuthenticated,
+
+        // State
         loading,
         authError,
+
+        // Actions
         login,
         logout,
     };
