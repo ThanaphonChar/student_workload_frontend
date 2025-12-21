@@ -41,7 +41,7 @@ export const Navbar = () => {
                         <div className="hidden md:flex space-x-6">
                             {menuItems.map((item) => (
                                 <button
-                                    key={item.path}
+                                    key={item.id}
                                     onClick={() => navigate(item.path)}
                                     className={`px-3 py-2 text-xl font-medium transition-colors relative ${isActive(item.path)
                                         ? 'text-[#050C9C]'
@@ -113,7 +113,7 @@ export const Navbar = () => {
                 <div className="px-2 pt-2 pb-3 space-y-1">
                     {menuItems.map((item) => (
                         <button
-                            key={item.path}
+                            key={item.id}
                             onClick={() => navigate(item.path)}
                             className={`block w-full text-left px-3 py-2 text-xl font-medium rounded-md ${isActive(item.path)
                                 ? 'bg-[#050C9C] text-white'

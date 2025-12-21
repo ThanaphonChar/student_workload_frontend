@@ -33,15 +33,13 @@ export const MENU_CONFIG = [
         id: 'home',
         label: 'หน้าหลัก',
         path: '/',
-        icon: 'home',
-        allowedRoles: [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
+        allowedRoles: [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER, ROLES.STUDENT],
     },
     {
         id: 'subjects',
-        label: 'จัดการวิชา',
+        label: 'ข้อมูลรายวิชา',
         path: '/subjects',
-        icon: 'book',
-        allowedRoles: [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
+        allowedRoles: [ROLES.ACADEMIC_OFFICER],
         children: [
             {
                 id: 'subjects-list',
@@ -56,6 +54,36 @@ export const MENU_CONFIG = [
                 allowedRoles: [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
             },
         ],
+    },
+    {
+        id: 'terms',
+        label: 'ปีการศึกษา',
+        path: '/terms',
+        allowedRoles: [ROLES.ACADEMIC_OFFICER],
+    },
+    {
+        id: 'term_subjects',
+        label: 'สถานะรายวิชา',
+        path: '/term-subjects',
+        allowedRoles: [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
+    },
+    {
+        id: 'my_subjects',
+        label: 'รายวิชาของฉัน',
+        path: '/my-subjects',
+        allowedRoles: [ROLES.ACADEMIC_OFFICER, ROLES.PROFESSOR],
+    },
+    {
+        id: 'dashboard',
+        label: 'แดชบอร์ด',
+        path: '/dashboard',
+        allowedRoles: [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
+    },
+    {
+        id: 'role_management',
+        label: 'การจัดการสิทธิ์',
+        path: '/permissions',
+        allowedRoles: [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
     },
 ];
 

@@ -100,7 +100,7 @@ export const SubjectEditPage = () => {
         <AppShell>
             <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6 px-4">
                 {/* Breadcrumb */}
-                <div className="flex items-center gap-2 text-sm sm:text-base text-gray-600">
+                <div className="flex items-center gap-2 text-2xl text-gray-600">
                     <button
                         onClick={() => navigate('/subjects')}
                         className="hover:text-[#050C9C] transition-colors"
@@ -110,13 +110,13 @@ export const SubjectEditPage = () => {
                     <span className="material-symbols-outlined text-base sm:text-lg">
                         chevron_right
                     </span>
-                    <span className="text-gray-900 font-medium">แก้ไขรายวิชา</span>
+                    <span className="text-[#050C9C] font-bold">แก้ไขรายวิชา</span>
                 </div>
 
                 {/* Success Alert */}
                 {successMessage && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
-                        <p className="text-sm sm:text-base text-green-800 font-medium">
+                        <p className="text-2xl text-green-800 font-medium">
                             {successMessage}
                         </p>
                     </div>
@@ -139,7 +139,7 @@ export const SubjectEditPage = () => {
                 ) : initialData ? (
                     /* Form Card */
                     <div className="bg-white rounded-lg shadow-md p-4 sm:p-8">
-                        <h2 className="text-3xl font-semibold text-gray-900 mb-4 sm:mb-6">
+                        <h2 className="text-4xl font-semibold text-gray-900 mb-4 sm:mb-6">
                             ข้อมูลรายวิชา
                         </h2>
 
@@ -157,12 +157,12 @@ export const SubjectEditPage = () => {
                         <span className="material-symbols-outlined text-5xl sm:text-6xl text-gray-300 mb-4">
                             error_outline
                         </span>
-                        <p className="text-gray-600 text-sm sm:text-base mb-4">
+                        <p className="text-gray-600 text-2xl mb-4">
                             ไม่พบข้อมูลรายวิชา
                         </p>
                         <button
                             onClick={() => navigate('/subjects')}
-                            className="bg-[#050C9C] text-white px-4 sm:px-6 py-2 text-sm sm:text-base rounded-lg hover:bg-[#040879]"
+                            className="bg-[#050C9C] text-white px-4 sm:px-6 py-2 text-2xl rounded-lg hover:bg-[#040879]"
                         >
                             กลับไปหน้ารายการ
                         </button>
