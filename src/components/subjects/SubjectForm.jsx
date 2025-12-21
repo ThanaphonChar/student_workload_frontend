@@ -7,6 +7,9 @@ import { useState } from 'react';
 import { TextInput } from '../common/TextInput';
 import { Button } from '../common/Button';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { IOSSwitch } from '../ui';
+import { FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+import { FONT_SIZES } from '../../theme';
 
 export const SubjectForm = ({
     initialData = {},
@@ -22,7 +25,7 @@ export const SubjectForm = ({
         name_th: initialData.name_th || '',
         name_eng: initialData.name_eng || '',
         program_id: initialData.program_id || '',
-        student_year_id: initialData.student_year_id || '',
+        student_year_ids: initialData.student_year_ids || [],
         credit: initialData.credit || '',
         outline: initialData.outline || '',
         count_workload: initialData.count_workload !== undefined ? initialData.count_workload : true,
@@ -38,6 +41,7 @@ export const SubjectForm = ({
         { value: 3, label: '2570' },
     ];
 
+    // Static options (ในอนาคตอาจดึงจาก API)
     const studentYearOptions = [
         { value: 1, label: '1' },
         { value: 2, label: '2' },
@@ -45,7 +49,7 @@ export const SubjectForm = ({
         { value: 4, label: '4' },
     ];
 
-    // Handle input change
+    //Handle input change
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
 
@@ -72,12 +76,24 @@ export const SubjectForm = ({
             newErrors.name_th = 'กรุณากรอกชื่อวิชา (ไทย)';
         }
 
+        if (!formData.code_th.trim()) {
+            newErrors.code_th = 'กรุณากรอกรหัสวิชา (อังกฤษ)';
+        }
+
+        if (!formData.name_th.trim()) {
+            newErrors.name_th = 'กรุณากรอกชื่อวิชา (อังกฤษ)';
+        }
+
+        if (!formData.outline.trim()) {
+            newErrors.outline = 'กรุณากรอกโครงสร้างรายวิชา';
+        }
+
         if (!formData.program_id) {
             newErrors.program_id = 'กรุณาเลือกหลักสูตร';
         }
 
-        if (!formData.student_year_id) {
-            newErrors.student_year_id = 'กรุณาเลือกชั้นปี';
+        if (!formData.student_year_ids || formData.student_year_ids.length === 0) {
+            newErrors.student_year_ids = 'กรุณาเลือกชั้นปีอย่างน้อย 1 ชั้นปี';
         }
 
         if (!formData.credit || formData.credit === '') {
@@ -105,7 +121,7 @@ export const SubjectForm = ({
             name_th: formData.name_th.trim(),
             name_eng: formData.name_eng.trim() || undefined,
             program_id: Number(formData.program_id),
-            student_year_id: Number(formData.student_year_id),
+            student_year_ids: formData.student_year_ids.map(Number),
             credit: Number(formData.credit),
             outline: formData.outline.trim() || undefined,
             count_workload: formData.count_workload,
@@ -125,7 +141,7 @@ export const SubjectForm = ({
                         name="code_th"
                         value={formData.code_th}
                         onChange={handleChange}
-                        placeholder="เช่น ดท101"
+                        placeholder="เช่น ทนด.101"
                         required
                         error={errors.code_th}
                     />
@@ -136,6 +152,8 @@ export const SubjectForm = ({
                         value={formData.code_eng}
                         onChange={handleChange}
                         placeholder="เช่น DTI101"
+                        required
+                        error={errors.code_eng}
                     />
 
                     <TextInput
@@ -152,14 +170,15 @@ export const SubjectForm = ({
 
                     {/* Program Dropdown */}
                     <div>
-                        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+                        <label className="block font-medium text-gray-700 mb-2 text-2xl">
                             หลักสูตร <span className="text-red-500">*</span>
                         </label>
                         <select
                             name="program_id"
                             value={formData.program_id}
                             onChange={handleChange}
-                            className={`w-full px-4 py-3 text-[16px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4c50a3] ${errors.program_id ? 'border-red-500' : 'border-gray-300'
+                            style={{ fontSize: FONT_SIZES.medium }}
+                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4c50a3] ${errors.program_id ? 'border-red-500' : 'border-gray-300'
                                 }`}
                         >
                             <option value="">-- เลือกหลักสูตร --</option>
@@ -170,7 +189,7 @@ export const SubjectForm = ({
                             ))}
                         </select>
                         {errors.program_id && (
-                            <p className="mt-1 text-[14px] text-red-500">{errors.program_id}</p>
+                            <p className="mt-1 text-red-500" style={{ fontSize: FONT_SIZES.medium }}>{errors.program_id}</p>
                         )}
                     </div>
                 </div>
@@ -193,48 +212,61 @@ export const SubjectForm = ({
                         value={formData.name_eng}
                         onChange={handleChange}
                         placeholder="Introduction to Computer Science"
+                        required
+                        error={errors.name_eng}
                     />
 
-                    {/* Student Year - Radio buttons */}
+                    <TextInput
+                        label="โครงสร้างรายวิชา"
+                        name="outline"
+                        value={formData.outline}
+                        onChange={handleChange}
+                        placeholder="ตัวอย่าง 3(3-0-6)"
+                        required
+                        error={errors.outline}
+                    />
+
+                    {/* Student Year - Checkboxes for multiple selection */}
                     <div>
-                        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+                        <label className="block font-medium text-gray-700 mb-2 text-2xl">
                             ชั้นปี <span className="text-red-500">*</span>
                         </label>
-                        <div className="flex gap-4">
+                        <FormGroup row>
                             {studentYearOptions.map(opt => (
-                                <label key={opt.value} className="flex items-center cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="student_year_id"
-                                        value={opt.value}
-                                        checked={Number(formData.student_year_id) === opt.value}
-                                        onChange={handleChange}
-                                        className="w-4 h-4 text-[#050C9C] focus:ring-[#050C9C] cursor-pointer"
-                                    />
-                                    <span className="ml-2 text-[16px] text-gray-700">
-                                        ชั้นปีที่ {opt.label}
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                        {errors.student_year_id && (
-                            <p className="mt-1 text-[14px] text-red-500">{errors.student_year_id}</p>
-                        )}
-                    </div>
+                                <FormControlLabel
+                                    key={opt.value}
+                                    control={
+                                        <Checkbox
+                                            checked={formData.student_year_ids.includes(opt.value)}
+                                            onChange={(e) => {
+                                                const value = opt.value;
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    student_year_ids: e.target.checked
+                                                        ? [...prev.student_year_ids, value]
+                                                        : prev.student_year_ids.filter(id => id !== value)
+                                                }));
+                                                // Clear error when selecting
+                                                if (errors.student_year_ids) {
+                                                    setErrors(prev => ({ ...prev, student_year_ids: '' }));
+                                                }
+                                            }}
+                                            sx={{
 
-                    {/* Outline */}
-                    <div>
-                        <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                            โครงสร้างรายวิชา
-                        </label>
-                        <textarea
-                            name="outline"
-                            value={formData.outline}
-                            onChange={handleChange}
-                            placeholder="3 (3-0-6)"
-                            rows="3"
-                            className="w-full px-4 py-3 text-[16px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#050C9C] resize-none"
-                        />
+                                                color: 'gray-300',
+                                                '&.Mui-checked': {
+                                                    color: '#050C9C',
+                                                },
+                                            }}
+                                        />
+                                    }
+                                    label={<span className="text-gray-700" style={{ fontSize: FONT_SIZES.medium }}>ชั้นปีที่ {opt.label}</span>}
+                                />
+                            ))}
+                        </FormGroup>
+                        {errors.student_year_ids && (
+                            <p className="mt-1 text-red-500" style={{ fontSize: FONT_SIZES.medium }}>{errors.student_year_ids}</p>
+                        )}
                     </div>
                 </div>
             </div>
@@ -242,43 +274,36 @@ export const SubjectForm = ({
             {/* Checkboxes */}
             <div className="flex gap-6 pt-2">
                 <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                        type="checkbox"
+                    <IOSSwitch
                         name="count_workload"
                         checked={formData.count_workload}
-                        onChange={handleChange}
-                        className="w-5 h-5 text-[#050C9C] border-gray-300 rounded focus:ring-[#050C9C] cursor-pointer"
+                        onChange={(e) => {
+                            setFormData(prev => ({
+                                ...prev,
+                                count_workload: e.target.checked
+                            }));
+                        }}
+                        inputProps={{ 'aria-label': 'count workload' }}
                     />
-                    <span className="text-[16px] text-gray-700">นับชั่วโมงภาระงาน</span>
-                </label>
-
-                <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        name="is_active"
-                        checked={formData.is_active}
-                        onChange={handleChange}
-                        className="w-5 h-5 text-[#050C9C] border-gray-300 rounded focus:ring-[#050C9C] cursor-pointer"
-                    />
-                    <span className="text-[16px] text-gray-700">เปิดใช้รายวิชา</span>
+                    <span className="text-gray-700 text-2xl">นับชั่วโมงภาระงาน <span className="text-red-500">*</span></span>
                 </label>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 pt-4">
+            <div className="flex ml-[60%] gap-4 pt-4">
                 <Button
                     type="button"
                     onClick={onCancel}
                     disabled={isSubmitting}
-                    className="flex-1 bg-gray-200 text-gray-700 text-[18px] hover:bg-gray-300"
+                    className="flex-1 bg-gray-300 hover:bg-gray-400"
                 >
-                    ยกเลิก
+                    <a className='text-gray-700 text-2xl'>ยกเลิก</a>
                 </Button>
 
                 <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex-1 bg-[#050C9C] text-white text-[18px] hover:bg-[#040879]"
+                    className="flex-1 bg-[#050C9C] text-white hover:bg-[#040879] text-2xl"
                 >
                     {isSubmitting ? (
                         <span className="flex items-center justify-center gap-2">

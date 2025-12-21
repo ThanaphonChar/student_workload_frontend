@@ -68,7 +68,7 @@ export const SubjectCreatePage = () => {
         <AppShell>
             <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6 px-4">
                 {/* Breadcrumb */}
-                <div className="flex items-center gap-2 text-sm sm:text-base text-gray-600">
+                <div className="flex items-center gap-2 text-2xl text-gray-600">
                     <button
                         onClick={() => navigate('/subjects')}
                         className="hover:text-[#050C9C] transition-colors"
@@ -78,14 +78,7 @@ export const SubjectCreatePage = () => {
                     <span className="material-symbols-outlined text-base sm:text-lg">
                         chevron_right
                     </span>
-                    <span className="text-gray-900 font-medium">เพิ่มรายวิชา</span>
-                </div>
-
-                {/* Page Title */}
-                <div>
-                    <h1 className="text-xl sm:text-4xl font-bold text-gray-900">
-                        เพิ่มรายวิชาใหม่
-                    </h1>
+                    <span className="text-[#050C9C] font-bold">เพิ่มรายวิชา</span>
                 </div>
 
                 {/* Success Alert */}
@@ -108,7 +101,7 @@ export const SubjectCreatePage = () => {
 
                 {/* Form Card */}
                 <div className="bg-white rounded-lg shadow-md p-4 sm:p-8">
-                    <h2 className="text-lg sm:text-3xl font-semibold text-gray-900 mb-4 sm:mb-6">
+                    <h2 className="text-4xl font-semibold text-gray-900 mb-4 sm:mb-6">
                         ข้อมูลรายวิชา
                     </h2>
 
