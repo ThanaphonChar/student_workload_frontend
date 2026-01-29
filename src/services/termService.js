@@ -213,7 +213,7 @@ export async function changeResponsibleLecturer(termSubjectId, userId) {
 }
 
 /**
- * Update lecturer assignment notes
+ * Update lecturer assignment Notes
  * @param {number} assignmentId - Assignment ID
  * @param {string} notes - Updated notes
  * @returns {Promise<Object>} Updated assignment
