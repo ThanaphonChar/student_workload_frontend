@@ -90,6 +90,25 @@ export async function deleteTerm(termId) {
 }
 
 /**
+ * Validate subject IDs before creating/updating term
+ * @param {Array<number>} subjectIds - Array of subject IDs to validate
+ * @returns {Promise<Object>} Validation result
+ */
+export async function validateSubjectIds(subjectIds) {
+    try {
+        console.log('[termService] Validating subject IDs:', subjectIds);
+        const response = await apiClient.post('/subjects/validate-ids', { 
+            subject_ids: subjectIds 
+        });
+        console.log('[termService] Validation result:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('[termService] Validation error:', error);
+        throw error;
+    }
+}
+
+/**
  * ==========================================
  * Term Subject Operations
  * ==========================================
