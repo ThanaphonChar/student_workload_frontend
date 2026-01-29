@@ -11,6 +11,9 @@ import { FontTestPage } from '../pages/test/FontTestPage';
 import { SubjectListPage } from '../pages/subjects/SubjectListPage';
 import { SubjectCreatePage } from '../pages/subjects/SubjectCreatePage';
 import { SubjectEditPage } from '../pages/subjects/SubjectEditPage';
+import TermListPage from '../pages/terms/TermListPage';
+import TermCreatePage from '../pages/terms/TermCreatePage';
+import { TermEditPage } from '../pages/terms/TermEditPage';
 import { UnauthorizedPage } from '../pages/UnauthorizedPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../hooks/useAuth';
@@ -62,6 +65,32 @@ export const AppRouter = () => {
                     element={
                         <ProtectedRoute allowedRoles={[ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
                             <SubjectEditPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Term Routes - Role-based Protection */}
+                <Route
+                    path="/terms"
+                    element={
+                        <ProtectedRoute>
+                            <TermListPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/terms/create"
+                    element={
+                        <ProtectedRoute allowedRoles={[ROLES.ACADEMIC_OFFICER]}>
+                            <TermCreatePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/terms/edit/:id"
+                    element={
+                        <ProtectedRoute allowedRoles={[ROLES.ACADEMIC_OFFICER]}>
+                            <TermEditPage />
                         </ProtectedRoute>
                     }
                 />

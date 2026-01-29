@@ -36,8 +36,8 @@ export const SubjectForm = ({
 
     // Static options (ในอนาคตอาจดึงจาก API)
     const programOptions = [
-        { value: 1, label: '2566' },
-        { value: 2, label: '2567' },
+        { value: 1, label: '2561' },
+        { value: 2, label: '2566' },
         { value: 3, label: '2570' },
     ];
 
