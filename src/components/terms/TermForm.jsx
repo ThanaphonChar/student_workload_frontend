@@ -261,6 +261,8 @@ export const TermForm = ({
         }
 
         // Prepare payload
+        const subjectIds = selectedSubjects.map(s => parseInt(s.id, 10)); // แปลงเป็น number เพื่อความแน่ใจ
+        
         const payload = {
             academic_year: Number(formData.academic_year),
             academic_sector: Number(formData.academic_sector),
@@ -270,10 +272,16 @@ export const TermForm = ({
             midterm_end_date: formData.midterm_end_date || null,
             final_start_date: formData.final_start_date || null,
             final_end_date: formData.final_end_date || null,
-            subject_ids: selectedSubjects.map(s => s.id), // Include selected subject IDs
+            subject_ids: subjectIds,
         };
 
-        console.log(`[TermForm] Submitting term with ${selectedSubjects.length} subjects:`, payload);
+        console.log('[TermForm] 📤 Submitting term...');
+        console.log('[TermForm] Selected subjects count:', selectedSubjects.length);
+        console.log('[TermForm] Selected subjects:', selectedSubjects.map(s => ({ id: s.id, code: s.code_eng || s.code_th, name: s.name_th })));
+        console.log('[TermForm] Subject IDs being sent:', subjectIds);
+        console.log('[TermForm] Subject IDs type check:', subjectIds.map(id => ({ id, type: typeof id })));
+        console.log('[TermForm] Full payload:', JSON.stringify(payload, null, 2));
+        
         onSubmit(payload);
     };
 

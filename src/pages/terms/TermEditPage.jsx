@@ -60,12 +60,41 @@ export const TermEditPage = () => {
         setErrorMessage('');
 
         try {
-            console.log('[TermEditPage] Submitting formData:', formData);
+            console.log('[TermEditPage] 📤 Submitting formData:', formData);
             console.log('[TermEditPage] subject_ids:', formData.subject_ids);
+            console.log('[TermEditPage] subject_ids count:', formData.subject_ids?.length);
+
+            // Validate subject IDs first (ถ้ามีรายวิชา)
+            if (formData.subject_ids && formData.subject_ids.length > 0) {
+                console.log('[TermEditPage] 🔍 Validating subject IDs before submission...');
+                
+                try {
+                    const validation = await termService.validateSubjectIds(formData.subject_ids);
+                    console.log('[TermEditPage] Validation result:', validation);
+                    
+                    if (!validation.valid) {
+                        const invalidIdsStr = validation.invalid_ids.join(', ');
+                        setErrorMessage(
+                            `❌ รายวิชาที่มี ID: ${invalidIdsStr} ไม่มีอยู่ในระบบ\n` +
+                            `กรุณาเลือกรายวิชาใหม่อีกครั้ง หรือรีเฟรชหน้าเว็บ (Ctrl+Shift+R)`
+                        );
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        setIsSubmitting(false);
+                        return;
+                    }
+                    
+                    console.log('[TermEditPage] ✅ All subject IDs are valid');
+                } catch (validationError) {
+                    console.error('[TermEditPage] ❌ Validation request failed:', validationError);
+                    // ถ้า validation API fail ให้ลองส่งต่อไปได้ (backend จะ validate อีกทีอยู่แล้ว)
+                }
+            }
 
             // Update term with all data including subject_ids
+            console.log('[TermEditPage] 🚀 Updating term...');
             await termService.updateTerm(id, formData);
             
+            console.log('[TermEditPage] ✅ Term updated successfully');
             setSuccessMessage('✅ แก้ไขภาคการศึกษาสำเร็จ!');
 
             // Navigate back to list after short delay
@@ -73,7 +102,12 @@ export const TermEditPage = () => {
                 navigate('/terms');
             }, 1500);
         } catch (error) {
-            console.error('Error updating term:', error);
+            console.error('[TermEditPage] ❌ Error updating term:', error);
+            console.error('[TermEditPage] Error details:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
 
             if (error.response?.data?.message) {
                 setErrorMessage(error.response.data.message);

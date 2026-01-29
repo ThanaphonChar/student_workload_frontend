@@ -25,12 +25,41 @@ export default function TermCreatePage() {
         setErrorMessage('');
 
         try {
-            console.log('[TermCreatePage] Submitting formData:', formData);
+            console.log('[TermCreatePage] 📤 Submitting formData:', formData);
             console.log('[TermCreatePage] subject_ids:', formData.subject_ids);
+            console.log('[TermCreatePage] subject_ids count:', formData.subject_ids?.length);
+
+            // Validate subject IDs first (ถ้ามีรายวิชา)
+            if (formData.subject_ids && formData.subject_ids.length > 0) {
+                console.log('[TermCreatePage] 🔍 Validating subject IDs before submission...');
+                
+                try {
+                    const validation = await termService.validateSubjectIds(formData.subject_ids);
+                    console.log('[TermCreatePage] Validation result:', validation);
+                    
+                    if (!validation.valid) {
+                        const invalidIdsStr = validation.invalid_ids.join(', ');
+                        setErrorMessage(
+                            `❌ รายวิชาที่มี ID: ${invalidIdsStr} ไม่มีอยู่ในระบบ\n` +
+                            `กรุณาเลือกรายวิชาใหม่อีกครั้ง หรือรีเฟรชหน้าเว็บ (Ctrl+Shift+R)`
+                        );
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        setIsSubmitting(false);
+                        return;
+                    }
+                    
+                    console.log('[TermCreatePage] ✅ All subject IDs are valid');
+                } catch (validationError) {
+                    console.error('[TermCreatePage] ❌ Validation request failed:', validationError);
+                    // ถ้า validation API fail ให้ลองส่งต่อไปได้ (backend จะ validate อีกทีอยู่แล้ว)
+                }
+            }
 
             // Create term with all data including subject_ids
+            console.log('[TermCreatePage] 🚀 Creating term...');
             const createdTerm = await termService.createTerm(formData);
             
+            console.log('[TermCreatePage] ✅ Term created successfully:', createdTerm);
             setSuccessMessage('✅ สร้างภาคการศึกษาและเพิ่มรายวิชาสำเร็จ!');
 
             // Navigate back to list after short delay
@@ -38,7 +67,12 @@ export default function TermCreatePage() {
                 navigate('/terms');
             }, 1500);
         } catch (error) {
-            console.error('Error creating term:', error);
+            console.error('[TermCreatePage] ❌ Error creating term:', error);
+            console.error('[TermCreatePage] Error details:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
 
             if (error.response?.data?.message) {
                 setErrorMessage(error.response.data.message);
