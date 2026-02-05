@@ -62,10 +62,10 @@ export const MENU_CONFIG = [
         allowedRoles: [ROLES.ACADEMIC_OFFICER],
     },
     {
-        id: 'term_subjects',
+        id: 'course_status',
         label: 'สถานะรายวิชา',
-        path: '/term-subjects',
-        allowedRoles: [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
+        path: '/course-status',
+        allowedRoles: [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
     },
     {
         id: 'my_subjects',

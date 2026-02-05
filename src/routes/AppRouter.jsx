@@ -14,6 +14,9 @@ import { SubjectEditPage } from '../pages/subjects/SubjectEditPage';
 import TermListPage from '../pages/terms/TermListPage';
 import TermCreatePage from '../pages/terms/TermCreatePage';
 import { TermEditPage } from '../pages/terms/TermEditPage';
+import { TermDetailPage } from '../pages/terms/TermDetailPage';
+import CourseStatusByTermPage from '../pages/courseStatus/CourseStatusByTermPage';
+import ActiveTermCourseStatusPage from '../pages/courseStatus/ActiveTermCourseStatusPage';
 import { UnauthorizedPage } from '../pages/UnauthorizedPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../hooks/useAuth';
@@ -87,10 +90,36 @@ export const AppRouter = () => {
                     }
                 />
                 <Route
+                    path="/terms/:id"
+                    element={
+                        <ProtectedRoute>
+                            <TermDetailPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
                     path="/terms/edit/:id"
                     element={
                         <ProtectedRoute allowedRoles={[ROLES.ACADEMIC_OFFICER]}>
                             <TermEditPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Course Status Routes - Role-based Protection */}
+                <Route
+                    path="/course-status"
+                    element={
+                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
+                            <ActiveTermCourseStatusPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/course-status/term/:termId"
+                    element={
+                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
+                            <CourseStatusByTermPage />
                         </ProtectedRoute>
                     }
                 />

@@ -51,7 +51,7 @@ export const FILTER_ALL_OPTION = {
   SEMESTER: { value: null, label: 'เทอม' },
 };
 
-// สถานะการอนุมัติ
+// สถานะการอนุมัติ (สำหรับ outline และ report เท่านั้น)
 export const APPROVAL_STATUS = {
   PENDING: 'pending',      // รออนุมัติ
   APPROVED: 'approved',    // อนุมัติแล้ว
@@ -97,30 +97,30 @@ export const LABELS = {
   SEMESTER: 'ภาคการศึกษา',
   START_DATE: 'วันเริ่มภาคการศึกษา',
   END_DATE: 'วันสิ้นสุดภาคการศึกษา',
-  
+
   // ช่วงสอบ
   EXAM_PERIODS: 'กำหนดช่วงสอบ',
   MIDTERM_PERIOD: 'ช่วงสอบกลางภาค',
   FINAL_PERIOD: 'ช่วงสอบปลายภาค',
   EXAM_START: 'เริ่ม',
   EXAM_END: 'สิ้นสุด',
-  
+
   // รายวิชา
   SUBJECTS: 'รายวิชา',
   SUBJECT_CODE: 'รหัสวิชา',
   SUBJECT_NAME: 'ชื่อวิชา',
   CREDITS: 'หน่วยกิต',
   YEAR_LEVEL: 'ชั้นปี',
-  
+
   // อาจารย์
   INSTRUCTORS: 'อาจารย์',
   RESPONSIBLE_INSTRUCTOR: 'อาจารย์ผู้รับผิดชอบ',
-  
+
   // สถานะ
   SYLLABUS_STATUS: 'คำโครงรายวิชา',
   WORKLOAD_STATUS: 'ภาระงาน',
   REPORT_STATUS: 'รายงานผล',
-  
+
   // Actions
   MANAGE: 'จัดการ',
   CREATE: 'สร้าง',
@@ -130,12 +130,12 @@ export const LABELS = {
   CANCEL: 'ยกเลิก',
   SELECT: 'เลือก',
   REMOVE: 'ลบออก',
-  
+
   // Buttons
   CREATE_NEW_TERM: 'เริ่มภาคการศึกษาใหม่',
   SELECT_SUBJECTS: 'เลือกรายวิชา',
   ADD_INSTRUCTOR: 'เพิ่มอาจารย์',
-  
+
   // Messages
   NO_DATA: 'ไม่พบข้อมูล',
   LOADING: 'กำลังโหลด...',
