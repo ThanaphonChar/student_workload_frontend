@@ -20,7 +20,7 @@ export const ROUTE_PERMISSIONS = {
     '/unauthorized': null,
 
     // Protected routes with specific roles
-    '/': [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER, ROLES.STUDENT],
+    '/profile': [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER, ROLES.STUDENT],
     '/subjects': [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
     '/subjects/create': [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
     '/subjects/:id': [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
@@ -32,7 +32,7 @@ export const MENU_CONFIG = [
     {
         id: 'home',
         label: 'หน้าหลัก',
-        path: '/',
+        path: '/profile',
         allowedRoles: [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER, ROLES.STUDENT],
     },
     {

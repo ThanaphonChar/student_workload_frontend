@@ -5,7 +5,7 @@
 
 const VARIANTS = {
   primary: `
-    bg-blue-600 hover:bg-blue-700
+    bg-[#050C9C] hover:bg-[#040A8A]
     text-white
     border-transparent
   `,
@@ -26,8 +26,8 @@ const VARIANTS = {
   `,
   outline: `
     bg-transparent hover:bg-blue-50
-    text-blue-600
-    border-blue-600
+    text-[#050C9C]
+    border-[#050C9C]
   `,
 };
 
@@ -55,7 +55,7 @@ export const Button = ({
         inline-flex items-center justify-center
         font-medium
         border rounded-lg
-        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#050C9C]
         transition-all duration-200
         ${VARIANTS[variant]}
         ${SIZES[size]}
