@@ -46,7 +46,7 @@ export function ProfessorDropdown({ termSubjectId, onSuccess }) {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 disabled={assigning || loadingProfessors}
-                className="text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed"
+                className="text-[#050C9C] hover:text-[#040A8A] disabled:text-gray-400 disabled:cursor-not-allowed"
                 title="มอบหมายอาจารย์"
             >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

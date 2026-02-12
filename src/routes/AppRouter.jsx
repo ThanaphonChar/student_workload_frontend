@@ -11,6 +11,7 @@ import { FontTestPage } from '../pages/test/FontTestPage';
 import { SubjectListPage } from '../pages/subjects/SubjectListPage';
 import { SubjectCreatePage } from '../pages/subjects/SubjectCreatePage';
 import { SubjectEditPage } from '../pages/subjects/SubjectEditPage';
+import MySubjectsPage from '../pages/subjects/MySubjectsPage';
 import TermListPage from '../pages/terms/TermListPage';
 import TermCreatePage from '../pages/terms/TermCreatePage';
 import { TermEditPage } from '../pages/terms/TermEditPage';
@@ -32,13 +33,13 @@ export const AppRouter = () => {
                 <Route
                     path="/login"
                     element={
-                        isAuthenticated ? <Navigate to="/home" replace /> : <LoginPage />
+                        isAuthenticated ? <Navigate to="/profile" replace /> : <LoginPage />
                     }
                 />
 
                 {/* Protected Routes */}
                 <Route
-                    path="/home"
+                    path="/profile"
                     element={
                         <ProtectedRoute>
                             <HomePage />
@@ -124,6 +125,16 @@ export const AppRouter = () => {
                     }
                 />
 
+                {/* My Subjects Route - Professor Only */}
+                <Route
+                    path="/my-subjects"
+                    element={
+                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR]}>
+                            <MySubjectsPage />
+                        </ProtectedRoute>
+                    }
+                />
+
                 {/* Unauthorized Page */}
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
@@ -134,7 +145,7 @@ export const AppRouter = () => {
                 <Route
                     path="/"
                     element={
-                        <Navigate to={isAuthenticated ? "/home" : "/login"} replace />
+                        <Navigate to={isAuthenticated ? "/profile" : "/login"} replace />
                     }
                 />
 

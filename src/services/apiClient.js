@@ -19,10 +19,16 @@ export const apiRequest = async (path, options = {}) => {
         const url = `${API_BASE_URL}${path}`;
 
         // Default headers
+        // สำคัญ: ไม่ต้อง set Content-Type ถ้าเป็น FormData
+        // Browser จะ set multipart/form-data พร้อม boundary เองอัตโนมัติ
         const headers = {
-            'Content-Type': 'application/json',
             ...options.headers,
         };
+        
+        // Set Content-Type เป็น application/json เฉพาะเมื่อ body ไม่ใช่ FormData
+        if (!(options.body instanceof FormData)) {
+            headers['Content-Type'] = 'application/json';
+        }
 
         // เพิ่ม Authorization header ถ้ามี token
         const auth = getAuth();

@@ -65,7 +65,7 @@ export function CourseStatusTable({
     if (loading) {
         return (
             <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#050C9C]"></div>
             </div>
         );
     }
@@ -111,8 +111,8 @@ export function CourseStatusTable({
                     <button
                         onClick={() => setFilterStatus('all')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filterStatus === 'all'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-[#050C9C] text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                     >
                         ทั้งหมด ({subjects.length})
@@ -120,8 +120,8 @@ export function CourseStatusTable({
                     <button
                         onClick={() => setFilterStatus('submitted')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filterStatus === 'submitted'
-                                ? 'bg-green-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                     >
                         ส่งครบแล้ว
@@ -129,8 +129,8 @@ export function CourseStatusTable({
                     <button
                         onClick={() => setFilterStatus('pending')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filterStatus === 'pending'
-                                ? 'bg-yellow-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-yellow-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                     >
                         รอส่ง
