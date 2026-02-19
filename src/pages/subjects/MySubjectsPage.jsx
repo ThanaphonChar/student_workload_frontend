@@ -5,6 +5,7 @@
  */
 
 import { useState, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMySubjects } from '../../hooks/useMySubjects';
 import { AppShell } from '../../components/layout/AppShell';
 import { Modal } from '../../components/common/Modal';
@@ -12,6 +13,7 @@ import { Button } from '../../components/common/Button';
 import { uploadDocument } from '../../services/uploadService';
 
 export default function MySubjectsPage() {
+    const navigate = useNavigate();
     const { subjects, loading, error, refetch } = useMySubjects();
     const [selectedTerm, setSelectedTerm] = useState('');
     const [uploadModal, setUploadModal] = useState({ isOpen: false, subject: null, type: '' });
@@ -268,9 +270,7 @@ export default function MySubjectsPage() {
                                                 variant="secondary"
                                                 size="sm"
                                                 onClick={() => {
-                                                    // TODO: Navigate to workload data entry page
-                                                    console.log('Navigate to workload form for:', subject);
-                                                    alert('ฟีเจอร์กรอกภาระงานจะพัฒนาในขั้นตอนถัดไป');
+                                                    navigate(`/term-subjects/${subject.term_subject_id}/workload`);
                                                 }}
                                                 className="text-base"
                                             >

@@ -100,3 +100,6 @@ export const put = (path, body, options = {}) => {
 export const deleteRequest = (path, options = {}) => {
     return apiRequest(path, { ...options, method: 'DELETE' });
 };
+
+// Alias สำหรับ delete (เพราะ 'delete' เป็น reserved keyword)
+export const del = deleteRequest;

@@ -18,6 +18,7 @@ import { TermEditPage } from '../pages/terms/TermEditPage';
 import { TermDetailPage } from '../pages/terms/TermDetailPage';
 import CourseStatusByTermPage from '../pages/courseStatus/CourseStatusByTermPage';
 import ActiveTermCourseStatusPage from '../pages/courseStatus/ActiveTermCourseStatusPage';
+import TermSubjectWorkloadPage from '../pages/terms/workload/TermSubjectWorkloadPage';
 import { UnauthorizedPage } from '../pages/UnauthorizedPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../hooks/useAuth';
@@ -131,6 +132,16 @@ export const AppRouter = () => {
                     element={
                         <ProtectedRoute allowedRoles={[ROLES.PROFESSOR]}>
                             <MySubjectsPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Workload Management Route - Academic Officer can create/edit, others can view */}
+                <Route
+                    path="/term-subjects/:termSubjectId/workload"
+                    element={
+                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
+                            <TermSubjectWorkloadPage />
                         </ProtectedRoute>
                     }
                 />
