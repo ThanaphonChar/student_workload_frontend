@@ -19,6 +19,7 @@ import { TermDetailPage } from '../pages/terms/TermDetailPage';
 import CourseStatusByTermPage from '../pages/courseStatus/CourseStatusByTermPage';
 import ActiveTermCourseStatusPage from '../pages/courseStatus/ActiveTermCourseStatusPage';
 import TermSubjectWorkloadPage from '../pages/terms/workload/TermSubjectWorkloadPage';
+import DashboardPage from '../pages/dashboard/DashboardPage';
 import { UnauthorizedPage } from '../pages/UnauthorizedPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../hooks/useAuth';
@@ -122,6 +123,16 @@ export const AppRouter = () => {
                     element={
                         <ProtectedRoute allowedRoles={[ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
                             <CourseStatusByTermPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Dashboard Route - Academic Officer Only */}
+                <Route
+                    path="/dashboard"
+                    element={
+                        <ProtectedRoute allowedRoles={[ROLES.ACADEMIC_OFFICER]}>
+                            <DashboardPage />
                         </ProtectedRoute>
                     }
                 />

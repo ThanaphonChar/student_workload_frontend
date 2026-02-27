@@ -24,7 +24,7 @@ export const apiRequest = async (path, options = {}) => {
         const headers = {
             ...options.headers,
         };
-        
+
         // Set Content-Type เป็น application/json เฉพาะเมื่อ body ไม่ใช่ FormData
         if (!(options.body instanceof FormData)) {
             headers['Content-Type'] = 'application/json';
@@ -103,3 +103,12 @@ export const deleteRequest = (path, options = {}) => {
 
 // Alias สำหรับ delete (เพราะ 'delete' เป็น reserved keyword)
 export const del = deleteRequest;
+
+// Default export
+export default {
+    get,
+    post,
+    put,
+    delete: deleteRequest,
+    del
+};

@@ -8,7 +8,7 @@ import { TextInput } from '../common/TextInput';
 import { Button } from '../common/Button';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { IOSSwitch } from '../ui';
-import { FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+import StudentYearSelector from './StudentYearSelector';
 import { FONT_SIZES } from '../../theme';
 
 export const SubjectForm = ({
@@ -39,14 +39,6 @@ export const SubjectForm = ({
         { value: 1, label: '2561' },
         { value: 2, label: '2566' },
         { value: 3, label: '2570' },
-    ];
-
-    // Static options (ในอนาคตอาจดึงจาก API)
-    const studentYearOptions = [
-        { value: 1, label: '1' },
-        { value: 2, label: '2' },
-        { value: 3, label: '3' },
-        { value: 4, label: '4' },
     ];
 
     //Handle input change
@@ -226,46 +218,23 @@ export const SubjectForm = ({
                         error={errors.outline}
                     />
 
-                    {/* Student Year - Checkboxes for multiple selection */}
+                    {/* Student Year Selector - Tailwind CSS */}
                     <div>
-                        <label className="block font-medium text-gray-700 mb-2 text-2xl">
-                            ชั้นปี <span className="text-red-500">*</span>
-                        </label>
-                        <FormGroup row>
-                            {studentYearOptions.map(opt => (
-                                <FormControlLabel
-                                    key={opt.value}
-                                    control={
-                                        <Checkbox
-                                            checked={formData.student_year_ids.includes(opt.value)}
-                                            onChange={(e) => {
-                                                const value = opt.value;
-                                                setFormData(prev => ({
-                                                    ...prev,
-                                                    student_year_ids: e.target.checked
-                                                        ? [...prev.student_year_ids, value]
-                                                        : prev.student_year_ids.filter(id => id !== value)
-                                                }));
-                                                // Clear error when selecting
-                                                if (errors.student_year_ids) {
-                                                    setErrors(prev => ({ ...prev, student_year_ids: '' }));
-                                                }
-                                            }}
-                                            sx={{
-
-                                                color: 'gray-300',
-                                                '&.Mui-checked': {
-                                                    color: '#050C9C',
-                                                },
-                                            }}
-                                        />
-                                    }
-                                    label={<span className="text-gray-700" style={{ fontSize: FONT_SIZES.medium }}>ชั้นปีที่ {opt.label}</span>}
-                                />
-                            ))}
-                        </FormGroup>
+                        <StudentYearSelector
+                            selectedYears={formData.student_year_ids}
+                            onChange={(years) => {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    student_year_ids: years
+                                }));
+                                // Clear error when selecting
+                                if (errors.student_year_ids) {
+                                    setErrors(prev => ({ ...prev, student_year_ids: '' }));
+                                }
+                            }}
+                        />
                         {errors.student_year_ids && (
-                            <p className="mt-1 text-red-500" style={{ fontSize: FONT_SIZES.medium }}>{errors.student_year_ids}</p>
+                            <p className="mt-1 text-sm text-red-500">{errors.student_year_ids}</p>
                         )}
                     </div>
                 </div>

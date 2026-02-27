@@ -6,19 +6,23 @@
 import { ApprovalBadge, StatusIcon, FileCountBadge } from './StatusBadge';
 import { Button } from '../common/Button';
 import { ProfessorDropdown } from './ProfessorDropdown';
+import { StudentYearDropdown } from './StudentYearDropdown';
 
 export function CourseStatusRow({ subject, onRefresh, onViewDetail, userRole }) {
+
     // Early return ถ้าไม่มีข้อมูล
     if (!subject) return null;
 
     const {
         id,
+        subject_id,
         code_th,
         code_eng,
         name_th,
         name_eng,
         credit,
         program_year,
+        student_year_ids = [],
         professors = [],
         outline_status,
         outline_approved,
@@ -29,6 +33,9 @@ export function CourseStatusRow({ subject, onRefresh, onViewDetail, userRole }) 
         workload_file_count,
         report_file_count,
     } = subject;
+
+    // Debug: ดูข้อมูล student_year_ids
+    console.log(`[${code_th}] student_year_ids:`, student_year_ids, 'type:', typeof student_year_ids);
 
     // แสดงรหัสวิชา
     const subjectCode = code_eng || code_th;
@@ -41,6 +48,7 @@ export function CourseStatusRow({ subject, onRefresh, onViewDetail, userRole }) 
 
     // เช็คว่า user มีสิทธิ์ assign professor หรือไม่ (เฉพาะ Academic Officer)
     const canAssignProfessor = userRole === 'Academic Officer';
+    const canEditStudentYear = userRole === 'Academic Officer';
 
     return (
         <tr className="hover:bg-gray-50 transition-colors">
@@ -52,9 +60,24 @@ export function CourseStatusRow({ subject, onRefresh, onViewDetail, userRole }) 
                 </div>
             </td>
 
-            {/* หลักสูตร/ชั้นปี */}
+            {/* ชั้นปีที่เรียน */}
             <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{program_year || '-'}</div>
+                <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-900 flex-1">
+                        {student_year_ids.length > 0 ? (
+                            student_year_ids.sort((a, b) => a - b).join(', ')
+                        ) : (
+                            <span className="text-gray-400 italic">ยังไม่ระบุ</span>
+                        )}
+                    </div>
+                    {canEditStudentYear && (
+                        <StudentYearDropdown
+                            subjectId={subject_id}
+                            currentYears={student_year_ids}
+                            onSuccess={onRefresh}
+                        />
+                    )}
+                </div>
             </td>
 
             {/* หน่วยกิต */}
