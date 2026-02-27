@@ -35,10 +35,16 @@ export const SubjectEditPage = () => {
         setErrorMessage('');
 
         try {
-            const response = await subjectService.getSubjectById(id);
+            const [subjectResponse, studentYearsData] = await Promise.all([
+                subjectService.getSubjectById(id),
+                subjectService.getStudentYears(id)
+            ]);
 
-            if (response.success && response.subject) {
-                setInitialData(response.subject);
+            if (subjectResponse.success && subjectResponse.subject) {
+                setInitialData({
+                    ...subjectResponse.subject,
+                    student_year_ids: studentYearsData || []
+                });
             } else {
                 setErrorMessage('ไม่พบข้อมูลรายวิชา');
             }

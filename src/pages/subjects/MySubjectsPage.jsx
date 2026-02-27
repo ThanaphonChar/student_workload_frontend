@@ -155,8 +155,8 @@ export default function MySubjectsPage() {
                     <div
                         className={`
                             rounded-lg shadow-lg p-4 min-w-80 max-w-md
-                            ${notification.type === 'success' 
-                                ? 'bg-green-50 border-l-4 border-green-500' 
+                            ${notification.type === 'success'
+                                ? 'bg-green-50 border-l-4 border-green-500'
                                 : 'bg-red-50 border-l-4 border-red-500'
                             }
                         `}

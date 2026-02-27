@@ -68,16 +68,16 @@ export const MENU_CONFIG = [
         allowedRoles: [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
     },
     {
+        id: 'dashboard',
+        label: 'แดชบอร์ด',
+        path: '/dashboard',
+        allowedRoles: [ROLES.ACADEMIC_OFFICER],
+    },
+    {
         id: 'my_subjects',
         label: 'รายวิชาของฉัน',
         path: '/my-subjects',
         allowedRoles: [ROLES.ACADEMIC_OFFICER, ROLES.PROFESSOR],
-    },
-    {
-        id: 'dashboard',
-        label: 'แดชบอร์ด',
-        path: '/dashboard',
-        allowedRoles: [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
     },
     {
         id: 'role_management',

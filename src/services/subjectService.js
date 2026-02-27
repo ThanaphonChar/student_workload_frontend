@@ -67,10 +67,25 @@ export const deleteSubject = async (id) => {
     return response;
 };
 
+/**
+ * ดึงรายการ student year IDs ของวิชา
+ * @param {number} id - Subject ID
+ * @returns {Promise<Array<number>>} Array of student year IDs
+ */
+export const getStudentYears = async (id) => {
+    const response = await apiClient.get(`${BASE_URL}/${id}/student-years`);
+    return response.data;
+};
+
+// Alias for updateSubject (for consistency)
+export const update = updateSubject;
+
 export default {
     getSubjects,
     getSubjectById,
     createSubject,
     updateSubject,
+    update,
     deleteSubject,
+    getStudentYears,
 };
