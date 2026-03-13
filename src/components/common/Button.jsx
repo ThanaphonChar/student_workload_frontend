@@ -20,7 +20,8 @@ const VARIANTS = {
     border-transparent
   `,
   success: `
-    bg-green-600 hover:bg-green-700
+    bg-[#10B981] 
+    hover:bg-[#E7F8F2] hover:text-[#10B981]
     text-white
     border-transparent
   `,
@@ -32,9 +33,9 @@ const VARIANTS = {
 };
 
 const SIZES = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-sm',
-  lg: 'px-6 py-3 text-base',
+  sm: 'px-2 py-1 text-xl',
+  md: 'px-4 py-2 text-xl',
+  lg: 'px-6 py-3 text-xl',
 };
 
 export const Button = ({
@@ -56,7 +57,7 @@ export const Button = ({
         inline-flex items-center justify-center
         font-medium
         border rounded-lg
-        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#050C9C]
+        focus:outline-none
         transition-all duration-200
         ${VARIANTS[variant]}
         ${SIZES[size]}

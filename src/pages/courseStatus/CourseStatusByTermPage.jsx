@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppShell } from '../../components/layout/AppShell';
 import { CourseStatusTable } from '../../components/courseStatus/CourseStatusTable';
+import { Button } from '../../components/common/Button';
 import { useCourseStatus } from '../../hooks/useCourseStatus';
 import { useAuth } from '../../hooks/useAuth';
 import { useTerms } from '../../hooks/useTerms';
@@ -76,7 +77,23 @@ export default function CourseStatusByTermPage() {
 
     // Handle ดูรายละเอียด
     const handleViewDetail = (subject) => {
-        navigate(`/term-subjects/${subject.id}`);
+        const targetId = subject?.term_subject_id || subject?.id;
+        if (!targetId) return;
+        const selectedTerm = terms.find((t) => String(t.id) === String(selectedTermId));
+        const termSector = selectedTerm?.academic_sector || selectedTerm?.semester;
+        const termLabel = termSector && selectedTerm?.academic_year
+            ? `ปีการศึกษา ${termSector}/${selectedTerm.academic_year}`
+            : null;
+        const subjectCode = subject?.code_eng || subject?.code_th || subject?.subject_code || null;
+
+        navigate(`/term-subjects/${targetId}/workload`, {
+            state: {
+                fromPath: selectedTermId ? `/course-status/term/${selectedTermId}` : '/course-status',
+                fromLabel: 'สถานะรายวิชา',
+                termLabel,
+                subjectCode,
+            },
+        });
     };
 
     return (
@@ -88,32 +105,34 @@ export default function CourseStatusByTermPage() {
                         <h1 className="text-2xl font-bold text-gray-900">
                             สถานะรายวิชาตามภาคการศึกษา
                         </h1>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-xl text-gray-600 mt-1">
                             ตรวจสอบสถานะการส่งเอกสารของแต่ละรายวิชา
                         </p>
                     </div>
 
                     {/* Refresh Button */}
-                    <button
+                    <Button
                         onClick={refetch}
                         disabled={loading}
-                        className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                        variant="secondary"
+                        size="sm"
+                        className="px-4 py-2"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Select Term */}
                 <div className="bg-white p-6 rounded-lg shadow">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xl font-medium text-gray-700 mb-2">
                         เลือกภาคการศึกษา
                     </label>
                     <select
                         value={selectedTermId}
                         onChange={handleTermChange}
-                        className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
                     >
                         <option value="">-- เลือกภาคการศึกษา --</option>
                         {terms.map((term) => (

@@ -53,7 +53,7 @@ export function AssignProfessorModal({ isOpen, onClose, termSubject, onSuccess }
                 <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full">
                     {/* Header */}
                     <div className="flex items-center justify-between p-6 border-b">
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-2xl font-semibold text-gray-900">
                             มอบหมายอาจารย์ผู้สอน
                         </h3>
                         <button
@@ -71,14 +71,14 @@ export function AssignProfessorModal({ isOpen, onClose, termSubject, onSuccess }
                         <div className="p-6 space-y-4">
                             {/* รายวิชา */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-2xl font-bold text-gray-700 mb-2">
                                     รายวิชา
                                 </label>
                                 <div className="bg-gray-50 p-3 rounded-lg">
-                                    <div className="text-sm font-medium text-gray-900">
+                                    <div className="text-2xl font-medium text-gray-900">
                                         {termSubject.code_eng || termSubject.code_th}
                                     </div>
-                                    <div className="text-sm text-gray-600">
+                                    <div className="text-2xl text-gray-600">
                                         {termSubject.name_th || termSubject.name_eng}
                                     </div>
                                 </div>
@@ -87,12 +87,12 @@ export function AssignProfessorModal({ isOpen, onClose, termSubject, onSuccess }
                             {/* อาจารย์ปัจจุบัน */}
                             {termSubject.professors && termSubject.professors.length > 0 && (
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-2xl font-bold text-gray-700 mb-2">
                                         อาจารย์ปัจจุบัน
                                     </label>
                                     <div className="space-y-1">
                                         {termSubject.professors.map((prof, idx) => (
-                                            <div key={idx} className="text-sm text-gray-600">
+                                            <div key={idx} className="text-2xl text-gray-600">
                                                 • {prof.first_name_th} {prof.last_name_th}
                                             </div>
                                         ))}
@@ -102,13 +102,13 @@ export function AssignProfessorModal({ isOpen, onClose, termSubject, onSuccess }
 
                             {/* เลือกอาจารย์ใหม่ */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-2xl font-bold text-gray-700 mb-2">
                                     เพิ่มอาจารย์ผู้สอน <span className="text-red-500">*</span>
                                 </label>
                                 <select
                                     value={professorId}
                                     onChange={(e) => setProfessorId(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
                                     disabled={assigning || loadingProfessors}
                                 >
                                     <option value="">
@@ -125,13 +125,13 @@ export function AssignProfessorModal({ isOpen, onClose, termSubject, onSuccess }
                             {/* Error message */}
                             {error && (
                                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                                    <p className="text-sm text-red-600">{error}</p>
+                                    <p className="text-2xl text-red-600">{error}</p>
                                 </div>
                             )}
 
                             {/* Note */}
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                <p className="text-sm text-blue-800">
+                                <p className="text-2xl text-[#050C9C]">
                                     <strong>หมายเหตุ:</strong> การเพิ่มอาจารย์ใหม่จะไม่ลบอาจารย์เดิม
                                     สามารถมีอาจารย์ผู้สอนหลายคนได้
                                 </p>
@@ -143,14 +143,14 @@ export function AssignProfessorModal({ isOpen, onClose, termSubject, onSuccess }
                             <button
                                 type="button"
                                 onClick={handleClose}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                                className="px-4 py-2 text-2xl font-bold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
                                 disabled={assigning}
                             >
                                 ยกเลิก
                             </button>
                             <button
                                 type="submit"
-                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-4 py-2 text-2xl font-bold text-white bg-[#050C9C] rounded-lg hover:bg-[#050C9C]/80 disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={assigning || loadingProfessors}
                             >
                                 {assigning ? 'กำลังบันทึก...' : 'บันทึก'}

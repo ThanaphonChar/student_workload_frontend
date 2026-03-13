@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '../common/Button';
 import { LoadingSpinner } from '../common/LoadingSpinner';
-import { DatePickerField, TextField, SearchInput } from '../common';
+import { DateInputField, TextField, SearchInput, DropdownMenu } from '../common';
 import { SEMESTERS } from '../../constants/academicYear';
 import * as subjectService from '../../services/subjectService';
 import * as termService from '../../services/termService';
@@ -111,12 +111,12 @@ export const TermForm = ({
             setAllSubjects(subjectArray);
 
             // Log for debugging
-            console.log(`[TermForm] ✅ Loaded ${subjectArray.length} subjects`);
+            console.log(`[TermForm] Loaded ${subjectArray.length} subjects`);
             if (subjectArray.length > 0) {
                 console.log('[TermForm] Sample subject:', subjectArray[0]);
             }
         } catch (error) {
-            console.error('[TermForm] ❌ Failed to load subjects:', error);
+            console.error('[TermForm] Failed to load subjects:', error);
             console.error('[TermForm] Error details:', error.message, error.response);
             setAllSubjects([]);
         } finally {
@@ -144,6 +144,7 @@ export const TermForm = ({
                     code_eng: ts.code_eng || ts.subject_code,
                     name_th: ts.name_th,
                     name_eng: ts.name_eng,
+                    program_year: ts.program_year,
                     credit: ts.credit || ts.credits,
                 }));
 
@@ -170,6 +171,10 @@ export const TermForm = ({
             subject.name_eng?.toLowerCase().includes(search)
         );
     });
+
+    const getProgramDisplay = (subject) => {
+        return subject.program_year || subject.program_name || subject.program_id || '-';
+    };
 
     /**
      * Add subject to selected list
@@ -262,7 +267,7 @@ export const TermForm = ({
 
         // Prepare payload
         const subjectIds = selectedSubjects.map(s => parseInt(s.id, 10)); // แปลงเป็น number เพื่อความแน่ใจ
-        
+
         const payload = {
             academic_year: Number(formData.academic_year),
             academic_sector: Number(formData.academic_sector),
@@ -275,13 +280,13 @@ export const TermForm = ({
             subject_ids: subjectIds,
         };
 
-        console.log('[TermForm] 📤 Submitting term...');
+        console.log('[TermForm] Submitting term...');
         console.log('[TermForm] Selected subjects count:', selectedSubjects.length);
         console.log('[TermForm] Selected subjects:', selectedSubjects.map(s => ({ id: s.id, code: s.code_eng || s.code_th, name: s.name_th })));
         console.log('[TermForm] Subject IDs being sent:', subjectIds);
         console.log('[TermForm] Subject IDs type check:', subjectIds.map(id => ({ id, type: typeof id })));
         console.log('[TermForm] Full payload:', JSON.stringify(payload, null, 2));
-        
+
         onSubmit(payload);
     };
 
@@ -289,7 +294,7 @@ export const TermForm = ({
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Section 1: ข้อมูลพื้นฐาน */}
             <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-900">
+                <h3 className="text-2xl font-semibold text-gray-900">
                     ข้อมูลพื้นฐาน
                 </h3>
 
@@ -307,42 +312,43 @@ export const TermForm = ({
 
                     {/* ภาคการศึกษา */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-2xl font-bold text-gray-700 mb-1">
                             ภาคการศึกษา
                             <span className="text-red-500 ml-1">*</span>
                         </label>
-                        <select
-                            value={formData.academic_sector}
-                            onChange={(e) => handleChange('academic_sector', e.target.value)}
-                            required
-                            className={`
-                                w-full px-4 py-2
-                                bg-white border rounded-lg
-                                text-sm text-gray-900
-                                focus:outline-none focus:ring-2
-                                transition-colors duration-200
-                                ${errors.academic_sector
-                                    ? 'border-red-500 focus:ring-red-500'
-                                    : 'border-gray-300 focus:ring-blue-500'
-                                }
-                            `}
-                        >
-                            <option value="">เลือกภาคการศึกษา</option>
-                            {SEMESTERS.map((sem) => (
-                                <option key={sem.value} value={sem.value}>
-                                    {sem.label}
-                                </option>
-                            ))}
-                        </select>
+                        <DropdownMenu
+                            trigger={
+                                <button
+                                    type="button"
+                                    className={`w-full px-4 py-2 border rounded-lg bg-white hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between text-2xl text-gray-900 ${errors.academic_sector ? 'border-red-500' : 'border-gray-300'}`}
+                                >
+                                    <span>
+                                        {formData.academic_sector
+                                            ? SEMESTERS.find((semester) => Number(semester.value) === Number(formData.academic_sector))?.label || 'เลือกภาคการศึกษา'
+                                            : 'เลือกภาคการศึกษา'}
+                                    </span>
+                                    <span className="material-symbols-outlined text-gray-500">
+                                        expand_more
+                                    </span>
+                                </button>
+                            }
+                            items={SEMESTERS.map((semester) => ({
+                                id: semester.value,
+                                label: semester.label,
+                                onClick: () => handleChange('academic_sector', semester.value),
+                            }))}
+                            position="left"
+                            className="w-full"
+                        />
                         {errors.academic_sector && (
-                            <p className="mt-1 text-xs text-red-500">{errors.academic_sector}</p>
+                            <p className="mt-1 text-2xl text-red-500">{errors.academic_sector}</p>
                         )}
                     </div>
                 </div>
 
                 {/* วันที่เริ่มต้น - สิ้นสุด */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <DatePickerField
+                    <DateInputField
                         label="วันเริ่มภาคการศึกษา"
                         value={formData.term_start_date}
                         onChange={(value) => handleChange('term_start_date', value)}
@@ -351,7 +357,7 @@ export const TermForm = ({
                         helperText={errors.term_start_date}
                     />
 
-                    <DatePickerField
+                    <DateInputField
                         label="วันสิ้นสุดภาคการศึกษา"
                         value={formData.term_end_date}
                         onChange={(value) => handleChange('term_end_date', value)}
@@ -364,12 +370,12 @@ export const TermForm = ({
 
             {/* Section 2: ช่วงสอบกลางภาค */}
             <div className="space-y-4 pt-4 border-t border-gray-200">
-                <h3 className="text-xl font-semibold text-gray-900">
+                <h3 className="text-2xl font-bold text-gray-900">
                     ช่วงสอบกลางภาค
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <DatePickerField
+                    <DateInputField
                         label="วันเริ่มสอบกลางภาค"
                         value={formData.midterm_start_date}
                         onChange={(value) => handleChange('midterm_start_date', value)}
@@ -377,7 +383,7 @@ export const TermForm = ({
                         helperText={errors.midterm_start_date}
                     />
 
-                    <DatePickerField
+                    <DateInputField
                         label="วันสิ้นสุดสอบกลางภาค"
                         value={formData.midterm_end_date}
                         onChange={(value) => handleChange('midterm_end_date', value)}
@@ -389,12 +395,12 @@ export const TermForm = ({
 
             {/* Section 3: ช่วงสอบปลายภาค */}
             <div className="space-y-4 pt-4 border-t border-gray-200">
-                <h3 className="text-xl font-semibold text-gray-900">
+                <h3 className="text-2xl font-bold text-gray-900">
                     ช่วงสอบปลายภาค
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <DatePickerField
+                    <DateInputField
                         label="วันเริ่มสอบปลายภาค"
                         value={formData.final_start_date}
                         onChange={(value) => handleChange('final_start_date', value)}
@@ -402,7 +408,7 @@ export const TermForm = ({
                         helperText={errors.final_start_date}
                     />
 
-                    <DatePickerField
+                    <DateInputField
                         label="วันสิ้นสุดสอบปลายภาค"
                         value={formData.final_end_date}
                         onChange={(value) => handleChange('final_end_date', value)}
@@ -414,7 +420,7 @@ export const TermForm = ({
 
             {/* Section 4: เลือกรายวิชา */}
             <div className="space-y-4 pt-4 border-t border-gray-200">
-                <h3 className="text-xl font-semibold text-gray-900">
+                <h3 className="text-2xl font-bold text-gray-900">
                     เลือกรายวิชา
                 </h3>
 
@@ -422,7 +428,7 @@ export const TermForm = ({
                 {isLoadingExistingSubjects && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-2">
                         <LoadingSpinner size="sm" />
-                        <span className="text-sm text-blue-700">กำลังโหลดรายวิชาที่มีอยู่...</span>
+                        <span className="text-2xl text-[#050C9C]">กำลังโหลดรายวิชาที่มีอยู่...</span>
                     </div>
                 )}
 
@@ -451,7 +457,7 @@ export const TermForm = ({
 
                                 {/* Debug Info */}
                                 {!isLoadingSubjects && (
-                                    <div className="relative z-20 text-xs text-gray-500 mt-1">
+                                    <div className="relative z-20 text-xl text-gray-500 mt-1">
                                         แสดง {filteredSubjects.length} จาก {allSubjects.length} รายวิชา
                                     </div>
                                 )}
@@ -462,7 +468,7 @@ export const TermForm = ({
                                         {isLoadingSubjects ? (
                                             <div className="flex justify-center items-center py-8">
                                                 <LoadingSpinner size="sm" />
-                                                <span className="ml-2 text-sm text-gray-500">กำลังโหลดรายวิชา...</span>
+                                                <span className="ml-2 text-2xl text-gray-500">กำลังโหลดรายวิชา...</span>
                                             </div>
                                         ) : filteredSubjects.length === 0 ? (
                                             <div className="text-center py-8 text-gray-500">
@@ -472,7 +478,7 @@ export const TermForm = ({
                                                         <button
                                                             type="button"
                                                             onClick={() => setSearchTerm('')}
-                                                            className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                                                            className="mt-2 text-2xl text-[#050C9C] hover:text-[#050C9C] font-bold"
                                                         >
                                                             ล้างการค้นหา
                                                         </button>
@@ -483,18 +489,18 @@ export const TermForm = ({
                                             </div>
                                         ) : (
                                             <table className="min-w-full divide-y divide-gray-200">
-                                                <thead className="bg-blue-600 sticky top-0">
+                                                <thead className="bg-[#050C9C] sticky top-0">
                                                     <tr>
-                                                        <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                        <th className="px-4 py-2 text-left text-2xl font-bold text-white uppercase tracking-wider">
                                                             รหัสวิชา
                                                         </th>
-                                                        <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                        <th className="px-4 py-2 text-left text-2xl font-bold text-white uppercase tracking-wider">
                                                             ชื่อวิชา
                                                         </th>
-                                                        <th className="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
-                                                            หน่วยกิต
+                                                        <th className="px-4 py-2 text-center text-2xl font-bold text-white uppercase tracking-wider">
+                                                            หลักสูตร
                                                         </th>
-                                                        <th className="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
+                                                        <th className="px-4 py-2 text-center text-2xl font-bold text-white uppercase tracking-wider">
                                                             จัดการ
                                                         </th>
                                                     </tr>
@@ -507,14 +513,14 @@ export const TermForm = ({
                                                                 key={subject.id}
                                                                 className={`hover:bg-gray-50 ${isSelected ? 'bg-green-50' : ''}`}
                                                             >
-                                                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                                                                <td className="px-4 py-3 whitespace-nowrap text-2xl font-bold text-gray-900">
                                                                     {subject.code_eng}
                                                                 </td>
-                                                                <td className="px-4 py-3 text-sm text-gray-900">
+                                                                <td className="px-4 py-3 text-2xl text-gray-900">
                                                                     {subject.name_th}
                                                                 </td>
-                                                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
-                                                                    {subject.credit}
+                                                                <td className="px-4 py-3 whitespace-nowrap text-2xl text-gray-900 text-center">
+                                                                    {getProgramDisplay(subject)}
                                                                 </td>
                                                                 <td className="px-4 py-3 whitespace-nowrap text-center">
                                                                     <button
@@ -526,11 +532,11 @@ export const TermForm = ({
                                                                         }}
                                                                         disabled={isSelected}
                                                                         className={`
-                                                                            px-3 py-1 text-xs font-medium rounded
+                                                                            px-4 text-xl font-bold rounded
                                                                             transition-colors
                                                                             ${isSelected
                                                                                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                                                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                                                                                : 'bg-[#050C9C] text-white hover:bg-[#050C9C]'
                                                                             }
                                                                         `}
                                                                     >
@@ -554,29 +560,25 @@ export const TermForm = ({
                 {selectedSubjects.length > 0 && (
                     <div className="mt-4">
                         <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-sm font-medium text-gray-900">
+                            <h4 className="text-xl font-medium text-gray-900">
                                 รายวิชาที่เลือก ({selectedSubjects.length} วิชา)
                             </h4>
-                            {/* {initialData.id && !isLoadingExistingSubjects && (
-                                <span className="text-xs text-blue-600">
-                                    ✓ โหลดรายวิชาที่มีอยู่แล้วเรียบร้อย
-                                </span>
-                            )} */}
+
                         </div>
                         <div className="border border-gray-300 rounded-lg overflow-hidden">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">
+                                        <th className="px-4 py-2 text-left text-xl font-medium text-gray-700 uppercase">
                                             รหัสวิชา
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">
+                                        <th className="px-4 py-2 text-left text-xl font-medium text-gray-700 uppercase">
                                             ชื่อวิชา
                                         </th>
-                                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-700 uppercase">
-                                            หน่วยกิต
+                                        <th className="px-4 py-2 text-center text-xl font-medium text-gray-700 uppercase">
+                                            หลักสูตร
                                         </th>
-                                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-700 uppercase">
+                                        <th className="px-4 py-2 text-center text-xl font-medium text-gray-700 uppercase">
                                             ลบ
                                         </th>
                                     </tr>
@@ -584,14 +586,14 @@ export const TermForm = ({
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {selectedSubjects.map((subject) => (
                                         <tr key={subject.id} className="hover:bg-gray-50">
-                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-4 py-2 whitespace-nowrap text-xl text-gray-900">
                                                 {subject.code_eng}
                                             </td>
-                                            <td className="px-4 py-2 text-sm text-gray-900">
+                                            <td className="px-4 py-2 text-xl text-gray-900">
                                                 {subject.name_th}
                                             </td>
-                                            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 text-center">
-                                                {subject.credit}
+                                            <td className="px-4 py-2 whitespace-nowrap text-xl text-gray-900 text-center">
+                                                {getProgramDisplay(subject)}
                                             </td>
                                             <td className="px-4 py-2 whitespace-nowrap text-center">
                                                 <button
@@ -614,21 +616,21 @@ export const TermForm = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+            <div className="flex ml-[60%] gap-4 pt-4">
                 <Button
                     type="button"
-                    variant="secondary"
                     onClick={onCancel}
                     disabled={isSubmitting}
+                    className="flex-1 bg-[#F1F1F1] hover:bg-[#E1E1E1] text-[#3B3B3B] text-2xl"
                 >
-                    ยกเลิก
+                    <a className='text-gray-700 text-2xl'>ยกเลิก</a>
                 </Button>
+
 
                 <Button
                     type="submit"
-                    variant="primary"
                     disabled={isSubmitting}
-                    className="min-w-[120px]"
+                    className="flex-1 bg-[#050C9C] text-white hover:bg-[#040879] text-2xl"
                 >
                     {isSubmitting ? (
                         <div className="flex items-center gap-2">
@@ -640,6 +642,6 @@ export const TermForm = ({
                     )}
                 </Button>
             </div>
-        </form>
+        </form >
     );
 };

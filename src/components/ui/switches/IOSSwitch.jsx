@@ -1,14 +1,21 @@
 /**
  * IOSSwitch Component
  * 
- * A production-grade iOS-style switch component built on top of Material UI.
- * Encapsulates all styling logic and provides a clean, reusable interface.
+ * A production-grade iOS-style switch component built with Tailwind CSS.
+ * Pure React implementation without Material-UI dependencies.
  * 
  * Design Principles:
  * - Single Responsibility: Only handles iOS-style switch behavior
- * - Encapsulation: All styling is internal, consumers see only props
+ * - Encapsulation: All styling uses Tailwind CSS classes
  * - Extensibility: Can be extended with size/color variants without breaking changes
- * - Consistency: Matches iOS visual language across the entire app
+ * - Consistency: Matches iOS visual language and project's Tailwind design system
+ * 
+ * Visual Specifications:
+ * - Track: 42x26px rounded pill shape
+ * - Thumb: 22x22px circle with shadow
+ * - Colors: iOS green (#34C759) when active, light gray (#E9E9EA) when inactive
+ * - Animation: Smooth 300ms transition
+ * - Disabled: 50% opacity with cursor not-allowed
  * 
  * @example
  * <IOSSwitch 
@@ -17,66 +24,6 @@
  *   disabled={false}
  * />
  */
-
-import { styled } from '@mui/material/styles';
-import Switch from '@mui/material/Switch';
-
-/**
- * Styled iOS Switch Component
- * 
- * Visual Specifications:
- * - Track: 36x20px rounded pill shape
- * - Thumb: 16x16px circle with shadow
- * - Colors: iOS green (#34C759) when active, light gray when inactive
- * - Animation: 300ms smooth transition
- * - Disabled: 50% opacity with cursor not-allowed
- */
-const StyledIOSSwitch = styled(Switch)(({ theme }) => ({
-    width: 42,
-    height: 26,
-    padding: 0,
-    '& .MuiSwitch-switchBase': {
-        padding: 0,
-        margin: 2,
-        transitionDuration: '300ms',
-        '&.Mui-checked': {
-            transform: 'translateX(16px)',
-            color: '#fff',
-            '& + .MuiSwitch-track': {
-                backgroundColor: '#34C759', // iOS green
-                opacity: 1,
-                border: 0,
-            },
-            '&.Mui-disabled + .MuiSwitch-track': {
-                opacity: 0.5,
-            },
-        },
-        '&.Mui-focusVisible .MuiSwitch-thumb': {
-            color: '#34C759',
-            border: '6px solid #fff',
-        },
-        '&.Mui-disabled .MuiSwitch-thumb': {
-            color: theme.palette.grey[100],
-        },
-        '&.Mui-disabled + .MuiSwitch-track': {
-            opacity: 0.3,
-        },
-    },
-    '& .MuiSwitch-thumb': {
-        boxSizing: 'border-box',
-        width: 22,
-        height: 22,
-        boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.2)',
-    },
-    '& .MuiSwitch-track': {
-        borderRadius: 26 / 2,
-        backgroundColor: '#E9E9EA', // iOS light gray
-        opacity: 1,
-        transition: theme.transitions.create(['background-color'], {
-            duration: 300,
-        }),
-    },
-}));
 
 /**
  * IOSSwitch Component
@@ -95,17 +42,42 @@ export const IOSSwitch = ({
     disabled = false,
     name,
     inputProps,
+    className = '',
     ...otherProps
 }) => {
     return (
-        <StyledIOSSwitch
-            checked={checked}
-            onChange={onChange}
-            disabled={disabled}
-            name={name}
-            inputProps={inputProps}
-            {...otherProps}
-        />
+        <label className={`relative inline-flex items-center ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${className}`}>
+            <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={checked}
+                onChange={onChange}
+                disabled={disabled}
+                name={name}
+                {...inputProps}
+                {...otherProps}
+            />
+            <div
+                className={`
+                    w-[42px] h-[26px] 
+                    rounded-full
+                    transition-colors duration-300
+                    ${checked ? 'bg-[#10B981]' : 'bg-[#E9E9EA]'}
+                    ${disabled ? 'opacity-50' : ''}
+                `}
+            >
+                <div
+                    className={`
+                        absolute top-[2px] left-[2px]
+                        w-[22px] h-[22px]
+                        bg-white rounded-full
+                        shadow-[0_2px_4px_0_rgba(0,0,0,0.2)]
+                        transition-transform duration-300 ease-in-out
+                        ${checked ? 'translate-x-[16px]' : 'translate-x-0'}
+                    `}
+                />
+            </div>
+        </label>
     );
 };
 

@@ -21,7 +21,7 @@ export const LoadingSpinner = ({ size = 'medium', fullScreen = false }) => {
             <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
                 <div className="text-center">
                     <div className={spinnerClasses}></div>
-                    <p className="mt-4 text-gray-600">กำลังโหลด...</p>
+                    <p className="mt-4 text-gray-600 text-xl">กำลังโหลด...</p>
                 </div>
             </div>
         );

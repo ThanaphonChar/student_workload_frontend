@@ -6,6 +6,15 @@
 import * as apiClient from './apiClient';
 
 /**
+ * Get filter options (academic years and sectors)
+ * @returns {Promise<Object>} Filter options with academic_years and academic_sectors arrays
+ */
+export async function getFilterOptions() {
+    const response = await apiClient.get('/terms/filter-options');
+    return response.data;
+}
+
+/**
  * Get all terms with optional filters
  * @param {Object} filters - Optional filters (academic_year, academic_sector, status)
  * @returns {Promise<Array>} List of terms
@@ -97,8 +106,8 @@ export async function deleteTerm(termId) {
 export async function validateSubjectIds(subjectIds) {
     try {
         console.log('[termService] Validating subject IDs:', subjectIds);
-        const response = await apiClient.post('/subjects/validate-ids', { 
-            subject_ids: subjectIds 
+        const response = await apiClient.post('/subjects/validate-ids', {
+            subject_ids: subjectIds
         });
         console.log('[termService] Validation result:', response.data);
         return response.data;

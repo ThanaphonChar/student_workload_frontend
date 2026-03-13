@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { TextInput } from '../common/TextInput';
 import { Button } from '../common/Button';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { DropdownMenu } from '../common/DropdownMenu';
 import { IOSSwitch } from '../ui';
 import StudentYearSelector from './StudentYearSelector';
 import { FONT_SIZES } from '../../theme';
@@ -162,24 +163,41 @@ export const SubjectForm = ({
 
                     {/* Program Dropdown */}
                     <div>
-                        <label className="block font-medium text-gray-700 mb-2 text-2xl">
+                        <label className="block text-2xl font-bold text-gray-700 mb-2">
                             หลักสูตร <span className="text-red-500">*</span>
                         </label>
-                        <select
-                            name="program_id"
-                            value={formData.program_id}
-                            onChange={handleChange}
-                            style={{ fontSize: FONT_SIZES.medium }}
-                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4c50a3] ${errors.program_id ? 'border-red-500' : 'border-gray-300'
-                                }`}
-                        >
-                            <option value="">-- เลือกหลักสูตร --</option>
-                            {programOptions.map(opt => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
+                        <DropdownMenu
+                            trigger={
+                                <button
+                                    type="button"
+                                    className={`w-full px-4 py-3 border rounded-lg bg-white hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between ${errors.program_id ? 'border-red-500' : 'border-gray-300'}`}
+                                    style={{ fontSize: FONT_SIZES.medium }}
+                                >
+                                    <span className="text-gray-900">
+                                        {formData.program_id
+                                            ? programOptions.find(opt => opt.value === Number(formData.program_id))?.label || '-- เลือกหลักสูตร --'
+                                            : '-- เลือกหลักสูตร --'
+                                        }
+                                    </span>
+                                    <span className="material-symbols-outlined text-gray-500">
+                                        expand_more
+                                    </span>
+                                </button>
+                            }
+                            items={programOptions.map(opt => ({
+                                id: opt.value,
+                                label: opt.label,
+                                onClick: () => {
+                                    setFormData(prev => ({ ...prev, program_id: opt.value }));
+                                    if (errors.program_id) {
+                                        setErrors(prev => ({ ...prev, program_id: '' }));
+                                    }
+                                }
+                            }))}
+                            position="left"
+                            className="w-full max-h-60 overflow-y-auto"
+                        />
+
                         {errors.program_id && (
                             <p className="mt-1 text-red-500" style={{ fontSize: FONT_SIZES.medium }}>{errors.program_id}</p>
                         )}
@@ -234,7 +252,7 @@ export const SubjectForm = ({
                             }}
                         />
                         {errors.student_year_ids && (
-                            <p className="mt-1 text-sm text-red-500">{errors.student_year_ids}</p>
+                            <p className="mt-1 text-2xl text-red-500">{errors.student_year_ids}</p>
                         )}
                     </div>
                 </div>
@@ -264,7 +282,7 @@ export const SubjectForm = ({
                     type="button"
                     onClick={onCancel}
                     disabled={isSubmitting}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400"
+                    className="flex-1 bg-[#F1F1F1] hover:bg-[#E1E1E1] text-[#3B3B3B] text-2xl"
                 >
                     <a className='text-gray-700 text-2xl'>ยกเลิก</a>
                 </Button>

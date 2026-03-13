@@ -38,6 +38,17 @@ export const getTermSubjectById = async (id) => {
 };
 
 /**
+ * อัปเดตข้อมูล term subject
+ * @param {number} id - Term Subject ID
+ * @param {Object} data - ข้อมูลที่ต้องการอัปเดต
+ * @returns {Promise} Updated term subject data
+ */
+export const updateTermSubject = async (id, data) => {
+    const response = await apiClient.put(`${BASE_URL}/${id}`, data);
+    return response;
+};
+
+/**
  * ลบรายวิชาออกจากภาคการศึกษา
  * @param {number} id - Term Subject ID
  * @returns {Promise} Response
@@ -54,7 +65,7 @@ export const removeSubjectFromTerm = async (id) => {
  * @returns {Promise} Array of results
  */
 export const addMultipleSubjects = async (termId, subjectIds) => {
-    const promises = subjectIds.map(subjectId => 
+    const promises = subjectIds.map(subjectId =>
         addSubjectToTerm({ term_id: termId, subject_id: subjectId })
     );
     return Promise.all(promises);

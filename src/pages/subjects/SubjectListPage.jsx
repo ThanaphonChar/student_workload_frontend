@@ -9,17 +9,20 @@
  * - No business logic (delegated to useSubjects hook)
  */
 
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Stack, Box, Typography, Alert, Button, CircularProgress } from '@mui/material';
+import { Container, Stack, Box, Typography, Button, CircularProgress } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { AppShell } from '../../components/layout/AppShell';
 import { SubjectToolbar } from '../../components/subjects/SubjectToolbar';
 import { SubjectTable } from '../../components/subjects/SubjectTable';
 import { useSubjects } from '../../hooks/useSubjects';
+import { Alert } from '../../components/common/Alert';
 import { FONT_SIZES } from '../../theme/muiTheme';
 
 export const SubjectListPage = () => {
     const navigate = useNavigate();
+    const [deleteError, setDeleteError] = React.useState(null);
 
     // ใช้ custom hook จัดการ business logic
     const {
@@ -54,7 +57,7 @@ export const SubjectListPage = () => {
         const result = await deleteSubject(id);
 
         if (!result.success) {
-            alert(result.error);
+            setDeleteError(result.error);
         }
     };
 
@@ -79,20 +82,19 @@ export const SubjectListPage = () => {
                     {/* Error State */}
                     {error && (
                         <Alert
-                            severity="error"
-                            action={
-                                <Button
-                                    color="inherit"
-                                    size="small"
-                                    startIcon={<RefreshIcon />}
-                                    onClick={refetch}
-                                >
-                                    ลองอีกครั้ง
-                                </Button>
-                            }
-                        >
-                            {error}
-                        </Alert>
+                            type="error"
+                            message={error}
+                            onClose={() => refetch()}
+                        />
+                    )}
+
+                    {/* Delete Error */}
+                    {deleteError && (
+                        <Alert
+                            type="error"
+                            message={deleteError}
+                            onClose={() => setDeleteError(null)}
+                        />
                     )}
 
                     {/* Table */}
@@ -102,15 +104,6 @@ export const SubjectListPage = () => {
                             onEdit={handleEdit}
                             onDelete={handleDelete}
                         />
-                    )}
-
-                    {/* Summary */}
-                    {!loading && !error && subjects.length > 0 && (
-                        <Box sx={{ textAlign: 'center' }}>
-                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: FONT_SIZES.medium }}>
-                                แสดง {subjects.length} {searchQuery && `จาก ${totalCount}`} รายวิชา
-                            </Typography>
-                        </Box>
                     )}
                 </Stack>
             </Container>

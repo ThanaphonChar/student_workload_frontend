@@ -23,11 +23,11 @@ export const TableBody = ({ children, className = '' }) => (
   </tbody>
 );
 
-export const TableRow = ({ 
-  children, 
+export const TableRow = ({
+  children,
   onClick,
   hoverable = true,
-  className = '' 
+  className = ''
 }) => (
   <tr
     onClick={onClick}
@@ -42,10 +42,10 @@ export const TableRow = ({
   </tr>
 );
 
-export const TableHeader = ({ 
-  children, 
+export const TableHeader = ({
+  children,
   align = 'left',
-  className = '' 
+  className = ''
 }) => {
   const alignClasses = {
     left: 'text-left',
@@ -57,7 +57,7 @@ export const TableHeader = ({
     <th
       className={`
         px-6 py-3
-        text-xs font-medium text-gray-500 uppercase tracking-wider
+        text-2xl font-bold text-gray-500 uppercase tracking-wider
         ${alignClasses[align]}
         ${className}
       `}
@@ -67,10 +67,10 @@ export const TableHeader = ({
   );
 };
 
-export const TableCell = ({ 
-  children, 
+export const TableCell = ({
+  children,
   align = 'left',
-  className = '' 
+  className = ''
 }) => {
   const alignClasses = {
     left: 'text-left',
@@ -82,7 +82,7 @@ export const TableCell = ({
     <td
       className={`
         px-6 py-4
-        text-sm text-gray-900
+        text-2xl text-gray-900
         ${alignClasses[align]}
         ${className}
       `}

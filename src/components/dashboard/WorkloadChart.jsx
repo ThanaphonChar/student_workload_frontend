@@ -18,6 +18,7 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Checkbox } from '../common/Checkbox';
 import { CHART_CONFIG, STUDENT_YEARS } from '@/constants/dashboard';
 
 const WorkloadChart = ({ semester = '1', termYear = '2568', chartData = [], onFilterChange }) => {
@@ -37,31 +38,28 @@ const WorkloadChart = ({ semester = '1', termYear = '2568', chartData = [], onFi
     const hasData = chartData && chartData.length > 0;
 
     return (
-        <Card className="col-span-2">
+        <Card className="col-span-3 bg-white rounded-xl shadow p-1">
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <div>
                         <CardTitle>ภาระงานภาคการศึกษา {semester}/{termYear}</CardTitle>
                         <CardDescription>
-                            แสดงภาระงานเฉลี่ยต่อสัปดาห์ (16 สัปดาห์)
+                            แสดงภาระงานเฉลี่ยต่อสัปดาห์ (15 สัปดาห์)
                         </CardDescription>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <span className="text-sm text-gray-600 font-medium">ชั้นปี</span>
+                        <span className="text-2xl text-gray-600">ชั้นปี</span>
                         {STUDENT_YEARS.map((year) => (
-                            <label
+                            <Checkbox
                                 key={year}
-                                className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={selectedYears.includes(year)}
-                                    onChange={() => handleYearToggle(year)}
-                                    className="w-4 h-4 text-[#050C9C] border-gray-300 rounded focus:ring-[#050C9C]"
-                                />
-                                <span className="text-sm font-medium text-gray-700">{year}</span>
-                            </label>
+                                checked={selectedYears.includes(year)}
+                                onChange={() => handleYearToggle(year)}
+                                label={year.toString()}
+                                size="sm"
+                                className="hover:opacity-80 transition-opacity"
+                                labelClassName="font-medium"
+                            />
                         ))}
                     </div>
                 </div>
@@ -122,7 +120,7 @@ const EmptyChartState = () => (
                     d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                 />
             </svg>
-            <p className="mt-2 text-sm">ไม่พบข้อมูลภาระงาน</p>
+            <p className="mt-2 text-2xl">ไม่พบข้อมูลภาระงาน</p>
         </div>
     </div>
 );
