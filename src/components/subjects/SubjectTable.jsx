@@ -1,81 +1,18 @@
 /**
  * SubjectTable Component
- * แสดงรายการวิชาในรูปแบบ MUI Table
+ * แสดงรายการวิชาแบบ paginated
  * 
  * Features:
- * - Sortable columns
+ * - Pagination และเลือกจำนวนแสดง
  * - Click row to edit
  * - Delete with confirmation
  * - Empty state
  */
 
-import { useState } from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TableSortLabel,
-    Paper,
-    IconButton,
-    Box,
-    Typography,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import InboxIcon from '@mui/icons-material/Inbox';
-import { FONT_SIZES } from '../../theme';
-
-// Shared styles
-const HEADER_CELL_STYLE = {
-    color: 'white',
-    fontSize: FONT_SIZES.large,
-    fontWeight: 700,
-};
-
-const SORT_LABEL_STYLE = {
-    color: 'white !important',
-    '&:hover': { color: 'white !important' },
-    '& .MuiTableSortLabel-icon': {
-        color: 'white !important',
-        opacity: 0.7,
-    },
-};
-
-// Column configuration
-const COLUMNS = [
-    { id: 'code_eng', label: 'รหัสวิชา', sortable: true, align: 'left' },
-    { id: 'name_th', label: 'ชื่อวิชา', sortable: false, align: 'left' },
-    { id: 'program_year', label: 'หลักสูตร', sortable: true, align: 'center' },
-    { id: 'credit', label: 'หน่วยกิต', sortable: true, align: 'center' },
-    { id: 'actions', label: 'จัดการ', sortable: false, align: 'center', width: 100 },
-];
+import { PaginatedTable } from '../common/PaginatedTable';
+import { TableRow } from '../common/TableRow';
 
 export const SubjectTable = ({ subjects, onEdit, onDelete }) => {
-    const [orderBy, setOrderBy] = useState('code_eng');
-    const [order, setOrder] = useState('asc');
-
-    const handleSort = (property) => {
-        const isAsc = orderBy === property && order === 'asc';
-        setOrder(isAsc ? 'desc' : 'asc');
-        setOrderBy(property);
-    };
-
-    const sortedSubjects = [...subjects].sort((a, b) => {
-        let aVal = a[orderBy] ?? '';
-        let bVal = b[orderBy] ?? '';
-
-        aVal = String(aVal).toLowerCase();
-        bVal = String(bVal).toLowerCase();
-
-        if (order === 'asc') {
-            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-        } else {
-            return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
-        }
-    });
-
     const handleDelete = (e, subject) => {
         e.stopPropagation();
         if (window.confirm(`คุณต้องการลบรายวิชา "${subject.name_th}" ใช่หรือไม่?`)) {
@@ -85,122 +22,96 @@ export const SubjectTable = ({ subjects, onEdit, onDelete }) => {
 
     if (subjects.length === 0) {
         return (
-            <Paper
-                elevation={0}
-                sx={{
-                    borderRadius: 2,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    p: 8,
-                    textAlign: 'center',
-                }}
-            >
-                <InboxIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
-                <Typography sx={{ fontSize: FONT_SIZES.medium, color: 'text.secondary' }}>
-                    ไม่พบข้อมูลรายวิชา
-                </Typography>
-            </Paper>
+            <div className="bg-white rounded-lg shadow p-8 text-center">
+                <svg
+                    className="mx-auto h-12 w-12 text-gray-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                    />
+                </svg>
+                <p className="mt-2 text-xl text-gray-500">ไม่พบข้อมูลรายวิชา</p>
+            </div>
         );
     }
 
+    const columns = [
+        {
+            label: 'รหัสวิชา',
+            width: '12%',
+            align: 'left',
+            renderCell: (subject) => (
+                <div className="text-xl font-bold text-gray-900">
+                    {subject.code_eng || subject.code_th}
+                </div>
+            )
+        },
+        {
+            label: 'ชื่อวิชา',
+            width: '46%',
+            align: 'left',
+            renderCell: (subject) => (
+                <div>
+                    <div className="text-xl text-gray-900">{subject.name_th}</div>
+                    {subject.name_eng && (
+                        <div className="text-xl text-gray-500 uppercase">{subject.name_eng}</div>
+                    )}
+                </div>
+            )
+        },
+        {
+            label: 'หลักสูตร',
+            width: '14%',
+            align: 'center',
+            renderCell: (subject) => (
+                <div className="text-xl text-gray-900">{subject.program_year || '-'}</div>
+            )
+        },
+        {
+            label: 'หน่วยกิต',
+            width: '14%',
+            align: 'center',
+            renderCell: (subject) => (
+                <div className="text-xl text-gray-900">{subject.credit}</div>
+            )
+        },
+        {
+            label: 'จัดการ',
+            width: '14%',
+            align: 'center',
+            renderCell: (subject) => (
+                <button
+                    onClick={(e) => handleDelete(e, subject)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                    title="ลบรายวิชา"
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            )
+        }
+    ];
+
     return (
-        <TableContainer
-            component={Paper}
-            elevation={0}
-            sx={{
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-            }}
-        >
-            <Table sx={{ minWidth: 650 }}>
-                <TableHead>
-                    <TableRow sx={{ bgcolor: '#050C9C' }}>
-                        {COLUMNS.map((column) => (
-                            <TableCell
-                                key={column.id}
-                                align={column.align}
-                                sx={{ ...HEADER_CELL_STYLE, width: column.width }}
-                            >
-                                {column.sortable ? (
-                                    <TableSortLabel
-                                        active={orderBy === column.id}
-                                        direction={orderBy === column.id ? order : 'asc'}
-                                        onClick={() => handleSort(column.id)}
-                                        sx={SORT_LABEL_STYLE}
-                                    >
-                                        {column.label}
-                                    </TableSortLabel>
-                                ) : (
-                                    column.label
-                                )}
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-
-                <TableBody>
-                    {sortedSubjects.map((subject) => (
-                        <TableRow
-                            key={subject.id}
-                            hover
-                            onClick={() => onEdit(subject.id)}
-                            sx={{
-                                cursor: 'pointer',
-                                '&:last-child td': { border: 0 },
-                            }}
-                        >
-                            <TableCell>
-                                <Typography sx={{ fontSize: FONT_SIZES.large, fontWeight: 700 }}>
-                                    {subject.code_eng || subject.code_th}
-                                </Typography>
-                            </TableCell>
-
-                            <TableCell>
-                                <Box>
-                                    <Typography sx={{ fontSize: FONT_SIZES.medium }}>
-                                        {subject.name_th}
-                                    </Typography>
-                                    {subject.name_eng && (
-                                        <Typography sx={{ fontSize: FONT_SIZES.small, color: 'text.secondary', textTransform: 'uppercase' }}>
-                                            {subject.name_eng}
-                                        </Typography>
-                                    )}
-                                </Box>
-                            </TableCell>
-
-                            <TableCell align="center">
-                                <Typography sx={{ fontSize: FONT_SIZES.medium }}>
-                                    {subject.program_year || '-'}
-                                </Typography>
-                            </TableCell>
-
-                            <TableCell align="center">
-                                <Typography sx={{ fontSize: FONT_SIZES.medium }}>
-                                    {subject.credit}
-                                </Typography>
-                            </TableCell>
-
-                            <TableCell align="center">
-                                <IconButton
-                                    size="small"
-                                    onClick={(e) => handleDelete(e, subject)}
-                                    sx={{
-                                        color: 'error.main',
-                                        '&:hover': {
-                                            bgcolor: 'error.lighter',
-                                        },
-                                    }}
-                                    title="ลบรายวิชา"
-                                >
-                                    <DeleteIcon fontSize="small" />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <PaginatedTable
+            data={subjects}
+            columns={columns}
+            renderRow={(subject) => (
+                <TableRow
+                    data={subject}
+                    columns={columns}
+                    className="hover:bg-gray-50 cursor-pointer"
+                    onClick={() => onEdit(subject.id)}
+                />
+            )}
+        />
     );
 };
 

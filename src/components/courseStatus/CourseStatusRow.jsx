@@ -3,14 +3,13 @@
  * แสดงข้อมูลรายวิชาแต่ละตัวในรูปแบบ row
  */
 
-import { ApprovalBadge, StatusIcon, FileCountBadge } from './StatusBadge';
-import { Button } from '../common/Button';
+import { ApprovalBadge, FileCountBadge } from './StatusBadge';
 import { ProfessorDropdown } from './ProfessorDropdown';
 import { StudentYearDropdown } from './StudentYearDropdown';
+import { Button } from '../common/Button';
 
 export function CourseStatusRow({ subject, onRefresh, onViewDetail, userRole }) {
 
-    // Early return ถ้าไม่มีข้อมูล
     if (!subject) return null;
 
     const {
@@ -34,131 +33,137 @@ export function CourseStatusRow({ subject, onRefresh, onViewDetail, userRole }) 
         report_file_count,
     } = subject;
 
-    // Debug: ดูข้อมูล student_year_ids
-    console.log(`[${code_th}] student_year_ids:`, student_year_ids, 'type:', typeof student_year_ids);
-
-    // แสดงรหัสวิชา
     const subjectCode = code_eng || code_th;
     const subjectName = name_th || name_eng;
 
-    // แสดงชื่ออาจารย์
-    const professorNames = professors.length > 0
-        ? professors.map(p => `${p.first_name_th} ${p.last_name_th}`).join(', ')
-        : 'ยังไม่มีอาจารย์';
+    // Professor info
+    const professor = professors.length > 0 ? professors[0] : null;
+    const professorName = professor ? `${professor.first_name_th} ${professor.last_name_th}` : 'ยังไม่มีอาจารย์';
+    const professorEmail = professor?.email || '';
 
-    // เช็คว่า user มีสิทธิ์ assign professor หรือไม่ (เฉพาะ Academic Officer)
     const canAssignProfessor = userRole === 'Academic Officer';
     const canEditStudentYear = userRole === 'Academic Officer';
 
     return (
-        <tr className="hover:bg-gray-50 transition-colors">
+        <div className="grid px-6 py-4" style={{ gridTemplateColumns: '25% 10% 10% 25% 10% 10% 10%' }}>
             {/* รหัสวิชา + ชื่อวิชา */}
-            <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex flex-col">
-                    <div className="text-sm font-medium text-gray-900">{subjectCode}</div>
-                    <div className="text-sm text-gray-500">{subjectName}</div>
-                </div>
-            </td>
+            <div>
+                <div className="text-xl font-semibold text-gray-900">{subjectCode}</div>
+                <div className="text-xl text-gray-500 uppercase mt-0.5">{subjectName}</div>
+            </div>
+
+            {/* หลักสูตร */}
+            <div className="text-center flex items-center justify-center">
+                <div className="text-xl text-gray-90">{program_year}</div>
+            </div>
 
             {/* ชั้นปีที่เรียน */}
-            <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-900 flex-1">
+            <div className="text-center flex items-center justify-center">
+                {canEditStudentYear ? (
+                    student_year_ids.length > 0 ? (
+                        <div className="flex-1 cursor-pointer rounded-lg p-2 transition-colors group">
+                            <StudentYearDropdown
+                                subjectId={subject_id}
+                                currentYears={student_year_ids}
+                                onSuccess={onRefresh}
+                                trigger={<div className="text-xl text-gray-900 group-hover:text-[#050C9C]">{student_year_ids.sort((a, b) => a - b).join(', ')}</div>}
+                            />
+                        </div>
+                    ) : (
+                        <StudentYearDropdown
+                            subjectId={subject_id}
+                            currentYears={student_year_ids}
+                            onSuccess={onRefresh}
+                            trigger={
+                                <button className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-[#050C9C] hover:text-white text-gray-600 transition-colors">
+                                    <span className="material-symbols-outlined text-2xl">add</span>
+                                </button>
+                            }
+                        />
+                    )
+                ) : (
+                    <div className="text-2xl text-gray-900">
                         {student_year_ids.length > 0 ? (
                             student_year_ids.sort((a, b) => a - b).join(', ')
                         ) : (
                             <span className="text-gray-400 italic">ยังไม่ระบุ</span>
                         )}
                     </div>
-                    {canEditStudentYear && (
-                        <StudentYearDropdown
-                            subjectId={subject_id}
-                            currentYears={student_year_ids}
-                            onSuccess={onRefresh}
-                        />
-                    )}
-                </div>
-            </td>
-
-            {/* หน่วยกิต */}
-            <td className="px-6 py-4 whitespace-nowrap text-center">
-                <div className="text-sm text-gray-900">{credit}</div>
-            </td>
+                )}
+            </div>
 
             {/* อาจารย์ผู้สอน */}
-            <td className="px-6 py-4">
-                <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-900 flex-1">
-                        {professors.length === 0 ? (
-                            <span className="text-gray-400 italic">ยังไม่มีอาจารย์</span>
-                        ) : (
-                            professorNames
-                        )}
-                    </div>
-                    {canAssignProfessor && (
+            <div className="text-center flex items-center justify-center">
+                {canAssignProfessor ? (
+                    professor ? (
+                        <div className="flex-1 cursor-pointer rounded-lg p-2 transition-colors group">
+                            <ProfessorDropdown
+                                termSubjectId={id}
+                                onSuccess={onRefresh}
+                                trigger={
+                                    <div className="text-center">
+                                        <div className="text-2xl font-bold text-gray-900 group-hover:text-[#050C9C]">
+                                            {professorName}
+                                        </div>
+                                        <div className="text-xl text-gray-500">{professorEmail}</div>
+                                    </div>
+                                }
+                            />
+                        </div>
+                    ) : (
                         <ProfessorDropdown
                             termSubjectId={id}
                             onSuccess={onRefresh}
+                            trigger={
+                                <button className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-[#050C9C] hover:text-white text-gray-600 transition-colors">
+                                    <span className="material-symbols-outlined text-2xl">add</span>
+                                </button>
+                            }
                         />
-                    )}
-                </div>
-            </td>
+                    )
+                ) : (
+                    <div>
+                        {professor ? (
+                            <>
+                                <div className="text-xl font-medium text-gray-900">{professorName}</div>
+                                <div className="text-xl text-gray-500">{professorEmail}</div>
+                            </>
+                        ) : (
+                            <span className="text-xl text-gray-400">ยังไม่มีอาจารย์</span>
+                        )}
+                    </div>
+                )}
+            </div>
 
             {/* สถานะ Outline */}
-            <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center">
-                    {/* <StatusIcon submitted={outline_status} /> */}
-                    <div className="ml-2">
-                        {outline_status ? (
-                            <ApprovalBadge status={outline_approved} />
-                        ) : (
-                            <span className="text-sm text-gray-400">ยังไม่ส่ง</span>
-                        )}
-                        <FileCountBadge count={outline_file_count} type="outline" />
-                    </div>
-                </div>
-            </td>
+            <div className="flex items-center justify-center">
+                {outline_status ? (
+                    <ApprovalBadge status={outline_approved} />
+                ) : (
+                    <span className="text-xl text-gray-400">ยังไม่ส่ง</span>
+                )}
+            </div>
 
-            {/* สถานะ Workload */}
-            <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center">
-                    {/* <StatusIcon submitted={workload_status} /> */}
-                    <div className="ml-2">
-                        {workload_status ? (
-                            <span className="text-sm text-green-600 font-medium">ส่งแล้ว</span>
-                        ) : (
-                            <span className="text-sm text-gray-400">ยังไม่ส่ง</span>
-                        )}
-                        <FileCountBadge count={workload_file_count} type="workload" />
-                    </div>
-                </div>
-            </td>
+            {/* ภาระงาน - Action Button */}
+            <div className="flex items-center justify-center">
+                <Button
+                    onClick={() => onViewDetail(subject)}
+                    variant="primary"
+                    size="sm"
+                    className="text-xl"
+                >
+                    กรอกภาระงาน
+                </Button>
+            </div>
 
             {/* สถานะ Report */}
-            <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center">
-                    {/* <StatusIcon submitted={report_status} /> */}
-                    <div className="ml-2">
-                        {report_status ? (
-                            <ApprovalBadge status={report_approved} />
-                        ) : (
-                            <span className="text-sm text-gray-400">ยังไม่ส่ง</span>
-                        )}
-                        <FileCountBadge count={report_file_count} type="report" />
-                    </div>
-                </div>
-            </td>
-
-            {/* Actions */}
-            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onViewDetail(subject)}
-                >
-                    รายละเอียด
-                </Button>
-            </td>
-        </tr>
+            <div className="flex items-center justify-center">
+                {report_status ? (
+                    <ApprovalBadge status={report_approved} />
+                ) : (
+                    <span className="text-xl text-gray-400">ยังไม่ส่ง</span>
+                )}
+            </div>
+        </div>
     );
 }

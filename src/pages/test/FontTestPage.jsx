@@ -25,21 +25,21 @@ export const FontTestPage = () => {
 
                     <div className="space-y-4">
                         <div>
-                            <p className="text-sm text-gray-500 mb-1">Light (300)</p>
+                            <p className="text-xl text-gray-500 mb-1">Light (300)</p>
                             <p className="text-xl font-light">
                                 มหาวิทยาลัยธรรมศาสตร์ - Thammasat University
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-gray-500 mb-1">Regular (400) - Default</p>
+                            <p className="text-xl text-gray-500 mb-1">Regular (400) - Default</p>
                             <p className="text-xl font-normal">
                                 มหาวิทยาลัยธรรมศาสตร์ - Thammasat University
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-gray-500 mb-1">Bold (700)</p>
+                            <p className="text-xl text-gray-500 mb-1">Bold (700)</p>
                             <p className="text-xl font-bold">
                                 มหาวิทยาลัยธรรมศาสตร์ - Thammasat University
                             </p>
@@ -55,21 +55,21 @@ export const FontTestPage = () => {
 
                     <div className="space-y-4">
                         <div>
-                            <p className="text-sm text-gray-500 mb-1">Normal</p>
+                            <p className="text-xl text-gray-500 mb-1">Normal</p>
                             <p className="text-xl">
                                 ระบบจัดการภาระงานนักศึกษา Student Workload Management System
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-gray-500 mb-1">Italic</p>
+                            <p className="text-xl text-gray-500 mb-1">Italic</p>
                             <p className="text-xl italic">
                                 ระบบจัดการภาระงานนักศึกษา Student Workload Management System
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-gray-500 mb-1">Bold Italic</p>
+                            <p className="text-xl text-gray-500 mb-1">Bold Italic</p>
                             <p className="text-xl font-bold italic">
                                 ระบบจัดการภาระงานนักศึกษา Student Workload Management System
                             </p>
@@ -84,10 +84,10 @@ export const FontTestPage = () => {
                     </h2>
 
                     <div className="space-y-3">
-                        <p className="text-xs">ขนาด XS - นักศึกษาและการจัดการภาระงาน</p>
-                        <p className="text-sm">ขนาด SM - นักศึกษาและการจัดการภาระงาน</p>
-                        <p className="text-base">ขนาด Base - นักศึกษาและการจัดการภาระงาน</p>
-                        <p className="text-lg">ขนาด LG - นักศึกษาและการจัดการภาระงาน</p>
+                        <p className="text-xl">ขนาด XS - นักศึกษาและการจัดการภาระงาน</p>
+                        <p className="text-xl">ขนาด SM - นักศึกษาและการจัดการภาระงาน</p>
+                        <p className="text-xl">ขนาด Base - นักศึกษาและการจัดการภาระงาน</p>
+                        <p className="text-xl">ขนาด LG - นักศึกษาและการจัดการภาระงาน</p>
                         <p className="text-xl">ขนาด XL - นักศึกษาและการจัดการภาระงาน</p>
                         <p className="text-2xl">ขนาด 2XL - นักศึกษาและการจัดการภาระงาน</p>
                         <p className="text-3xl">ขนาด 3XL - นักศึกษาและการจัดการภาระงาน</p>
@@ -118,10 +118,10 @@ export const FontTestPage = () => {
 
                 {/* Technical Info */}
                 <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
-                    <h3 className="text-lg font-bold text-blue-900 mb-2">
+                    <h3 className="text-xl font-bold text-blue-900 mb-2">
                         ข้อมูลทางเทคนิค
                     </h3>
-                    <ul className="text-sm text-blue-800 space-y-1">
+                    <ul className="text-xl text-blue-800 space-y-1">
                         <li>✅ Font Family: KhwanThongCard</li>
                         <li>✅ Weights: Light (300), Regular (400), Bold (700)</li>
                         <li>✅ Styles: Normal, Italic</li>

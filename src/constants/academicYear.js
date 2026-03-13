@@ -36,15 +36,6 @@ export const SEMESTERS = [
   { value: 3, label: '3 (ฤดูร้อน)' },
 ];
 
-// ตัวเลือกปีการศึกษา (สร้างจากปีปัจจุบัน)
-const currentYear = new Date().getFullYear();
-const buddhistYear = currentYear + 543;
-
-export const ACADEMIC_YEARS = Array.from({ length: 5 }, (_, i) => ({
-  value: buddhistYear - i,
-  label: `${buddhistYear - i}`,
-}));
-
 // ตัวเลือกสำหรับ dropdown filter
 export const FILTER_ALL_OPTION = {
   YEAR: { value: null, label: 'ทั้งหมด' },
@@ -68,8 +59,8 @@ export const APPROVAL_STATUS_LABEL = {
 // สีของ badge การอนุมัติ
 export const APPROVAL_STATUS_COLOR = {
   [APPROVAL_STATUS.PENDING]: {
-    bg: 'bg-yellow-50',
-    text: 'text-yellow-700',
+    bg: 'bg-[#FFA230]',
+    text: 'text-[#FF8D28',
     border: 'border-yellow-200',
   },
   [APPROVAL_STATUS.APPROVED]: {

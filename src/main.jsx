@@ -17,6 +17,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import './index.css';
 import App from './App.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
+import { ToastProvider } from './components/common/Toast.jsx';
 import { theme } from './theme';
 
 createRoot(document.getElementById('root')).render(
@@ -25,7 +26,9 @@ createRoot(document.getElementById('root')).render(
       {/* CssBaseline: Reset CSS และใช้ baseline styles ของ MUI */}
       <CssBaseline />
       <AuthProvider>
-        <App />
+        <ToastProvider>
+          <App />
+        </ToastProvider>
       </AuthProvider>
     </ThemeProvider>
   </StrictMode>,

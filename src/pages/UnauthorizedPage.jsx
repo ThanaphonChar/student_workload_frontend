@@ -40,14 +40,14 @@ export const UnauthorizedPage = () => {
 
                 {/* Content */}
                 <div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    <h2 className="text-5xl font-bold text-gray-900 mb-2">
                         ไม่มีสิทธิ์เข้าถึง
                     </h2>
                     <p className="text-gray-600 mb-4">
                         คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้
                     </p>
                     {roles && roles.length > 0 && (
-                        <p className="text-sm text-gray-500">
+                        <p className="text-2xl text-gray-500">
                             บทบาทปัจจุบัน: <span className="font-semibold">{roles.join(', ')}</span>
                         </p>
                     )}
@@ -70,9 +70,9 @@ export const UnauthorizedPage = () => {
                 </div>
 
                 {/* Help Text */}
-                <p className="text-xs text-gray-500 mt-4">
+                {/* <p className="text-2xl text-gray-500 mt-4">
                     หากคุณคิดว่านี่เป็นข้อผิดพลาด กรุณาติดต่อผู้ดูแลระบบ
-                </p>
+                </p> */}
             </div>
         </div>
     );

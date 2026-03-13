@@ -27,7 +27,7 @@ export const Navbar = () => {
     };
 
     return (
-        <nav className="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+        <nav className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     {/* Left side - Logo & Menu */}
@@ -43,14 +43,14 @@ export const Navbar = () => {
                                 <button
                                     key={item.id}
                                     onClick={() => navigate(item.path)}
-                                    className={`px-3 py-2 text-xl font-medium transition-colors relative ${isActive(item.path)
+                                    className={`px-3 py-5 text-xl font-medium transition-colors relative ${isActive(item.path)
                                         ? 'text-[#050C9C]'
                                         : 'text-gray-600 hover:text-[#050C9C]'
                                         }`}
                                 >
                                     {item.label}
                                     {isActive(item.path) && (
-                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#050C9C]" />
+                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-[#050C9C]" />
                                     )}
                                 </button>
                             ))}

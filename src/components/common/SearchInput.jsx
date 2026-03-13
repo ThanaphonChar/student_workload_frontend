@@ -3,12 +3,12 @@
  * Input สำหรับค้นหาข้อมูล
  */
 
-export const SearchInput = ({ 
-  value, 
-  onChange, 
+export const SearchInput = ({
+  value,
+  onChange,
   placeholder = 'ค้นหา...',
   className = '',
-  ...props 
+  ...props
 }) => {
   return (
     <div className={`relative ${className}`}>
@@ -28,7 +28,7 @@ export const SearchInput = ({
           />
         </svg>
       </div>
-      
+
       {/* Input field */}
       <input
         type="text"
@@ -40,9 +40,9 @@ export const SearchInput = ({
           pl-10 pr-4 py-2
           bg-white
           border border-gray-300 rounded-lg
-          text-sm text-gray-900
-          placeholder-gray-400
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+          text-2xl text-gray-900
+          placeholder:text-2xl placeholder:text-gray-400
+          focus:outline-none
           transition-colors duration-200
         "
         {...props}

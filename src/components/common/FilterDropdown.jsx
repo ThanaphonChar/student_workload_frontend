@@ -3,13 +3,13 @@
  * Dropdown สำหรับ filter ข้อมูล
  */
 
-export const FilterDropdown = ({ 
-  value, 
-  onChange, 
+export const FilterDropdown = ({
+  value,
+  onChange,
   options = [],
   placeholder = 'เลือก',
   className = '',
-  ...props 
+  ...props
 }) => {
   return (
     <select
@@ -20,8 +20,8 @@ export const FilterDropdown = ({
         px-4 py-2
         bg-white
         border border-gray-300 rounded-lg
-        text-sm text-gray-900
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+        text-2xl text-gray-900
+        focus:outline-none
         transition-colors duration-200
         cursor-pointer
         ${!value ? 'text-gray-400' : ''}
@@ -33,8 +33,8 @@ export const FilterDropdown = ({
         {placeholder}
       </option>
       {options.map((option) => (
-        <option 
-          key={option.value} 
+        <option
+          key={option.value}
           value={option.value}
           className="text-gray-900"
         >

@@ -5,12 +5,14 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button, DateInputField } from './common';
+import { formatDateToString, parseDate } from '../utils/dateUtils';
 
 const WorkloadForm = ({ termSubjectId, termSubjectData, onSuccess, onCancel, editData = null }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
-    
+
     // Form state
     const [formData, setFormData] = useState({
         work_title: '',
@@ -45,6 +47,21 @@ const WorkloadForm = ({ termSubjectId, termSubjectData, onSuccess, onCancel, edi
             setErrors(prev => {
                 const newErrors = { ...prev };
                 delete newErrors[name];
+                return newErrors;
+            });
+        }
+    };
+
+    const handleDateChange = (field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value ? formatDateToString(value) : ''
+        }));
+
+        if (errors[field]) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[field];
                 return newErrors;
             });
         }
@@ -107,7 +124,7 @@ const WorkloadForm = ({ termSubjectId, termSubjectData, onSuccess, onCancel, edi
             }
         } catch (error) {
             console.error('Error submitting workload:', error);
-            
+
             // แสดง validation errors จาก backend
             if (error.details && Array.isArray(error.details)) {
                 const backendErrors = {};
@@ -134,145 +151,133 @@ const WorkloadForm = ({ termSubjectId, termSubjectData, onSuccess, onCancel, edi
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
-                {/* ข้อมูลพื้นฐานของงาน */}
-                <div className="mb-6">
-                    <h3 className="text-lg font-medium text-gray-800 mb-4">
-                        ข้อมูลพื้นฐานของงาน
-                    </h3>
+            {/* ข้อมูลพื้นฐานของงาน */}
+            <div className="mb-6">
+                <h3 className="text-xl font-medium text-gray-800 mb-4">
+                    ข้อมูลพื้นฐานของงาน
+                </h3>
 
-                    {/* ชื่องาน */}
-                    <div className="mb-4">
-                        <label htmlFor="work_title" className="block text-sm font-medium text-gray-700 mb-1">
-                            ชื่องาน <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="work_title"
-                            name="work_title"
-                            value={formData.work_title}
-                            onChange={handleChange}
-                            className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-[#050C9C] focus:border-transparent ${
-                                errors.work_title ? 'border-red-500' : 'border-gray-300'
+                {/* ชื่องาน */}
+                <div className="mb-4">
+                    <label htmlFor="work_title" className="block text-xl font-medium text-gray-700 mb-1">
+                        ชื่องาน <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="work_title"
+                        name="work_title"
+                        value={formData.work_title}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-2 border rounded-md focus:outline-none ${errors.work_title ? 'border-red-500' : 'border-gray-300'
                             }`}
-                            placeholder="ระบุชื่องาน"
-                            disabled={loading}
+                        placeholder="ระบุชื่องาน"
+                        disabled={loading}
+                    />
+                    {errors.work_title && (
+                        <p className="mt-1 text-xl text-red-500">{errors.work_title}</p>
+                    )}
+                </div>
+
+                {/* รายละเอียดงาน */}
+                <div className="mb-4">
+                    <label htmlFor="description" className="block text-xl font-medium text-gray-700 mb-1">
+                        รายละเอียดงาน
+                    </label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                        rows="4"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none resize-none"
+                        placeholder="ระบุรายละเอียดเพิ่มเติม (ถ้ามี)"
+                        disabled={loading}
+                    />
+                </div>
+            </div>
+
+            {/* ระยะเวลาและชั่วโมง */}
+            <div className="mb-6">
+                <h3 className="text-xl font-medium text-gray-800 mb-4">
+                    ระยะเวลาและชั่วโมง
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* วันที่เริ่มงาน */}
+                    <div>
+                        <DateInputField
+                            label="วันที่เริ่มงาน"
+                            value={parseDate(formData.start_date)}
+                            onChange={(value) => handleDateChange('start_date', value)}
+                            required
+                            error={!!errors.start_date}
                         />
-                        {errors.work_title && (
-                            <p className="mt-1 text-sm text-red-500">{errors.work_title}</p>
+                        {errors.start_date && (
+                            <p className="mt-1 text-xl text-red-500">{errors.start_date}</p>
                         )}
                     </div>
 
-                    {/* รายละเอียดงาน */}
-                    <div className="mb-4">
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                            รายละเอียดงาน
-                        </label>
-                        <textarea
-                            id="description"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            rows="4"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#050C9C] focus:border-transparent resize-none"
-                            placeholder="ระบุรายละเอียดเพิ่มเติม (ถ้ามี)"
-                            disabled={loading}
+                    {/* วันที่สิ้นสุด (Deadline) */}
+                    <div>
+                        <DateInputField
+                            label="วันที่สิ้นสุด (Deadline)"
+                            value={parseDate(formData.end_date)}
+                            onChange={(value) => handleDateChange('end_date', value)}
+                            required
+                            error={!!errors.end_date}
                         />
-                    </div>
-                </div>
-
-                {/* ระยะเวลาและชั่วโมง */}
-                <div className="mb-6">
-                    <h3 className="text-lg font-medium text-gray-800 mb-4">
-                        ระยะเวลาและชั่วโมง
-                    </h3>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* วันที่เริ่มงาน */}
-                        <div>
-                            <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 mb-1">
-                                วันที่เริ่มงาน <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="date"
-                                id="start_date"
-                                name="start_date"
-                                value={formData.start_date}
-                                onChange={handleChange}
-                                className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.start_date ? 'border-red-500' : 'border-gray-300'
-                                }`}
-                                disabled={loading}
-                            />
-                            {errors.start_date && (
-                                <p className="mt-1 text-sm text-red-500">{errors.start_date}</p>
-                            )}
-                        </div>
-
-                        {/* วันที่สิ้นสุด (Deadline) */}
-                        <div>
-                            <label htmlFor="end_date" className="block text-sm font-medium text-gray-700 mb-1">
-                                วันที่สิ้นสุด (Deadline) <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="date"
-                                id="end_date"
-                                name="end_date"
-                                value={formData.end_date}
-                                onChange={handleChange}
-                                className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.end_date ? 'border-red-500' : 'border-gray-300'
-                                }`}
-                                disabled={loading}
-                            />
-                            {errors.end_date && (
-                                <p className="mt-1 text-sm text-red-500">{errors.end_date}</p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* จำนวนชั่วโมงต่อสัปดาห์ */}
-                    <div className="mt-4">
-                        <label htmlFor="hours_per_week" className="block text-sm font-medium text-gray-700 mb-1">
-                            จำนวนชั่วโมงต่อสัปดาห์ <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="number"
-                            id="hours_per_week"
-                            name="hours_per_week"
-                            value={formData.hours_per_week}
-                            onChange={handleChange}
-                            min="1"
-                            max="168"
-                            className={`w-full md:w-1/2 px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.hours_per_week ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                            placeholder="ระบุจำนวนชั่วโมง"
-                            disabled={loading}
-                        />
-                        {errors.hours_per_week && (
-                            <p className="mt-1 text-sm text-red-500">{errors.hours_per_week}</p>
+                        {errors.end_date && (
+                            <p className="mt-1 text-xl text-red-500">{errors.end_date}</p>
                         )}
                     </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex justify-end gap-3 pt-4">
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                {/* จำนวนชั่วโมงต่อสัปดาห์ */}
+                <div className="mt-4">
+                    <label htmlFor="hours_per_week" className="block text-xl font-medium text-gray-700 mb-1">
+                        จำนวนชั่วโมงต่อสัปดาห์ <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="number"
+                        id="hours_per_week"
+                        name="hours_per_week"
+                        value={formData.hours_per_week}
+                        onChange={handleChange}
+                        min="1"
+                        max="168"
+                        className={`w-full md:w-1/2 px-4 py-2 border rounded-md focus:outline-none ${errors.hours_per_week ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        placeholder="ระบุจำนวนชั่วโมง"
                         disabled={loading}
-                    >
-                        ยกเลิก
-                    </button>
-                    <button
-                        type="submit"
-                        className="px-6 py-2 bg-[#050C9C] text-white rounded-md hover:bg-[#040a7a] font-medium transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        disabled={loading}
-                    >
-                        {loading ? 'กำลังบันทึก...' : 'บันทึก'}
-                    </button>
+                    />
+                    {errors.hours_per_week && (
+                        <p className="mt-1 text-xl text-red-500">{errors.hours_per_week}</p>
+                    )}
                 </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-3 pt-4">
+                <Button
+                    type="button"
+                    onClick={handleCancel}
+                    variant="secondary"
+                    size="sm"
+                    className="text-xl"
+                    disabled={loading}
+                >
+                    ยกเลิก
+                </Button>
+                <Button
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    className="text-xl"
+                    disabled={loading}
+                >
+                    {loading ? 'กำลังบันทึก...' : 'บันทึก'}
+                </Button>
+            </div>
         </form>
     );
 };

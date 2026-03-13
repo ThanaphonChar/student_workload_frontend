@@ -32,10 +32,10 @@ export const WarningBox = ({ message, daysRemaining, className = '' }) => {
         
         {/* Content */}
         <div className="flex-1">
-          <h4 className="text-base font-semibold text-yellow-900 mb-1">
+          <h4 className="text-xl font-semibold text-yellow-900 mb-1">
             แจ้งเตือน
           </h4>
-          <p className="text-sm text-yellow-950">
+          <p className="text-xl text-yellow-950">
             {message}
             {daysRemaining !== undefined && (
               <span className="font-semibold">

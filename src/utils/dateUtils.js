@@ -6,11 +6,63 @@
 import { TERM_STATUS, WARNING_DAYS } from '../constants/academicYear';
 
 /**
- * แปลง string เป็น Date object
+ * แปลง Date object เป็นข้อความภาษาไทย พ.ศ.
+ * @param {Date} date - Date object
+ * @returns {string} - เช่น "8 สิงหาคม 2568"
+ */
+export function formatThaiDate(date) {
+  if (!date || !(date instanceof Date)) return '';
+
+  try {
+    const formatter = new Intl.DateTimeFormat('th-TH', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      calendar: 'buddhist',
+      timeZone: 'Asia/Bangkok'
+    });
+
+    return formatter.format(date);
+  } catch (error) {
+    console.error('Error formatting Thai date:', error);
+    return '';
+  }
+}
+
+/**
+ * แปลง string เป็น Date object (timezone-safe)
+ * @param {string} dateString - ISO date string หรือ YYYY-MM-DD
+ * @returns {Date|null} Date object หรือ null
  */
 export const parseDate = (dateString) => {
   if (!dateString) return null;
-  return new Date(dateString);
+  try {
+    // ถ้าเป็น YYYY-MM-DD ให้ใช้ local timezone
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      const [year, month, day] = dateString.split('-');
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    // ถ้าเป็น ISO string ให้แปลงตามปกติ
+    return new Date(dateString);
+  } catch (error) {
+    console.error('[dateUtils] Error parsing date:', error);
+    return null;
+  }
+};
+
+/**
+ * แปลง Date object เป็น YYYY-MM-DD string
+ * @param {Date} date - Date object
+ * @returns {string} YYYY-MM-DD format หรือ empty string
+ */
+export const formatDateToString = (date) => {
+  if (!date || !(date instanceof Date) || isNaN(date)) return '';
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 };
 
 /**
@@ -18,14 +70,14 @@ export const parseDate = (dateString) => {
  */
 export const formatDateThai = (date) => {
   if (!date) return '';
-  
+
   const d = typeof date === 'string' ? parseDate(date) : date;
   if (!d || isNaN(d.getTime())) return '';
-  
+
   const day = d.getDate().toString().padStart(2, '0');
   const month = (d.getMonth() + 1).toString().padStart(2, '0');
   const year = d.getFullYear() + 543; // แปลงเป็น พ.ศ.
-  
+
   return `${day}/${month}/${year}`;
 };
 
@@ -34,14 +86,14 @@ export const formatDateThai = (date) => {
  */
 export const formatDateForInput = (date) => {
   if (!date) return '';
-  
+
   const d = typeof date === 'string' ? parseDate(date) : date;
   if (!d || isNaN(d.getTime())) return '';
-  
+
   const year = d.getFullYear();
   const month = (d.getMonth() + 1).toString().padStart(2, '0');
   const day = d.getDate().toString().padStart(2, '0');
-  
+
   return `${year}-${month}-${day}`;
 };
 
@@ -52,14 +104,14 @@ export const formatDateForInput = (date) => {
  */
 export const calculateTermStatus = (endDate) => {
   if (!endDate) return TERM_STATUS.ENDED;
-  
+
   const end = typeof endDate === 'string' ? parseDate(endDate) : endDate;
   const today = new Date();
-  
+
   // เปรียบเทียบเฉพาะวันที่ (ไม่สนใจเวลา)
   today.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
-  
+
   return today <= end ? TERM_STATUS.ONGOING : TERM_STATUS.ENDED;
 };
 
@@ -70,17 +122,17 @@ export const calculateTermStatus = (endDate) => {
  */
 export const getDaysUntilDeadline = (deadlineDate) => {
   if (!deadlineDate) return 0;
-  
+
   const deadline = typeof deadlineDate === 'string' ? parseDate(deadlineDate) : deadlineDate;
   const today = new Date();
-  
+
   // เปรียบเทียบเฉพาะวันที่
   today.setHours(0, 0, 0, 0);
   deadline.setHours(0, 0, 0, 0);
-  
+
   const diffTime = deadline - today;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   return diffDays;
 };
 
@@ -92,14 +144,14 @@ export const getDaysUntilDeadline = (deadlineDate) => {
  */
 export const calculateSyllabusDeadline = (midtermStartDate) => {
   if (!midtermStartDate) return null;
-  
-  const midtermStart = typeof midtermStartDate === 'string' 
-    ? parseDate(midtermStartDate) 
+
+  const midtermStart = typeof midtermStartDate === 'string'
+    ? parseDate(midtermStartDate)
     : midtermStartDate;
-  
+
   const deadline = new Date(midtermStart);
   deadline.setDate(deadline.getDate() - WARNING_DAYS.SYLLABUS_SUBMIT);
-  
+
   return deadline;
 };
 
@@ -111,13 +163,13 @@ export const calculateSyllabusDeadline = (midtermStartDate) => {
  */
 export const checkSyllabusWarning = (midtermStartDate) => {
   if (!midtermStartDate) return null;
-  
+
   const deadline = calculateSyllabusDeadline(midtermStartDate);
   const daysRemaining = getDaysUntilDeadline(deadline);
-  
+
   // แสดงเตือนเมื่อเหลือ 8-15 วัน
   const shouldShow = daysRemaining >= 8 && daysRemaining <= WARNING_DAYS.SHOW_WARNING_START;
-  
+
   return {
     show: shouldShow,
     deadline,
@@ -131,10 +183,10 @@ export const checkSyllabusWarning = (midtermStartDate) => {
  */
 export const isDateRangeValid = (startDate, endDate) => {
   if (!startDate || !endDate) return false;
-  
+
   const start = typeof startDate === 'string' ? parseDate(startDate) : startDate;
   const end = typeof endDate === 'string' ? parseDate(endDate) : endDate;
-  
+
   return end >= start;
 };
 
@@ -146,7 +198,7 @@ export const isExamPeriodWithinTerm = (examStart, examEnd, termStart, termEnd) =
   const exEnd = typeof examEnd === 'string' ? parseDate(examEnd) : examEnd;
   const tmStart = typeof termStart === 'string' ? parseDate(termStart) : termStart;
   const tmEnd = typeof termEnd === 'string' ? parseDate(termEnd) : termEnd;
-  
+
   return exStart >= tmStart && exEnd <= tmEnd;
 };
 
@@ -156,7 +208,7 @@ export const isExamPeriodWithinTerm = (examStart, examEnd, termStart, termEnd) =
 export const getBuddhistYear = (date) => {
   const d = typeof date === 'string' ? parseDate(date) : date;
   if (!d || isNaN(d.getTime())) return null;
-  
+
   return d.getFullYear() + 543;
 };
 
@@ -166,22 +218,22 @@ export const getBuddhistYear = (date) => {
  */
 export const formatDateRange = (startDate, endDate) => {
   if (!startDate || !endDate) return '';
-  
+
   const thaiMonths = [
     'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
     'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
   ];
-  
+
   const start = typeof startDate === 'string' ? parseDate(startDate) : startDate;
   const end = typeof endDate === 'string' ? parseDate(endDate) : endDate;
-  
+
   const startDay = start.getDate();
   const startMonth = thaiMonths[start.getMonth()];
   const startYear = start.getFullYear() + 543;
-  
+
   const endDay = end.getDate();
   const endMonth = thaiMonths[end.getMonth()];
   const endYear = end.getFullYear() + 543;
-  
+
   return `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`;
 };

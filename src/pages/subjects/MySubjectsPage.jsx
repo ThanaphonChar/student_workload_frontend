@@ -8,6 +8,8 @@ import { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMySubjects } from '../../hooks/useMySubjects';
 import { AppShell } from '../../components/layout/AppShell';
+import { DropdownMenu } from '../../components/common/DropdownMenu';
+import { PaginatedTable } from '../../components/common/PaginatedTable';
 import { Modal } from '../../components/common/Modal';
 import { Button } from '../../components/common/Button';
 import { uploadDocument } from '../../services/uploadService';
@@ -107,7 +109,7 @@ export default function MySubjectsPage() {
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#050C9C] mx-auto"></div>
-                        <p className="mt-4 text-gray-600">กำลังโหลดข้อมูล...</p>
+                        <p className="mt-4 text-gray-600 text-xl">กำลังโหลดข้อมูล...</p>
                     </div>
                 </div>
             </AppShell>
@@ -174,7 +176,7 @@ export default function MySubjectsPage() {
                                 )}
                             </div>
                             <div className="ml-3 flex-1">
-                                <p className={`text-sm font-medium ${notification.type === 'success' ? 'text-green-800' : 'text-red-800'}`}>
+                                <p className={`text-xl font-medium ${notification.type === 'success' ? 'text-green-800' : 'text-red-800'}`}>
                                     {notification.message}
                                 </p>
                             </div>
@@ -202,96 +204,109 @@ export default function MySubjectsPage() {
                 {/* Term Selector */}
                 {sortedTerms.length > 1 && (
                     <div>
-                        <select
-                            value={selectedTerm}
-                            onChange={(e) => setSelectedTerm(e.target.value)}
-                            className="block w-full md:w-96 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#050C9C] bg-white"
-                        >
-                            {sortedTerms.map(([termKey, termData]) => (
-                                <option key={termKey} value={termKey}>
-                                    ภาคการศึกษา {termData.academic_sector}/{termData.academic_year} ({termData.subjects.length} รายวิชา)
-                                </option>
-                            ))}
-                        </select>
+                        <DropdownMenu
+                            trigger={
+                                <button className="block w-full md:w-96 px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between">
+                                    <span className="text-gray-900">
+                                        {(() => {
+                                            const current = sortedTerms.find(([key]) => key === selectedTerm);
+                                            return current
+                                                ? `ภาคการศึกษา ${current[1].academic_sector}/${current[1].academic_year} (${current[1].subjects.length} รายวิชา)`
+                                                : 'เลือกภาคการศึกษา';
+                                        })()}
+                                    </span>
+                                    <span className="material-symbols-outlined text-gray-500">
+                                        expand_more
+                                    </span>
+                                </button>
+                            }
+                            items={sortedTerms.map(([termKey, termData]) => ({
+                                id: termKey,
+                                label: `ภาคการศึกษา ${termData.academic_sector}/${termData.academic_year} (${termData.subjects.length} รายวิชา)`,
+                                onClick: () => setSelectedTerm(termKey)
+                            }))}
+                            position="left"
+                            className="w-full md:w-96 max-h-96 overflow-y-auto"
+                        />
                     </div>
                 )}
 
                 {/* Table */}
                 {currentTermData && (
-                    <div className="bg-white rounded-lg shadow overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-[#050C9C]">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xl font-medium text-white">
-                                        รายวิชา
-                                    </th>
-                                    <th className="px-6 py-3 text-center text-xl font-medium text-white">
-                                        หลักสูตร
-                                    </th>
-                                    <th className="px-6 py-3 text-center text-xl font-medium text-white">
-                                        เค้าโครงรายวิชา
-                                    </th>
-                                    <th className="px-6 py-3 text-center text-xl font-medium text-white">
-                                        ภาระงาน
-                                    </th>
-                                    <th className="px-6 py-3 text-center text-xl font-medium text-white">
-                                        รายงานผล
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {currentTermData.subjects.map((subject) => (
-                                    <tr key={subject.term_subject_id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4">
-                                            <div>
-                                                <div className="text-lg font-medium text-gray-900">
-                                                    {subject.code_eng || subject.code_th}
-                                                </div>
-                                                <div className="text-base text-gray-600">
-                                                    {subject.name_th || subject.name_eng}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-center text-lg text-gray-900">
-                                            {subject.credit || '-'}
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <Button
-                                                variant="primary"
-                                                size="sm"
-                                                onClick={() => openUploadModal(subject, 'outline')}
-                                                className="text-base"
-                                            >
-                                                อัปโหลด
-                                            </Button>
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <Button
-                                                variant="secondary"
-                                                size="sm"
-                                                onClick={() => {
-                                                    navigate(`/term-subjects/${subject.term_subject_id}/workload`);
-                                                }}
-                                                className="text-base"
-                                            >
-                                                กรอกภาระงาน
-                                            </Button>
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <Button
-                                                variant="primary"
-                                                size="sm"
-                                                onClick={() => openUploadModal(subject, 'report')}
-                                                className="text-base"
-                                            >
-                                                อัปโหลด
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <PaginatedTable
+                        data={currentTermData.subjects}
+                        columns={[
+                            { label: 'รายวิชา', width: '2fr', align: 'left' },
+                            { label: 'หลักสูตร', width: '100px', align: 'center' },
+                            { label: 'เค้าโครงรายวิชา', width: '150px', align: 'center' },
+                            { label: 'ภาระงาน', width: '150px', align: 'center' },
+                            { label: 'รายงานผล', width: '150px', align: 'center' }
+                        ]}
+                        defaultRowsPerPage={10}
+                        renderRow={(subject) => (
+                            <div
+                                key={subject.term_subject_id}
+                                className="grid hover:bg-gray-50"
+                                style={{ gridTemplateColumns: '2fr 100px 150px 150px 150px' }}
+                            >
+                                <div className="px-6 py-4">
+                                    <div className="text-xl font-medium text-gray-900">
+                                        {subject.code_eng || subject.code_th}
+                                    </div>
+                                    <div className="text-xl text-gray-600">
+                                        {subject.name_th || subject.name_eng}
+                                    </div>
+                                </div>
+                                <div className="px-6 py-4 flex items-center justify-center text-xl text-gray-900">
+                                    {subject.credit || '-'}
+                                </div>
+                                <div className="px-6 py-4 flex items-center justify-center">
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={() => openUploadModal(subject, 'outline')}
+                                        className="text-xl"
+                                    >
+                                        อัปโหลด
+                                    </Button>
+                                </div>
+                                <div className="px-6 py-4 flex items-center justify-center">
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => {
+                                            const termLabel = subject?.academic_sector && subject?.academic_year
+                                                ? `ปีการศึกษา ${subject.academic_sector}/${subject.academic_year}`
+                                                : null;
+                                            const subjectCode = subject?.code_eng || subject?.code_th || subject?.subject_code || null;
+
+                                            navigate(`/term-subjects/${subject.term_subject_id}/workload`, {
+                                                state: {
+                                                    fromPath: '/my-subjects',
+                                                    fromLabel: 'รายวิชาของฉัน',
+                                                    termLabel,
+                                                    subjectCode,
+                                                },
+                                            });
+                                        }}
+                                        className="text-xl"
+                                    >
+                                        กรอกภาระงาน
+                                    </Button>
+                                </div>
+                                <div className="px-6 py-4 flex items-center justify-center">
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={() => openUploadModal(subject, 'report')}
+                                        className="text-xl"
+                                    >
+                                        อัปโหลด
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    />
                 )}
             </div>
 
@@ -304,10 +319,10 @@ export default function MySubjectsPage() {
                 <div className="space-y-4">
                     {/* Subject Info */}
                     <div className="bg-gray-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-medium text-gray-900 mb-1">
+                        <h3 className="text-xl font-medium text-gray-900 mb-1">
                             {uploadModal.subject?.code_eng || uploadModal.subject?.code_th}
                         </h3>
-                        <p className="text-base text-gray-600">
+                        <p className="text-xl text-gray-600">
                             {uploadModal.subject?.name_th || uploadModal.subject?.name_eng}
                         </p>
                     </div>
@@ -321,8 +336,8 @@ export default function MySubjectsPage() {
                             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
-                            <p className="text-base font-medium text-gray-700 mb-1">แนบเอกสาร</p>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-xl font-medium text-gray-700 mb-1">แนบเอกสาร</p>
+                            <p className="text-xl text-gray-500">
                                 {selectedFile ? selectedFile.name : 'คลิกเพิ่มเลือกไฟล์'}
                             </p>
                         </div>

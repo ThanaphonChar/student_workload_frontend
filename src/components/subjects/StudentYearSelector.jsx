@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { Checkbox } from '../common/Checkbox';
 
 const STUDENT_YEARS = [1, 2, 3, 4];
 
@@ -25,7 +26,7 @@ export default function StudentYearSelector({ selectedYears = [], onChange }) {
 
     return (
         <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-2xl font-bold text-gray-700">
                 ชั้นปีที่เรียน
                 <span className="text-red-500 ml-1">*</span>
             </label>
@@ -35,20 +36,13 @@ export default function StudentYearSelector({ selectedYears = [], onChange }) {
                     const isChecked = selectedYears.includes(year);
 
                     return (
-                        <label
+                        <Checkbox
                             key={year}
-                            className="flex items-center gap-2 cursor-pointer select-none"
-                        >
-                            <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={() => handleToggle(year)}
-                                className="w-4 h-4 text-[#050C9C] border-gray-300 rounded focus:ring-[#050C9C]"
-                            />
-                            <span className="text-sm text-gray-700">
-                                ปี {year}
-                            </span>
-                        </label>
+                            checked={isChecked}
+                            onChange={() => handleToggle(year)}
+                            label={`ปี ${year}`}
+                            size="md"
+                        />
                     );
                 })}
             </div>

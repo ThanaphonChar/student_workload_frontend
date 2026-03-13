@@ -13,9 +13,9 @@ export function ApprovalBadge({ status }) {
     if (!status) return <span className="text-gray-400">-</span>;
 
     const styles = {
-        pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-        approved: 'bg-green-100 text-green-800 border-green-300',
-        rejected: 'bg-red-100 text-red-800 border-red-300',
+        pending: 'bg-[#FFF5EA] text-[#FF8D28]',
+        approved: 'bg-[#E7F8F2] text-[#10B981]',
+        rejected: 'bg-[#FBE9E9] text-[#DC2626]',
     };
 
     const labels = {
@@ -25,7 +25,7 @@ export function ApprovalBadge({ status }) {
     };
 
     return (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[status] || styles.pending}`}>
+        <span className={`inline-flex items-center px-4 py-1 rounded-full text-xl font-bold ${styles[status] || styles.pending}`}>
             {labels[status] || status}
         </span>
     );
@@ -41,7 +41,7 @@ export function SubmissionBadge({ submitted, approved, label }) {
 
     if (!submitted) {
         return (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-300">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xl font-bold bg-gray-100 text-gray-600 border border-gray-300">
                 ยังไม่ส่ง
             </span>
         );
@@ -78,7 +78,7 @@ export function FileCountBadge({ count, type }) {
     }
 
     return (
-        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xl font-medium bg-blue-100 text-blue-800">
             {count} ไฟล์
         </span>
     );

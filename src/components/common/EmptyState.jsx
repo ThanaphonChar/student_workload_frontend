@@ -3,7 +3,7 @@
  * แสดงเมื่อไม่มีข้อมูล
  */
 
-export const EmptyState = ({ 
+export const EmptyState = ({
   message = 'ไม่พบข้อมูล',
   icon = null,
   action = null,
@@ -29,12 +29,12 @@ export const EmptyState = ({
           />
         </svg>
       )}
-      
+
       {/* Message */}
-      <p className="mt-4 text-base text-gray-500">
+      <p className="mt-4 text-2xl text-gray-500">
         {message}
       </p>
-      
+
       {/* Action Button */}
       {action && (
         <div className="mt-6">

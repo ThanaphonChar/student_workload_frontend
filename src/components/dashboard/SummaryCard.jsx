@@ -9,10 +9,10 @@ import { FiFileText, FiCheckCircle, FiClipboard } from 'react-icons/fi';
 const SummaryCard = ({ title, count, total, icon: Icon, color = 'green' }) => {
     // กำหนดสีตาม type
     const colorClasses = {
-        blue: 'bg-blue-50 text-blue-600',
-        green: 'bg-green-50 text-green-600',
-        yellow: 'bg-yellow-50 text-yellow-600',
-        purple: 'bg-purple-50 text-purple-600'
+        blue: 'bg-white text-[#F1F1F1]',
+        green: 'bg-white text-[#F1F1F1]',
+        yellow: 'bg-white text-[#F1F1F1]',
+        purple: 'bg-white text-[#F1F1F1]',
     };
 
     const bgClass = colorClasses[color] || colorClasses.green;
@@ -21,7 +21,7 @@ const SummaryCard = ({ title, count, total, icon: Icon, color = 'green' }) => {
         <div className="bg-white rounded-xl shadow p-6">
             <div className="flex items-start justify-between">
                 <div className="flex-1">
-                    <p className="text-gray-600 text-sm font-medium mb-2">{title}</p>
+                    <p className="text-gray-600 text-2xl font-medium mb-2">{title}</p>
 
                     {total !== undefined ? (
                         // แสดงแบบ count/total
@@ -40,7 +40,7 @@ const SummaryCard = ({ title, count, total, icon: Icon, color = 'green' }) => {
                         </div>
                     )}
 
-                    <p className="text-gray-500 text-sm mt-1">
+                    <p className="text-gray-500 text-2xl mt-1">
                         {total !== undefined ? 'ส่งแล้ว' : 'รายวิชา'}
                     </p>
                 </div>
