@@ -8,6 +8,7 @@ import { Button } from '../common/Button';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { DateInputField, TextField, SearchInput, DropdownMenu } from '../common';
 import { SEMESTERS } from '../../constants/academicYear';
+import { parseDate, formatDateToString } from '../../utils/dateUtils';
 import * as subjectService from '../../services/subjectService';
 import * as termService from '../../services/termService';
 
@@ -22,12 +23,12 @@ export const TermForm = ({
     const [formData, setFormData] = useState({
         academic_year: initialData.academic_year || '',
         academic_sector: initialData.academic_sector || '',
-        term_start_date: initialData.term_start_date || '',
-        term_end_date: initialData.term_end_date || '',
-        midterm_start_date: initialData.midterm_start_date || '',
-        midterm_end_date: initialData.midterm_end_date || '',
-        final_start_date: initialData.final_start_date || '',
-        final_end_date: initialData.final_end_date || '',
+        term_start_date: parseDate(initialData.term_start_date) || null,
+        term_end_date: parseDate(initialData.term_end_date) || null,
+        midterm_start_date: parseDate(initialData.midterm_start_date) || null,
+        midterm_end_date: parseDate(initialData.midterm_end_date) || null,
+        final_start_date: parseDate(initialData.final_start_date) || null,
+        final_end_date: parseDate(initialData.final_end_date) || null,
     });
 
     const [errors, setErrors] = useState({});
@@ -40,22 +41,6 @@ export const TermForm = ({
     const [isLoadingExistingSubjects, setIsLoadingExistingSubjects] = useState(false);
     const [showSubjectDropdown, setShowSubjectDropdown] = useState(false);
 
-    /**
-     * Convert ISO date string to YYYY-MM-DD format
-     * @param {string} isoDate - ISO date string from API
-     * @returns {string} - Date in YYYY-MM-DD format or empty string
-     */
-    const formatDateForInput = (isoDate) => {
-        if (!isoDate) return '';
-        try {
-            const date = new Date(isoDate);
-            return date.toISOString().split('T')[0];
-        } catch (error) {
-            console.error('[TermForm] Error formatting date:', error);
-            return '';
-        }
-    };
-
     // Update form data when initialData changes (only for edit mode)
     useEffect(() => {
         // Only update if initialData has an ID (edit mode)
@@ -63,22 +48,22 @@ export const TermForm = ({
             setFormData({
                 academic_year: initialData.academic_year || '',
                 academic_sector: initialData.academic_sector || '',
-                term_start_date: formatDateForInput(initialData.term_start_date),
-                term_end_date: formatDateForInput(initialData.term_end_date),
-                midterm_start_date: formatDateForInput(initialData.midterm_start_date),
-                midterm_end_date: formatDateForInput(initialData.midterm_end_date),
-                final_start_date: formatDateForInput(initialData.final_start_date),
-                final_end_date: formatDateForInput(initialData.final_end_date),
+                term_start_date: parseDate(initialData.term_start_date) || null,
+                term_end_date: parseDate(initialData.term_end_date) || null,
+                midterm_start_date: parseDate(initialData.midterm_start_date) || null,
+                midterm_end_date: parseDate(initialData.midterm_end_date) || null,
+                final_start_date: parseDate(initialData.final_start_date) || null,
+                final_end_date: parseDate(initialData.final_end_date) || null,
             });
             console.log('[TermForm] Updated formData with initialData:', {
                 raw: initialData,
                 formatted: {
-                    term_start_date: formatDateForInput(initialData.term_start_date),
-                    term_end_date: formatDateForInput(initialData.term_end_date),
+                    term_start_date: parseDate(initialData.term_start_date),
+                    term_end_date: parseDate(initialData.term_end_date),
                 }
             });
         }
-    }, [initialData.id]);
+    }, [initialData]);
 
     // Load subjects on mount
     useEffect(() => {
@@ -271,12 +256,12 @@ export const TermForm = ({
         const payload = {
             academic_year: Number(formData.academic_year),
             academic_sector: Number(formData.academic_sector),
-            term_start_date: formData.term_start_date,
-            term_end_date: formData.term_end_date,
-            midterm_start_date: formData.midterm_start_date || null,
-            midterm_end_date: formData.midterm_end_date || null,
-            final_start_date: formData.final_start_date || null,
-            final_end_date: formData.final_end_date || null,
+            term_start_date: formatDateToString(formData.term_start_date),
+            term_end_date: formatDateToString(formData.term_end_date),
+            midterm_start_date: formData.midterm_start_date ? formatDateToString(formData.midterm_start_date) : null,
+            midterm_end_date: formData.midterm_end_date ? formatDateToString(formData.midterm_end_date) : null,
+            final_start_date: formData.final_start_date ? formatDateToString(formData.final_start_date) : null,
+            final_end_date: formData.final_end_date ? formatDateToString(formData.final_end_date) : null,
             subject_ids: subjectIds,
         };
 

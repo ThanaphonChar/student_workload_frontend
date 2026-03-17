@@ -147,9 +147,9 @@ export function CourseStatusRow({ subject, onRefresh, onViewDetail, userRole }) 
             {/* ภาระงาน - Action Button */}
             <div className="flex items-center justify-center">
                 <Button
-                    onClick={() => onViewDetail(subject)}
-                    variant="primary"
+                    variant="secondary"
                     size="sm"
+                    onClick={() => onViewDetail(subject)}
                     className="text-xl"
                 >
                     กรอกภาระงาน

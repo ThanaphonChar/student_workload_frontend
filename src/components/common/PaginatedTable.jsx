@@ -105,7 +105,7 @@ export const PaginatedTable = ({
                 {/* Body - Card-like rows with gaps */}
                 <div className="space-y-3">
                     {currentData.map((row, index) => (
-                        <div key={startIndex + index} className="bg-white m-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <div key={startIndex + index} className="bg-white m-4 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                             {renderRow(row, startIndex + index)}
                         </div>
                     ))}
