@@ -3,15 +3,33 @@
  * แสดงข้อมูลรายวิชาในรูปแบบการ์ด
  */
 
-export const SubjectCard = ({ subject, onDelete }) => {
-    const handleDelete = () => {
+export const SubjectCard = ({ subject, onDelete, onEdit }) => {
+    const handleDelete = (e) => {
+        e.stopPropagation();
         if (window.confirm(`คุณต้องการลบรายวิชา "${subject.name_th}" ใช่หรือไม่?`)) {
             onDelete(subject.id);
         }
     };
 
+    const handleCardClick = () => {
+        if (typeof onEdit === 'function') {
+            onEdit(subject.id);
+        }
+    };
+
     return (
-        <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 border border-gray-200">
+        <div
+            className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 border border-gray-200 cursor-pointer"
+            onClick={handleCardClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleCardClick();
+                }
+            }}
+        >
             <div className="flex justify-between items-center">
                 {/* Left - Code & Name */}
                 <div className="flex-1">

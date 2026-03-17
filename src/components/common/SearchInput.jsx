@@ -13,21 +13,9 @@ export const SearchInput = ({
   return (
     <div className={`relative ${className}`}>
       {/* Icon ค้นหา */}
-      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-        <svg
-          className="w-5 h-5 text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
-      </div>
+      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#acacac] pointer-events-none">
+        search
+      </span>
 
       {/* Input field */}
       <input
@@ -37,11 +25,11 @@ export const SearchInput = ({
         placeholder={placeholder}
         className="
           w-full
-          pl-10 pr-4 py-2
-          bg-white
-          border border-gray-300 rounded-lg
-          text-2xl text-gray-900
-          placeholder:text-2xl placeholder:text-gray-400
+          pl-10 pr-6 py-2
+          rounded-full
+          bg-[#F1F1F1]
+          text-lg text-gray-900
+          placeholder:text-gray-400
           focus:outline-none
           transition-colors duration-200
         "

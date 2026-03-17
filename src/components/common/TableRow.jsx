@@ -4,11 +4,20 @@
  * รองรับการ render cell แบบ custom ผ่าน renderCell function
  */
 
-export function TableRow({ data, columns, className = '' }) {
+export function TableRow({ data, columns, className = '', onClick }) {
     return (
         <div
             className={`grid px-6 py-4 ${className}`}
             style={{ gridTemplateColumns: columns.map(c => c.width || '1fr').join(' ') }}
+            onClick={onClick}
+            role={onClick ? 'button' : undefined}
+            tabIndex={onClick ? 0 : undefined}
+            onKeyDown={onClick ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onClick();
+                }
+            } : undefined}
         >
             {columns.map((column, index) => (
                 <div

@@ -24,17 +24,6 @@ const TermSubjectWorkloadPage = () => {
     const { roles } = useAuth();
     const isAcademicOfficer = roles?.includes('Academic Officer');
 
-    const breadcrumbSourcePath = location.state?.fromPath || '/course-status';
-    const breadcrumbSourceLabel = location.state?.fromLabel || 'ติดตามสถานะรายวิชา';
-    const breadcrumbTermLabel = location.state?.termLabel
-        || ((termSubject?.academic_sector && termSubject?.academic_year)
-            ? `ปีการศึกษา ${termSubject.academic_sector}/${termSubject.academic_year}`
-            : 'ภาคการศึกษา');
-    const breadcrumbSubjectLabel = location.state?.subjectCode
-        || termSubject?.code_eng
-        || termSubject?.subject_code
-        || 'รายวิชา';
-
     const [loading, setLoading] = useState(true);
     const [termSubject, setTermSubject] = useState(null);
     const [workloads, setWorkloads] = useState([]);
@@ -46,6 +35,17 @@ const TermSubjectWorkloadPage = () => {
     const [showForm, setShowForm] = useState(false);
     const [editingWork, setEditingWork] = useState(null);
     const [error, setError] = useState(null);
+
+    const breadcrumbSourcePath = location.state?.fromPath || '/course-status';
+    const breadcrumbSourceLabel = location.state?.fromLabel || 'ติดตามสถานะรายวิชา';
+    const breadcrumbTermLabel = location.state?.termLabel
+        || ((termSubject?.academic_sector && termSubject?.academic_year)
+            ? `ปีการศึกษา ${termSubject.academic_sector}/${termSubject.academic_year}`
+            : 'ภาคการศึกษา');
+    const breadcrumbSubjectLabel = location.state?.subjectCode
+        || termSubject?.code_eng
+        || termSubject?.subject_code
+        || 'รายวิชา';
 
     // ดึงข้อมูล term subject และ workload
     const fetchData = async () => {

@@ -4,7 +4,6 @@
  */
 
 import React from 'react';
-import { FiFileText, FiCheckCircle, FiClipboard } from 'react-icons/fi';
 
 const SummaryCard = ({ title, count, total, icon: Icon, color = 'green' }) => {
     // กำหนดสีตาม type
