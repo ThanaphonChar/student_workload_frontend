@@ -7,7 +7,7 @@
 export function TableRow({ data, columns, className = '', onClick }) {
     return (
         <div
-            className={`grid px-6 py-4 ${className}`}
+            className={`grid rounded-lg px-6 py-4 ${className}`}
             style={{ gridTemplateColumns: columns.map(c => c.width || '1fr').join(' ') }}
             onClick={onClick}
             role={onClick ? 'button' : undefined}

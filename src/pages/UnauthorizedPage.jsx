@@ -5,10 +5,11 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
+import { Button } from '../components/common/Button';
 
 export const UnauthorizedPage = () => {
     const navigate = useNavigate();
-    const { user, roles } = useAuth();
+    const { roles } = useAuth();
 
     const handleGoBack = () => {
         navigate(-1);
@@ -46,27 +47,31 @@ export const UnauthorizedPage = () => {
                     <p className="text-gray-600 mb-4">
                         คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้
                     </p>
-                    {roles && roles.length > 0 && (
+                    {/* {roles && roles.length > 0 && (
                         <p className="text-2xl text-gray-500">
                             บทบาทปัจจุบัน: <span className="font-semibold">{roles.join(', ')}</span>
                         </p>
-                    )}
+                    )} */}
                 </div>
 
                 {/* Actions */}
                 <div className="flex flex-col space-y-3">
-                    <button
+                    <Button
                         onClick={handleGoBack}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                        variant="secondary"
+                        size="md"
+                        fullWidth
                     >
                         ย้อนกลับ
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={handleGoHome}
-                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        variant="primary"
+                        size="md"
+                        fullWidth
                     >
                         กลับหน้าหลัก
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Help Text */}

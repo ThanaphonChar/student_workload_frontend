@@ -25,33 +25,34 @@ export const ROUTE_PERMISSIONS = {
     '/subjects/create': [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
     '/subjects/:id': [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
     '/subjects/:id/edit': [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
+    '/permissions': [ROLES.ACADEMIC_OFFICER],
 };
 
 // Menu configuration - กำหนดว่า menu item ไหนแสดงให้ role ไหนบ้าง
 export const MENU_CONFIG = [
-    {
-        id: 'home',
-        label: 'หน้าหลัก',
-        path: '/profile',
-        allowedRoles: [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER, ROLES.STUDENT],
-    },
+    // {
+    //     id: 'home',
+    //     label: 'หน้าหลัก',
+    //     path: '/profile',
+    //     allowedRoles: [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER, ROLES.STUDENT],
+    // },
     {
         id: 'subjects',
         label: 'ข้อมูลรายวิชา',
         path: '/subjects',
-        allowedRoles: [ROLES.ACADEMIC_OFFICER],
+        allowedRoles: [ROLES.ACADEMIC_OFFICER, ROLES.PROGRAM_CHAIR],
         children: [
             {
                 id: 'subjects-list',
                 label: 'รายการวิชา',
                 path: '/subjects',
-                allowedRoles: [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
+                allowedRoles: [ROLES.ACADEMIC_OFFICER, ROLES.PROGRAM_CHAIR],
             },
             {
                 id: 'subjects-create',
                 label: 'สร้างวิชาใหม่',
                 path: '/subjects/create',
-                allowedRoles: [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
+                allowedRoles: [ROLES.ACADEMIC_OFFICER],
             },
         ],
     },
@@ -71,7 +72,7 @@ export const MENU_CONFIG = [
         id: 'dashboard',
         label: 'แดชบอร์ด',
         path: '/dashboard',
-        allowedRoles: [ROLES.ACADEMIC_OFFICER],
+        allowedRoles: [ROLES.ACADEMIC_OFFICER, ROLES.PROGRAM_CHAIR, ROLES.PROFESSOR, ROLES.STUDENT],
     },
     {
         id: 'my_subjects',
@@ -83,7 +84,7 @@ export const MENU_CONFIG = [
         id: 'role_management',
         label: 'การจัดการสิทธิ์',
         path: '/permissions',
-        allowedRoles: [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
+        allowedRoles: [ROLES.ACADEMIC_OFFICER],
     },
 ];
 

@@ -20,6 +20,7 @@ import CourseStatusByTermPage from '../pages/courseStatus/CourseStatusByTermPage
 import ActiveTermCourseStatusPage from '../pages/courseStatus/ActiveTermCourseStatusPage';
 import TermSubjectWorkloadPage from '../pages/terms/workload/TermSubjectWorkloadPage';
 import DashboardPage from '../pages/dashboard/DashboardPage';
+import PermissionManagementPage from '../pages/PermissionManagement/PermissionManagementPage';
 import { UnauthorizedPage } from '../pages/UnauthorizedPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../hooks/useAuth';
@@ -131,8 +132,18 @@ export const AppRouter = () => {
                 <Route
                     path="/dashboard"
                     element={
-                        <ProtectedRoute allowedRoles={[ROLES.ACADEMIC_OFFICER]}>
+                        <ProtectedRoute allowedRoles={[ROLES.ACADEMIC_OFFICER, ROLES.PROGRAM_CHAIR, ROLES.PROFESSOR, ROLES.STUDENT]}>
                             <DashboardPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Permission Management Route - Academic Officer Only */}
+                <Route
+                    path="/permissions"
+                    element={
+                        <ProtectedRoute allowedRoles={[ROLES.ACADEMIC_OFFICER]}>
+                            <PermissionManagementPage />
                         </ProtectedRoute>
                     }
                 />
@@ -179,7 +190,7 @@ export const AppRouter = () => {
                             <div className="text-center">
                                 <h1 className="text-4xl font-bold text-gray-800 mb-4">404</h1>
                                 <p className="text-gray-600 mb-4">ไม่พบหน้าที่คุณต้องการ</p>
-                                <a href="/" className="text-blue-600 hover:underline">
+                                <a href="/" className="text-[#050a9c] hover:underline">
                                     กลับสู่หน้าหลัก
                                 </a>
                             </div>
