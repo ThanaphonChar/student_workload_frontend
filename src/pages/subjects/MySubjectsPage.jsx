@@ -10,6 +10,7 @@ import { useMySubjects } from '../../hooks/useMySubjects';
 import { AppShell } from '../../components/layout/AppShell';
 import { DropdownMenu } from '../../components/common/DropdownMenu';
 import { PaginatedTable } from '../../components/common/PaginatedTable';
+import { TableRow } from '../../components/common/TableRow';
 import { Modal } from '../../components/common/Modal';
 import { Button } from '../../components/common/Button';
 import { uploadDocument } from '../../services/uploadService';
@@ -244,67 +245,79 @@ export default function MySubjectsPage() {
                         ]}
                         defaultRowsPerPage={10}
                         renderRow={(subject) => (
-                            <div
-                                key={subject.term_subject_id}
-                                className="grid hover:bg-gray-50"
-                                style={{ gridTemplateColumns: '2fr 100px 150px 150px 150px' }}
-                            >
-                                <div className="px-6 py-4">
-                                    <div className="text-xl font-medium text-gray-900">
-                                        {subject.code_eng || subject.code_th}
-                                    </div>
-                                    <div className="text-xl text-gray-600">
-                                        {subject.name_th || subject.name_eng}
-                                    </div>
-                                </div>
-                                <div className="px-6 py-4 flex items-center justify-center text-xl text-gray-900">
-                                    {subject.credit || '-'}
-                                </div>
-                                <div className="px-6 py-4 flex items-center justify-center">
-                                    <Button
-                                        variant="primary"
-                                        size="sm"
-                                        onClick={() => openUploadModal(subject, 'outline')}
-                                        className="text-xl"
-                                    >
-                                        อัปโหลด
-                                    </Button>
-                                </div>
-                                <div className="px-6 py-4 flex items-center justify-center">
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={() => {
-                                            const termLabel = subject?.academic_sector && subject?.academic_year
-                                                ? `ปีการศึกษา ${subject.academic_sector}/${subject.academic_year}`
-                                                : null;
-                                            const subjectCode = subject?.code_eng || subject?.code_th || subject?.subject_code || null;
+                            <TableRow
+                                data={subject}
+                                columns={[
+                                    {
+                                        label: 'รายวิชา', width: '2fr', align: 'left', renderCell: (row) => (
+                                            <div>
+                                                <div className="text-xl font-medium text-gray-900">
+                                                    {row.code_eng || row.code_th}
+                                                </div>
+                                                <div className="text-xl text-gray-600">
+                                                    {row.name_th || row.name_eng}
+                                                </div>
+                                            </div>
+                                        )
+                                    },
+                                    {
+                                        label: 'หลักสูตร', width: '100px', align: 'center', renderCell: (row) => (
+                                            <div className="text-xl text-gray-900">{row.program_year || '-'}</div>
+                                        )
+                                    },
+                                    {
+                                        label: 'เค้าโครงรายวิชา', width: '150px', align: 'center', renderCell: (row) => (
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
+                                                onClick={() => openUploadModal(row, 'outline')}
+                                                className="text-xl"
+                                            >
+                                                อัปโหลด
+                                            </Button>
+                                        )
+                                    },
+                                    {
+                                        label: 'ภาระงาน', width: '150px', align: 'center', renderCell: (row) => (
+                                            <Button
+                                                variant="secondary"
+                                                size="sm"
+                                                onClick={() => {
+                                                    const termLabel = row?.academic_sector && row?.academic_year
+                                                        ? `ปีการศึกษา ${row.academic_sector}/${row.academic_year}`
+                                                        : null;
+                                                    const subjectCode = row?.code_eng || row?.code_th || row?.subject_code || null;
 
-                                            navigate(`/term-subjects/${subject.term_subject_id}/workload`, {
-                                                state: {
-                                                    fromPath: '/my-subjects',
-                                                    fromLabel: 'รายวิชาของฉัน',
-                                                    termLabel,
-                                                    subjectCode,
-                                                },
-                                            });
-                                        }}
-                                        className="text-xl"
-                                    >
-                                        กรอกภาระงาน
-                                    </Button>
-                                </div>
-                                <div className="px-6 py-4 flex items-center justify-center">
-                                    <Button
-                                        variant="primary"
-                                        size="sm"
-                                        onClick={() => openUploadModal(subject, 'report')}
-                                        className="text-xl"
-                                    >
-                                        อัปโหลด
-                                    </Button>
-                                </div>
-                            </div>
+                                                    navigate(`/term-subjects/${row.term_subject_id}/workload`, {
+                                                        state: {
+                                                            fromPath: '/my-subjects',
+                                                            fromLabel: 'รายวิชาของฉัน',
+                                                            termLabel,
+                                                            subjectCode,
+                                                        },
+                                                    });
+                                                }}
+                                                className="text-xl"
+                                            >
+                                                กรอกภาระงาน
+                                            </Button>
+                                        )
+                                    },
+                                    {
+                                        label: 'รายงานผล', width: '150px', align: 'center', renderCell: (row) => (
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
+                                                onClick={() => openUploadModal(row, 'report')}
+                                                className="text-xl"
+                                            >
+                                                อัปโหลด
+                                            </Button>
+                                        )
+                                    }
+                                ]}
+                                className="hover:bg-gray-50"
+                            />
                         )}
                     />
                 )}

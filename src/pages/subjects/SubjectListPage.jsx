@@ -17,7 +17,6 @@ import { AppShell } from '../../components/layout/AppShell';
 import { SubjectToolbar } from '../../components/subjects/SubjectToolbar';
 import { SubjectTable } from '../../components/subjects/SubjectTable';
 import { useSubjects } from '../../hooks/useSubjects';
-import { Alert } from '../../components/common/Alert';
 import { FONT_SIZES } from '../../theme/muiTheme';
 
 export const SubjectListPage = () => {
@@ -81,20 +80,33 @@ export const SubjectListPage = () => {
 
                     {/* Error State */}
                     {error && (
-                        <Alert
-                            type="error"
-                            message={error}
-                            onClose={() => refetch()}
-                        />
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between">
+                            <p className="text-red-600 text-xl">{error}</p>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                size="small"
+                                startIcon={<RefreshIcon />}
+                                onClick={() => refetch()}
+                            >
+                                ลองอีกครั้ง
+                            </Button>
+                        </div>
                     )}
 
                     {/* Delete Error */}
                     {deleteError && (
-                        <Alert
-                            type="error"
-                            message={deleteError}
-                            onClose={() => setDeleteError(null)}
-                        />
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between">
+                            <p className="text-red-600 text-xl">{deleteError}</p>
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                size="small"
+                                onClick={() => setDeleteError(null)}
+                            >
+                                ปิด
+                            </Button>
+                        </div>
                     )}
 
                     {/* Table */}
