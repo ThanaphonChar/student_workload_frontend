@@ -102,7 +102,7 @@ export default function ActiveTermCourseStatusPage() {
                 <div>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="flex-1">
-                            <h1 className="text-3xl font-bold text-gray-900">
+                            <h1 className="text-4xl font-bold text-gray-900">
                                 {selectedTermId && !termsLoading ? (() => {
                                     const selected = terms.find(t => t.id === selectedTermId);
                                     return selected ? `ติดตามสถานะรายวิชา ปีการศึกษา ${selected.academic_sector}/${selected.academic_year}` : 'ติดตามสถานะรายวิชา';
@@ -117,13 +117,11 @@ export default function ActiveTermCourseStatusPage() {
                             </label>
                             <DropdownMenu
                                 trigger={
-                                    <Button
+                                    <button
                                         disabled={termsLoading}
-                                        variant="secondary"
-                                        size="sm"
-                                        className="w-64 text-left flex items-center justify-between"
+                                        className="px-4 py-2 rounded-lg bg-white hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between min-w-60 max-w-[360px] border border-gray-300 disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
-                                        <span className="text-gray-900 text-xl">
+                                        <span className="text-gray-900 text-xl truncate">
                                             {termsLoading ? 'กำลังโหลด...' :
                                                 terms.length === 0 ? 'ไม่พบภาคการศึกษา' :
                                                     selectedTermId ? (() => {
@@ -132,17 +130,17 @@ export default function ActiveTermCourseStatusPage() {
                                                     })() : '-- เลือกภาคการศึกษา --'
                                             }
                                         </span>
-                                        <span className="material-symbols-outlined text-gray-500">
+                                        <span className="material-symbols-outlined text-gray-500 ml-2">
                                             expand_more
                                         </span>
-                                    </Button>
+                                    </button>
                                 }
                                 items={termsLoading || terms.length === 0 ? [] : terms.map((t) => ({
                                     id: t.id,
                                     label: `${getTermLabel(t)}${t.is_active ? ' (ปัจจุบัน)' : ''}`,
                                     onClick: () => setSelectedTermId(t.id)
                                 }))}
-                                position="right"
+                                position="left"
                                 className="w-80 max-h-96 overflow-y-auto"
                             />
 

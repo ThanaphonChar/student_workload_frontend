@@ -165,7 +165,7 @@ export default function MySubjectsPage() {
                         `}
                     >
                         <div className="flex items-start">
-                            <div className="flex-shrink-0">
+                            <div className="shrink-0">
                                 {notification.type === 'success' ? (
                                     <svg className="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -183,7 +183,7 @@ export default function MySubjectsPage() {
                             </div>
                             <button
                                 onClick={() => setNotification({ show: false, type: '', message: '' })}
-                                className="ml-4 flex-shrink-0"
+                                className="ml-4 shrink-0"
                             >
                                 <svg className={`h-5 w-5 ${notification.type === 'success' ? 'text-green-400' : 'text-red-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -196,41 +196,43 @@ export default function MySubjectsPage() {
 
             <div className="space-y-6">
                 {/* Header */}
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        รายวิชาของฉัน ภาคการศึกษา {currentTermData?.academic_sector}/{currentTermData?.academic_year}
-                    </h1>
-                </div>
-
-                {/* Term Selector */}
-                {sortedTerms.length > 1 && (
-                    <div>
-                        <DropdownMenu
-                            trigger={
-                                <button className="block w-full md:w-96 px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between">
-                                    <span className="text-gray-900">
-                                        {(() => {
-                                            const current = sortedTerms.find(([key]) => key === selectedTerm);
-                                            return current
-                                                ? `ภาคการศึกษา ${current[1].academic_sector}/${current[1].academic_year} (${current[1].subjects.length} รายวิชา)`
-                                                : 'เลือกภาคการศึกษา';
-                                        })()}
-                                    </span>
-                                    <span className="material-symbols-outlined text-gray-500">
-                                        expand_more
-                                    </span>
-                                </button>
-                            }
-                            items={sortedTerms.map(([termKey, termData]) => ({
-                                id: termKey,
-                                label: `ภาคการศึกษา ${termData.academic_sector}/${termData.academic_year} (${termData.subjects.length} รายวิชา)`,
-                                onClick: () => setSelectedTerm(termKey)
-                            }))}
-                            position="left"
-                            className="w-full md:w-96 max-h-96 overflow-y-auto"
-                        />
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="flex-1">
+                        <h1 className="text-4xl font-bold text-gray-900">
+                            รายวิชาของฉัน ภาคการศึกษา {currentTermData?.academic_sector}/{currentTermData?.academic_year}
+                        </h1>
                     </div>
-                )}
+
+                    {/* Term Selector */}
+                    {sortedTerms.length > 1 && (
+                        <div className="flex items-center gap-3 py-3">
+                            <DropdownMenu
+                                trigger={
+                                    <button className="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between">
+                                        <span className="text-gray-900 text-xl truncate">
+                                            {(() => {
+                                                const current = sortedTerms.find(([key]) => key === selectedTerm);
+                                                return current
+                                                    ? `ภาคการศึกษา ${current[1].academic_sector}/${current[1].academic_year} (${current[1].subjects.length} รายวิชา)`
+                                                    : 'เลือกภาคการศึกษา';
+                                            })()}
+                                        </span>
+                                        <span className="material-symbols-outlined text-gray-500">
+                                            expand_more
+                                        </span>
+                                    </button>
+                                }
+                                items={sortedTerms.map(([termKey, termData]) => ({
+                                    id: termKey,
+                                    label: `ภาคการศึกษา ${termData.academic_sector}/${termData.academic_year} (${termData.subjects.length} รายวิชา)`,
+                                    onClick: () => setSelectedTerm(termKey)
+                                }))}
+                                position="left"
+                                className="w-full md:w-96 max-h-96 overflow-y-auto"
+                            />
+                        </div>
+                    )}
+                </div>
 
                 {/* Table */}
                 {currentTermData && (
@@ -251,7 +253,7 @@ export default function MySubjectsPage() {
                                     {
                                         label: 'รายวิชา', width: '2fr', align: 'left', renderCell: (row) => (
                                             <div>
-                                                <div className="text-xl font-medium text-gray-900">
+                                                <div className="text-2xl font-bold text-gray-900">
                                                     {row.code_eng || row.code_th}
                                                 </div>
                                                 <div className="text-xl text-gray-600">

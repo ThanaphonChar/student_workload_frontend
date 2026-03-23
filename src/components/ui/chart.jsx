@@ -31,7 +31,7 @@ const ChartContainer = React.forwardRef(
           data-chart={chartId}
           ref={ref}
           className={cn(
-            "flex aspect-video justify-center text-2xl",
+            "flex h-full w-full min-h-0 min-w-0 justify-center text-sm",
             className
           )}
           {...props}

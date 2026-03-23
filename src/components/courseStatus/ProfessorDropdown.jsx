@@ -62,7 +62,7 @@ export function ProfessorDropdown({ termSubjectId, onSuccess, trigger }) {
 
             {/* Dropdown Menu */}
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-60 overflow-y-auto">
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                     {loadingProfessors ? (
                         <div className="px-4 py-3 text-xl text-gray-500 text-center">
                             กำลังโหลด...
@@ -72,18 +72,19 @@ export function ProfessorDropdown({ termSubjectId, onSuccess, trigger }) {
                             ไม่มีอาจารย์ในระบบ
                         </div>
                     ) : (
-                        <div className="py-1">
+                        <div className="py-2">
                             {professors.map((prof) => (
                                 <button
                                     key={prof.id}
                                     onClick={() => handleAssign(prof.id)}
                                     disabled={assigning}
-                                    className="w-full text-left px-4 py-2 text-2xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full text-left px-4 text-2xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <div className="font-medium text-gray-900">
+                                    <div className="font-bold text-gray-900">
                                         {prof.first_name_th} {prof.last_name_th}
                                     </div>
-                                    <div className="text-2xl text-gray-500">{prof.email}</div>
+                                    <div className="text-xl text-[#989898]">{prof.email}</div>
+                                    <div className="border-b  mt-2 border-gray-200"></div>
                                 </button>
                             ))}
                         </div>

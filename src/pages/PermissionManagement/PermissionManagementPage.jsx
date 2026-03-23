@@ -2,12 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { AppShell } from '../../components/layout/AppShell';
 import GlobalUserSearch from '../../components/PermissionManagement/GlobalUserSearch';
 import RoleSection from '../../components/PermissionManagement/RoleSection';
+import InstructorDropdown from '../../components/PermissionManagement/InstructorDropdown';
+import { Modal } from '../../components/common/Modal';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 import * as permissionService from '../../services/permission.service';
 
 const ROLE_SECTIONS = [
+    { key: 'program_chair', title: 'ประธานหลักสูตร' },
     { key: 'academic_officer', title: 'เจ้าหน้าที่วิชาการ' },
     { key: 'professor', title: 'อาจารย์' },
-    { key: 'program_chair', title: 'ประธานหลักสูตร' },
 ];
 
 function getMemberName(member) {
@@ -27,6 +30,8 @@ export default function PermissionManagementPage() {
     const [error, setError] = useState('');
     const [addingByRole, setAddingByRole] = useState({});
     const [removingKey, setRemovingKey] = useState('');
+    const [activeAddRole, setActiveAddRole] = useState('');
+    const [pendingRemoveMember, setPendingRemoveMember] = useState(null);
 
     const loadUsers = async () => {
         try {
@@ -69,6 +74,7 @@ export default function PermissionManagementPage() {
             setAddingByRole((prev) => ({ ...prev, [roleKey]: true }));
             const data = await permissionService.bulkAddUsers(selectedInstructors, roleKey);
             setGroupedUsers(data);
+            setActiveAddRole('');
         } catch (err) {
             setError(err.message || 'เพิ่มผู้ใช้ไม่สำเร็จ');
         } finally {
@@ -76,18 +82,49 @@ export default function PermissionManagementPage() {
         }
     };
 
-    const handleRemove = async (member) => {
-        const key = `${member.id}-${member.role_id}`;
+    const handleRemove = (member) => {
+        setPendingRemoveMember(member);
+    };
+
+    const handleConfirmRemove = async () => {
+        if (!pendingRemoveMember) return;
+
+        const { id, role_id } = pendingRemoveMember;
+        const key = `${id}-${role_id}`;
         try {
             setRemovingKey(key);
-            await permissionService.removeUserRole(member.id, member.role_id);
+            await permissionService.removeUserRole(id, role_id);
             await loadUsers();
+            setPendingRemoveMember(null);
         } catch (err) {
             setError(err.message || 'ลบสิทธิ์ไม่สำเร็จ');
         } finally {
             setRemovingKey('');
         }
     };
+
+    const handleCloseRemoveDialog = () => {
+        if (removingKey) return;
+        setPendingRemoveMember(null);
+    };
+
+    const handleOpenAddModal = (roleKey) => {
+        setError('');
+        setActiveAddRole(roleKey);
+    };
+
+    const handleCloseAddModal = () => {
+        if (activeAddRole && addingByRole[activeAddRole]) return;
+        setActiveAddRole('');
+    };
+
+    const activeSection = ROLE_SECTIONS.find((section) => section.key === activeAddRole);
+
+    const visibleSections = ROLE_SECTIONS.filter((section) => {
+        const members = filteredByRole[section.key] || [];
+        if (searchQuery.trim() && members.length === 0) return false;
+        return true;
+    });
 
     return (
         <AppShell title="การจัดการสิทธิ์">
@@ -112,26 +149,56 @@ export default function PermissionManagementPage() {
                         {!hasAnyResult && searchQuery.trim() ? (
                             <div className="rounded-lg bg-gray-50 p-4 text-xl text-gray-500">ไม่พบผู้ใช้ที่ค้นหา</div>
                         ) : (
-                            ROLE_SECTIONS.map((section) => {
+                            visibleSections.map((section) => {
                                 const members = filteredByRole[section.key] || [];
-                                if (searchQuery.trim() && members.length === 0) return null;
 
                                 return (
-                                    <RoleSection
-                                        key={section.key}
-                                        roleKey={section.key}
-                                        title={section.title}
-                                        members={members}
-                                        onAdd={handleAdd}
-                                        onRemove={handleRemove}
-                                        adding={!!addingByRole[section.key]}
-                                        removingKey={removingKey}
-                                    />
+                                    <div key={section.key} className="space-y-6">
+                                        <RoleSection
+                                            roleKey={section.key}
+                                            title={section.title}
+                                            members={members}
+                                            onOpenAdd={handleOpenAddModal}
+                                            onRemove={handleRemove}
+                                            removingKey={removingKey}
+                                        />
+                                        {/* {index < visibleSections.length - 1 ? (
+                                            <div className="border-2 rounded-full border-[#ababab]" />
+                                        ) : null} */}
+                                    </div>
                                 );
                             })
                         )}
                     </div>
                 )}
+
+                <Modal
+                    isOpen={!!activeAddRole}
+                    onClose={handleCloseAddModal}
+                    title={activeSection ? `เพิ่มผู้ใช้ - ${activeSection.title}` : 'เพิ่มผู้ใช้'}
+                    size="md"
+                    closeOnOverlay
+                >
+                    {activeAddRole ? (
+                        <InstructorDropdown
+                            onConfirm={(selected) => handleAdd(activeAddRole, selected)}
+                            loading={!!addingByRole[activeAddRole]}
+                        />
+                    ) : null}
+                </Modal>
+
+                <ConfirmDialog
+                    isOpen={!!pendingRemoveMember}
+                    onClose={handleCloseRemoveDialog}
+                    onConfirm={handleConfirmRemove}
+                    title="ยืนยันการลบสิทธิ์"
+                    message={pendingRemoveMember
+                        ? `คุณต้องการลบสิทธิ์ของ ${getMemberName(pendingRemoveMember)} ใช่หรือไม่?`
+                        : 'คุณต้องการลบสิทธิ์ผู้ใช้นี้ใช่หรือไม่?'}
+                    confirmText="ยืนยันลบ"
+                    cancelText="ยกเลิก"
+                    variant="danger"
+                />
             </div>
         </AppShell>
     );

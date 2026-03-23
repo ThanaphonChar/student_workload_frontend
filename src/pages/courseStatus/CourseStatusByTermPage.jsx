@@ -14,6 +14,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { AppShell } from '../../components/layout/AppShell';
 import { CourseStatusTable } from '../../components/courseStatus/CourseStatusTable';
 import { Button } from '../../components/common/Button';
+import { DropdownMenu } from '../../components/common/DropdownMenu';
 import { useCourseStatus } from '../../hooks/useCourseStatus';
 import { useAuth } from '../../hooks/useAuth';
 import { useTerms } from '../../hooks/useTerms';
@@ -65,14 +66,20 @@ export default function CourseStatusByTermPage() {
     }
 
     // Handle เลือกภาคการศึกษา
-    const handleTermChange = (e) => {
-        const newTermId = e.target.value;
+    const handleTermChange = (newTermId) => {
         setSelectedTermId(newTermId);
 
         // อัพเดท URL ด้วย
         if (newTermId) {
             navigate(`/course-status/term/${newTermId}`);
         }
+    };
+
+    const selectedTerm = terms.find((t) => String(t.id) === String(selectedTermId));
+
+    const getTermLabel = (t) => {
+        const termSector = t.academic_sector || t.semester;
+        return `${t.academic_year}/${termSector}`;
     };
 
     // Handle ดูรายละเอียด
@@ -129,19 +136,27 @@ export default function CourseStatusByTermPage() {
                     <label className="block text-xl font-medium text-gray-700 mb-2">
                         เลือกภาคการศึกษา
                     </label>
-                    <select
-                        value={selectedTermId}
-                        onChange={handleTermChange}
-                        className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
-                    >
-                        <option value="">-- เลือกภาคการศึกษา --</option>
-                        {terms.map((term) => (
-                            <option key={term.id} value={term.id}>
-                                {term.academic_year}/{term.semester}
-                                {term.is_active && ' (ปัจจุบัน)'}
-                            </option>
-                        ))}
-                    </select>
+                    <DropdownMenu
+                        trigger={
+                            <button className="px-4 py-2 rounded-lg bg-white hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between min-w-[100px] border border-gray-300">
+                                <span className="text-gray-900 text-xl">
+                                    {selectedTerm
+                                        ? `${getTermLabel(selectedTerm)}${selectedTerm.is_active ? ' (ปัจจุบัน)' : ''}`
+                                        : '-- เลือกภาคการศึกษา --'}
+                                </span>
+                                <span className="material-symbols-outlined text-gray-500 ml-2">
+                                    expand_more
+                                </span>
+                            </button>
+                        }
+                        items={terms.map((term) => ({
+                            id: term.id,
+                            label: `${getTermLabel(term)}${term.is_active ? ' (ปัจจุบัน)' : ''}`,
+                            onClick: () => handleTermChange(term.id),
+                        }))}
+                        position="left"
+                        className="w-80 max-h-96 overflow-y-auto"
+                    />
                 </div>
 
                 {/* Error */}

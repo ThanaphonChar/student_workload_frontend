@@ -10,9 +10,9 @@ const VARIANTS = {
     border-transparent
   `,
   secondary: `
-    bg-white hover:bg-gray-50
+    bg-[#F1F1F1] hover:bg-[#E0E0E0]
     text-gray-700
-    border-gray-300
+    border-transparent
   `,
   danger: `
     bg-red-600 hover:bg-red-700
@@ -55,7 +55,6 @@ export const Button = ({
       disabled={disabled || isLoading}
       className={`
         inline-flex items-center justify-center
-        font-medium
         border rounded-lg
         focus:outline-none
         transition-all duration-200

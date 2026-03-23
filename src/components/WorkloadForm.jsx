@@ -5,11 +5,14 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, DateInputField } from './common';
+import { Button, DateInputField, LoadingSpinner, TextAreaInput } from './common';
+import { TextInput } from './common/TextInput';
 import { formatDateToString, parseDate } from '../utils/dateUtils';
+import { useAlert } from '../hooks/useAlert';
 
 const WorkloadForm = ({ termSubjectId, termSubjectData, onSuccess, onCancel, editData = null }) => {
     const navigate = useNavigate();
+    const { alert, AlertDialog } = useAlert();
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -28,8 +31,8 @@ const WorkloadForm = ({ termSubjectId, termSubjectData, onSuccess, onCancel, edi
             setFormData({
                 work_title: editData.work_title || '',
                 description: editData.description || '',
-                start_date: editData.start_date || '',
-                end_date: editData.end_date || '',
+                start_date: editData.start_date ? formatDateToString(parseDate(editData.start_date)) : '',
+                end_date: editData.end_date ? formatDateToString(parseDate(editData.end_date)) : '',
                 hours_per_week: editData.hours_per_week || ''
             });
         }
@@ -126,14 +129,19 @@ const WorkloadForm = ({ termSubjectId, termSubjectData, onSuccess, onCancel, edi
             console.error('Error submitting workload:', error);
 
             // แสดง validation errors จาก backend
-            if (error.details && Array.isArray(error.details)) {
+            if (error.data?.details && Array.isArray(error.data.details)) {
                 const backendErrors = {};
-                error.details.forEach(err => {
+                error.data.details.forEach(err => {
                     backendErrors[err.field] = err.message;
                 });
                 setErrors(backendErrors);
             } else {
-                alert('เกิดข้อผิดพลาด: ' + (error.message || 'ไม่สามารถบันทึกข้อมูลได้'));
+                await alert({
+                    title: 'เกิดข้อผิดพลาด',
+                    message: error.message || 'ไม่สามารถบันทึกข้อมูลได้',
+                    variant: 'error',
+                    buttonText: 'ตกลง'
+                });
             }
         } finally {
             setLoading(false);
@@ -150,135 +158,122 @@ const WorkloadForm = ({ termSubjectId, termSubjectData, onSuccess, onCancel, edi
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            {/* ข้อมูลพื้นฐานของงาน */}
-            <div className="mb-6">
-                <h3 className="text-xl font-medium text-gray-800 mb-4">
-                    ข้อมูลพื้นฐานของงาน
-                </h3>
+        <>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {/* ข้อมูลพื้นฐานของงาน */}
+                <div className="mb-6">
+                    <h3 className="text-3xl font-bold text-[#7A7A7A] mb-4">
+                        ข้อมูลพื้นฐานของงาน
+                    </h3>
 
-                {/* ชื่องาน */}
-                <div className="mb-4">
-                    <label htmlFor="work_title" className="block text-xl font-medium text-gray-700 mb-1">
-                        ชื่องาน <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        id="work_title"
+                    {/* ชื่องาน */}
+                    <TextInput
+                        label="ชื่องาน"
                         name="work_title"
                         value={formData.work_title}
                         onChange={handleChange}
-                        className={`w-full px-4 py-2 border rounded-md focus:outline-none ${errors.work_title ? 'border-red-500' : 'border-gray-300'
-                            }`}
                         placeholder="ระบุชื่องาน"
+                        required
+                        error={errors.work_title}
                         disabled={loading}
                     />
-                    {errors.work_title && (
-                        <p className="mt-1 text-xl text-red-500">{errors.work_title}</p>
-                    )}
-                </div>
 
-                {/* รายละเอียดงาน */}
-                <div className="mb-4">
-                    <label htmlFor="description" className="block text-xl font-medium text-gray-700 mb-1">
-                        รายละเอียดงาน
-                    </label>
-                    <textarea
-                        id="description"
+                    {/* รายละเอียดงาน */}
+                    <TextAreaInput
+                        label="รายละเอียดงาน"
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        rows="4"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none resize-none"
+                        rows={4}
                         placeholder="ระบุรายละเอียดเพิ่มเติม (ถ้ามี)"
                         disabled={loading}
                     />
                 </div>
-            </div>
 
-            {/* ระยะเวลาและชั่วโมง */}
-            <div className="mb-6">
-                <h3 className="text-xl font-medium text-gray-800 mb-4">
-                    ระยะเวลาและชั่วโมง
-                </h3>
+                {/* ระยะเวลาและชั่วโมง */}
+                <div className="mb-6">
+                    <h3 className="text-3xl font-bold text-[#7A7A7A] mb-4">
+                        ระยะเวลาและชั่วโมง
+                    </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* วันที่เริ่มงาน */}
-                    <div>
-                        <DateInputField
-                            label="วันที่เริ่มงาน"
-                            value={parseDate(formData.start_date)}
-                            onChange={(value) => handleDateChange('start_date', value)}
-                            required
-                            error={!!errors.start_date}
-                        />
-                        {errors.start_date && (
-                            <p className="mt-1 text-xl text-red-500">{errors.start_date}</p>
-                        )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* วันที่เริ่มงาน */}
+                        <div>
+                            <DateInputField
+                                label="วันที่เริ่มงาน"
+                                value={parseDate(formData.start_date)}
+                                onChange={(value) => handleDateChange('start_date', value)}
+                                required
+                                error={!!errors.start_date}
+                            />
+                            {errors.start_date && (
+                                <p className="mt-1 text-xl text-red-500">{errors.start_date}</p>
+                            )}
+                        </div>
+
+                        {/* วันที่สิ้นสุด (Deadline) */}
+                        <div>
+                            <DateInputField
+                                label="วันที่สิ้นสุด (Deadline)"
+                                value={parseDate(formData.end_date)}
+                                onChange={(value) => handleDateChange('end_date', value)}
+                                required
+                                error={!!errors.end_date}
+                            />
+                            {errors.end_date && (
+                                <p className="mt-1 text-xl text-red-500">{errors.end_date}</p>
+                            )}
+                        </div>
                     </div>
 
-                    {/* วันที่สิ้นสุด (Deadline) */}
-                    <div>
-                        <DateInputField
-                            label="วันที่สิ้นสุด (Deadline)"
-                            value={parseDate(formData.end_date)}
-                            onChange={(value) => handleDateChange('end_date', value)}
-                            required
-                            error={!!errors.end_date}
-                        />
-                        {errors.end_date && (
-                            <p className="mt-1 text-xl text-red-500">{errors.end_date}</p>
-                        )}
-                    </div>
-                </div>
-
-                {/* จำนวนชั่วโมงต่อสัปดาห์ */}
-                <div className="mt-4">
-                    <label htmlFor="hours_per_week" className="block text-xl font-medium text-gray-700 mb-1">
-                        จำนวนชั่วโมงต่อสัปดาห์ <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="number"
-                        id="hours_per_week"
+                    {/* จำนวนชั่วโมงต่อสัปดาห์ */}
+                    <TextInput
+                        label="จำนวนชั่วโมงต่อสัปดาห์"
                         name="hours_per_week"
+                        type="number"
                         value={formData.hours_per_week}
                         onChange={handleChange}
                         min="1"
                         max="168"
-                        className={`w-full md:w-1/2 px-4 py-2 border rounded-md focus:outline-none ${errors.hours_per_week ? 'border-red-500' : 'border-gray-300'
-                            }`}
                         placeholder="ระบุจำนวนชั่วโมง"
+                        required
+                        error={errors.hours_per_week}
                         disabled={loading}
+                        className="mt-4 md:w-1/2 md:pr-2"
                     />
-                    {errors.hours_per_week && (
-                        <p className="mt-1 text-xl text-red-500">{errors.hours_per_week}</p>
-                    )}
                 </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-4">
-                <Button
-                    type="button"
-                    onClick={handleCancel}
-                    variant="secondary"
-                    size="sm"
-                    className="text-xl"
-                    disabled={loading}
-                >
-                    ยกเลิก
-                </Button>
-                <Button
-                    type="submit"
-                    variant="primary"
-                    size="sm"
-                    className="text-xl"
-                    disabled={loading}
-                >
-                    {loading ? 'กำลังบันทึก...' : 'บันทึก'}
-                </Button>
-            </div>
-        </form>
+                {/* Action Buttons */}
+                <div className="flex ml-[60%] gap-4 pt-4">
+                    <Button
+                        type="button"
+                        onClick={handleCancel}
+                        disabled={loading}
+                        className="flex-1 bg-[#F1F1F1] hover:bg-[#E1E1E1] text-[#3B3B3B] text-2xl"
+                    >
+                        <span className="text-gray-700 text-2xl">ยกเลิก</span>
+                    </Button>
+
+                    <Button
+                        type="submit"
+                        disabled={loading}
+                        className="flex-1 bg-[#050C9C] text-white hover:bg-[#040879] text-2xl"
+                    >
+                        {loading ? (
+                            <span className="flex items-center justify-center gap-2">
+                                <LoadingSpinner size="small" />
+                                <span>กำลังบันทึก...</span>
+                            </span>
+                        ) : (
+                            'บันทึก'
+                        )}
+                    </Button>
+                </div>
+            </form>
+
+            {/* Alert Dialog */}
+            <AlertDialog />
+        </>
     );
 };
 
