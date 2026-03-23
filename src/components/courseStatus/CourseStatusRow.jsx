@@ -48,7 +48,7 @@ export function CourseStatusRow({ subject, onRefresh, onViewDetail, userRole }) 
         <div className="grid px-6 py-4" style={{ gridTemplateColumns: '25% 10% 10% 25% 10% 10% 10%' }}>
             {/* รหัสวิชา + ชื่อวิชา */}
             <div>
-                <div className="text-xl font-semibold text-gray-900">{subjectCode}</div>
+                <div className="mt-1 text-2xl font-bold text-gray-900">{subjectCode}</div>
                 <div className="text-xl text-gray-500 uppercase mt-0.5">{subjectName}</div>
             </div>
 

@@ -9,12 +9,25 @@ import { AppShell } from '../../../components/layout/AppShell';
 import WorkloadForm from '../../../components/WorkloadForm';
 import WorkloadList from '../../../components/WorkloadList';
 import { Button } from '../../../components/common/Button';
+import { Breadcrumb } from '../../../components/common';
 import { useToast } from '../../../components/common/Toast';
+import ApprovalFlowModal from '../../../components/terms/workload/ApprovalFlowModal';
+import ApproveStep1 from '../../../components/terms/workload/ApproveStep1';
+import ApproveStep2 from '../../../components/terms/workload/ApproveStep2';
+import ApproveStep3 from '../../../components/terms/workload/ApproveStep3';
+import RejectStep1 from '../../../components/terms/workload/RejectStep1';
+import RejectStep2 from '../../../components/terms/workload/RejectStep2';
+import RejectStep3 from '../../../components/terms/workload/RejectStep3';
+import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
+import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { useAuth } from '../../../hooks/useAuth';
 import { formatThaiDate, parseDate } from '../../../utils/dateUtils';
 import * as termSubjectService from '../../../services/termSubjectService';
 import * as workloadService from '../../../services/workloadService';
 import * as uploadService from '../../../services/uploadService';
+
+const APPROVE_STEPS = ['ยืนยันเอกสาร', 'ตรวจสอบข้อมูล', 'เสร็จสิ้น'];
+const REJECT_STEPS = ['ระบุเหตุผล', 'ตรวจสอบก่อนส่ง', 'เสร็จสิ้น'];
 
 const TermSubjectWorkloadPage = () => {
     const { termSubjectId } = useParams();
@@ -35,17 +48,33 @@ const TermSubjectWorkloadPage = () => {
     const [showForm, setShowForm] = useState(false);
     const [editingWork, setEditingWork] = useState(null);
     const [error, setError] = useState(null);
+    const [approvalFlow, setApprovalFlow] = useState({
+        isOpen: false,
+        mode: null,
+        currentStep: 0,
+        documentType: null,
+        note: '',
+        reason: '',
+        reasonError: '',
+    });
+    const [approvalFlowLoading, setApprovalFlowLoading] = useState(false);
 
     const breadcrumbSourcePath = location.state?.fromPath || '/course-status';
     const breadcrumbSourceLabel = location.state?.fromLabel || 'ติดตามสถานะรายวิชา';
-    const breadcrumbTermLabel = location.state?.termLabel
-        || ((termSubject?.academic_sector && termSubject?.academic_year)
-            ? `ปีการศึกษา ${termSubject.academic_sector}/${termSubject.academic_year}`
-            : 'ภาคการศึกษา');
     const breadcrumbSubjectLabel = location.state?.subjectCode
         || termSubject?.code_eng
         || termSubject?.subject_code
         || 'รายวิชา';
+
+    const breadcrumbItems = [
+        {
+            label: breadcrumbSourceLabel,
+            onClick: () => navigate(breadcrumbSourcePath),
+        },
+        {
+            label: breadcrumbSubjectLabel,
+        },
+    ];
 
     // ดึงข้อมูล term subject และ workload
     const fetchData = async () => {
@@ -168,6 +197,98 @@ const TermSubjectWorkloadPage = () => {
         }));
     };
 
+    const getDocumentTitle = (documentType) => {
+        return documentType === 'outline'
+            ? 'เอกสารเค้าโครงรายวิชา'
+            : 'เอกสารรายงานผลการดำเนินงาน';
+    };
+
+    const getDocumentNameByType = (documentType) => {
+        const targetDocument = documents?.[documentType];
+        if (!targetDocument) {
+            return getDocumentTitle(documentType);
+        }
+
+        return normalizeDisplayFileName(targetDocument.original_name);
+    };
+
+    const openApproveFlow = (documentType) => {
+        setApprovalFlow({
+            isOpen: true,
+            mode: 'approve',
+            currentStep: 0,
+            documentType,
+            note: '',
+            reason: '',
+            reasonError: '',
+        });
+    };
+
+    const openRejectFlow = (documentType) => {
+        setApprovalFlow({
+            isOpen: true,
+            mode: 'reject',
+            currentStep: 0,
+            documentType,
+            note: '',
+            reason: '',
+            reasonError: '',
+        });
+    };
+
+    const closeApprovalFlow = () => {
+        setApprovalFlow({
+            isOpen: false,
+            mode: null,
+            currentStep: 0,
+            documentType: null,
+            note: '',
+            reason: '',
+            reasonError: '',
+        });
+        setApprovalFlowLoading(false);
+    };
+
+    const handleApproveStepNext = () => {
+        setApprovalFlow((prev) => ({
+            ...prev,
+            currentStep: 1,
+        }));
+    };
+
+    const handleRejectStepNext = () => {
+        const cleanedReason = approvalFlow.reason.trim();
+        if (!cleanedReason) {
+            setApprovalFlow((prev) => ({
+                ...prev,
+                reasonError: 'กรุณาระบุเหตุผลการปฏิเสธ',
+            }));
+            return;
+        }
+
+        setApprovalFlow((prev) => ({
+            ...prev,
+            reason: cleanedReason,
+            reasonError: '',
+            currentStep: 1,
+        }));
+    };
+
+    const handleFlowBack = () => {
+        setApprovalFlow((prev) => ({
+            ...prev,
+            currentStep: 0,
+        }));
+    };
+
+    const handleFlowReasonChange = (value) => {
+        setApprovalFlow((prev) => ({
+            ...prev,
+            reason: value,
+            reasonError: '',
+        }));
+    };
+
     const handleViewDocument = async (documentType) => {
         const doc = documents?.[documentType];
         if (!doc) return;
@@ -198,7 +319,7 @@ const TermSubjectWorkloadPage = () => {
     };
 
     const handleDocumentApproval = async (documentType, nextStatus) => {
-        if (!isAcademicOfficer) return;
+        if (!isAcademicOfficer) return false;
 
         const fieldName = documentType === 'outline' ? 'outline_approved' : 'report_approved';
 
@@ -210,11 +331,114 @@ const TermSubjectWorkloadPage = () => {
 
             setTermSubject(response.data);
             toast.success(nextStatus === 'approved' ? 'อนุมัติเอกสารสำเร็จ' : 'ปฏิเสธเอกสารสำเร็จ');
+            return true;
         } catch (err) {
             toast.error(err.message || 'ไม่สามารถอัปเดตสถานะเอกสารได้');
+            return false;
         } finally {
             setDocumentLoading(documentType, false);
         }
+    };
+
+    const handleApproveConfirm = async () => {
+        if (!approvalFlow.documentType) return;
+
+        try {
+            setApprovalFlowLoading(true);
+            const success = await handleDocumentApproval(approvalFlow.documentType, 'approved');
+            if (success) {
+                setApprovalFlow((prev) => ({
+                    ...prev,
+                    currentStep: 2,
+                }));
+            }
+        } catch {
+            // Error ถูกจัดการด้วย toast ใน handleDocumentApproval
+        } finally {
+            setApprovalFlowLoading(false);
+        }
+    };
+
+    const handleRejectConfirm = async () => {
+        if (!approvalFlow.documentType) return;
+
+        try {
+            setApprovalFlowLoading(true);
+            const success = await handleDocumentApproval(approvalFlow.documentType, 'rejected');
+            if (success) {
+                setApprovalFlow((prev) => ({
+                    ...prev,
+                    currentStep: 2,
+                }));
+            }
+        } catch {
+            // Error ถูกจัดการด้วย toast ใน handleDocumentApproval
+        } finally {
+            setApprovalFlowLoading(false);
+        }
+    };
+
+    const renderApprovalFlowStep = () => {
+        const documentName = getDocumentNameByType(approvalFlow.documentType);
+
+        if (approvalFlow.mode === 'approve') {
+            if (approvalFlow.currentStep === 0) {
+                return (
+                    <ApproveStep1
+                        documentName={documentName}
+                        note={approvalFlow.note}
+                        onNoteChange={(value) => setApprovalFlow((prev) => ({ ...prev, note: value }))}
+                        onCancel={closeApprovalFlow}
+                        onNext={handleApproveStepNext}
+                    />
+                );
+            }
+
+            if (approvalFlow.currentStep === 1) {
+                return (
+                    <ApproveStep2
+                        documentName={documentName}
+                        note={approvalFlow.note}
+                        onBack={handleFlowBack}
+                        onConfirm={handleApproveConfirm}
+                        isSubmitting={approvalFlowLoading}
+                    />
+                );
+            }
+
+            return (
+                <ApproveStep3
+                    documentName={documentName}
+                    onClose={closeApprovalFlow}
+                />
+            );
+        }
+
+        if (approvalFlow.currentStep === 0) {
+            return (
+                <RejectStep1
+                    reason={approvalFlow.reason}
+                    reasonError={approvalFlow.reasonError}
+                    onReasonChange={handleFlowReasonChange}
+                    onCancel={closeApprovalFlow}
+                    onNext={handleRejectStepNext}
+                />
+            );
+        }
+
+        if (approvalFlow.currentStep === 1) {
+            return (
+                <RejectStep2
+                    documentName={documentName}
+                    reason={approvalFlow.reason}
+                    onBack={handleFlowBack}
+                    onConfirm={handleRejectConfirm}
+                    isSubmitting={approvalFlowLoading}
+                />
+            );
+        }
+
+        return <RejectStep3 onClose={closeApprovalFlow} />;
     };
 
     const renderDocumentCard = (documentType, title) => {
@@ -264,7 +488,7 @@ const TermSubjectWorkloadPage = () => {
                                 {isAcademicOfficer && (
                                     <>
                                         <Button
-                                            onClick={() => handleDocumentApproval(documentType, 'approved')}
+                                            onClick={() => openApproveFlow(documentType)}
                                             variant="success"
                                             size="sm"
                                             disabled={isBusy || status === 'approved'}
@@ -273,7 +497,7 @@ const TermSubjectWorkloadPage = () => {
                                             อนุมัติ
                                         </Button>
                                         <Button
-                                            onClick={() => handleDocumentApproval(documentType, 'rejected')}
+                                            onClick={() => openRejectFlow(documentType)}
                                             variant="danger"
                                             size="sm"
                                             disabled={isBusy || status === 'rejected'}
@@ -332,14 +556,14 @@ const TermSubjectWorkloadPage = () => {
         return (
             <AppShell>
                 <div className="space-y-6">
+                    {/* Breadcrumb */}
+                    <Breadcrumb items={breadcrumbItems} />
                     {/* Header */}
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">
                             {editingWork ? 'แก้ไขภาระงาน' : 'เพิ่มภาระงาน'}
                         </h1>
-                        <p className="text-gray-600 mt-2">
-                            {termSubject?.subject_code} - {termSubject?.subject_name_th}
-                        </p>
+
                     </div>
 
                     {/* Form */}
@@ -362,30 +586,14 @@ const TermSubjectWorkloadPage = () => {
         <AppShell>
             <div className="space-y-6">
                 {/* Breadcrumb */}
-                <div className="flex items-center gap-2 text-2xl text-gray-600">
-                    <span className="hover:text-[#050C9C] cursor-pointer" onClick={() => navigate(breadcrumbSourcePath)}>
-                        {breadcrumbSourceLabel}
-                    </span>
-                    <span className="material-symbols-outlined text-xl sm:text-xl">
-                        chevron_right
-                    </span>
-                    <span className="hover:text-[#050C9C] cursor-pointer" onClick={() => navigate(breadcrumbSourcePath)}>
-                        {breadcrumbTermLabel}
-                    </span>
-                    <span className="material-symbols-outlined text-xl sm:text-xl">
-                        chevron_right
-                    </span>
-                    <span className="text-[#050C9C] font-bold">
-                        {breadcrumbSubjectLabel}
-                    </span>
-                </div>
+                <Breadcrumb items={breadcrumbItems} />
 
                 {/* Top Section: Subject Info + Summary Cards */}
                 <div className="grid grid-cols-3 gap-4">
                     {/* Subject Info Card - Takes 2 columns */}
-                    <div className="col-span-2 bg-white rounded-lg shadow p-6">
+                    <div className="col-span-2 bg-white rounded-lg shadow px-6 py-6">
                         <div className="flex items-start gap-3">
-                            <div className="w-2 h-30 bg-[#050C9C] rounded shrink-0"></div>
+                            <div className="w-3 h-24 bg-[#050C9C] rounded-full shrink-0 mr-6"></div>
                             <div>
                                 <h1 className="text-5xl font-bold text-gray-900">
                                     {termSubject?.code_eng || termSubject?.subject_code}
@@ -400,24 +608,24 @@ const TermSubjectWorkloadPage = () => {
                     {/* Summary Cards Container - Takes 1 column */}
                     <div className="grid grid-cols-2 gap-4">
                         {/* Total Workload Card */}
-                        <div className="bg-white rounded-lg shadow p-6">
+                        <div className="bg-white rounded-lg shadow px-6 py-3">
                             <div className="text-center">
-                                <p className="text-xl text-gray-600 mb-2">รวมภาระงาน</p>
+                                <p className="text-xl font-bold text-gray-600">รวมภาระงาน</p>
                                 <p className="text-6xl font-bold text-yellow-500">
                                     {workloads.length}
                                 </p>
-                                <p className="text-xl text-gray-600 mt-2">งาน</p>
+                                <p className="text-xl text-gray-600">งาน</p>
                             </div>
                         </div>
 
                         {/* Total Hours Card */}
-                        <div className="bg-white rounded-lg shadow p-6">
+                        <div className="bg-white rounded-lg shadow px-6 py-3">
                             <div className="text-center">
-                                <p className="text-xl text-gray-600 mb-2">ชั่วโมง/สัปดาห์</p>
+                                <p className="text-xl font-bold text-gray-600">ชั่วโมง/สัปดาห์</p>
                                 <p className="text-6xl font-bold text-[#050C9C]">
                                     {workloads.reduce((sum, w) => sum + (w.hours_per_week || 0), 0)}
                                 </p>
-                                <p className="text-xl text-gray-600 mt-2">ชม./สัปดาห์</p>
+                                <p className="text-xl text-gray-600">ชม./สัปดาห์</p>
                             </div>
                         </div>
                     </div>
@@ -429,17 +637,29 @@ const TermSubjectWorkloadPage = () => {
                     {renderDocumentCard('report', 'เอกสารรายงานผลการดำเนินงาน')}
                 </div>
 
+                <ApprovalFlowModal
+                    isOpen={approvalFlow.isOpen}
+                    onClose={closeApprovalFlow}
+                    title={approvalFlow.mode === 'approve' ? 'อนุมัติเอกสาร' : 'ปฏิเสธเอกสาร'}
+                    Icon={approvalFlow.mode === 'approve' ? TaskAltOutlinedIcon : HighlightOffOutlinedIcon}
+                    steps={approvalFlow.mode === 'approve' ? APPROVE_STEPS : REJECT_STEPS}
+                    currentStep={approvalFlow.currentStep}
+                >
+                    {renderApprovalFlowStep()}
+                </ApprovalFlowModal>
+
                 {/* Workload Section */}
                 <div>
                     {/* Section Header */}
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-2xl font-semibold text-gray-900">ภาระงาน</h2>
+                        <h2 className="text-3xl font-bold text-gray-900">ภาระงาน</h2>
                         <Button
                             onClick={handleAddWorkload}
-                            variant="primary"
-                            size="sm"
-                            className="text-xl shadow"
+                            className="px-6 py-2 bg-[#050C9C] hover:bg-[#040879] text-white rounded-lg font-bold text-xl flex items-center justify-center gap-2 whitespace-nowrap transition-colors"
                         >
+                            <span className="material-symbols-outlined text-xl">
+                                add
+                            </span>
 
                             เพิ่มภาระงาน
                         </Button>

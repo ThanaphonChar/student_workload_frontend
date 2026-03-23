@@ -1,11 +1,11 @@
 /**
  * WorkloadChart Component
  * Displays area chart of workload per week (1-16)
- * Filterable by student year via checkboxes
+ * Filterable by student year via dropdown
  */
 
-import React, { useState } from 'react';
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import React from 'react';
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
     Card,
     CardContent,
@@ -18,21 +18,21 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Checkbox } from '../common/Checkbox';
+import { DropdownMenu } from '../common/DropdownMenu';
 import { CHART_CONFIG, STUDENT_YEARS } from '@/constants/dashboard';
 
-const WorkloadChart = ({ semester = '1', termYear = '2568', chartData = [], onFilterChange }) => {
-    const [selectedYears, setSelectedYears] = useState(STUDENT_YEARS);
+const WorkloadChart = ({
+    semester = '1',
+    termYear = '2568',
+    chartData = [],
+    selectedYear = STUDENT_YEARS[0],
+    onFilterChange,
+}) => {
 
-    const handleYearToggle = (year) => {
-        const newSelection = selectedYears.includes(year)
-            ? selectedYears.filter(y => y !== year)
-            : [...selectedYears, year].sort();
+    const handleYearChange = (year) => {
+        if (!year) return;
 
-        if (newSelection.length === 0) return;
-
-        setSelectedYears(newSelection);
-        onFilterChange?.(newSelection);
+        onFilterChange?.([year]);
     };
 
     const hasData = chartData && chartData.length > 0;
@@ -49,29 +49,33 @@ const WorkloadChart = ({ semester = '1', termYear = '2568', chartData = [], onFi
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <span className="text-2xl text-gray-600">ชั้นปี</span>
-                        {STUDENT_YEARS.map((year) => (
-                            <Checkbox
-                                key={year}
-                                checked={selectedYears.includes(year)}
-                                onChange={() => handleYearToggle(year)}
-                                label={year.toString()}
-                                size="sm"
-                                className="hover:opacity-80 transition-opacity"
-                                labelClassName="font-medium"
-                            />
-                        ))}
+                        <DropdownMenu
+                            trigger={
+                                <button className="px-4 py-2 rounded-lg bg-white border-1 border-[#F1F1F1] hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between min-w-[100px]">
+                                    <span className="text-[#989898] font-bold text-xl">{`ชั้นปี ${selectedYear}`}</span>
+                                    <span className="material-symbols-outlined text-[#989898] ml-2">
+                                        expand_more
+                                    </span>
+                                </button>
+                            }
+                            items={STUDENT_YEARS.map((year) => ({
+                                id: year,
+                                label: `ชั้นปี ${year}`,
+                                onClick: () => handleYearChange(year),
+                            }))}
+                            position="left"
+                        />
                     </div>
                 </div>
             </CardHeader>
             <CardContent>
                 {hasData ? (
-                    <div style={{ width: '100%', height: 400 }}>
-                        <ChartContainer config={CHART_CONFIG} className="h-full w-full">
+                    <div className="w-full h-[260px] sm:h-[320px] lg:h-[380px]">
+                        <ChartContainer config={CHART_CONFIG} className="h-full w-full aspect-auto">
                             <AreaChart
                                 accessibilityLayer
                                 data={chartData}
-                                margin={{ left: 12, right: 12 }}
+                                margin={{ top: 8, right: 12, left: 12, bottom: 24 }}
                             >
                                 <CartesianGrid vertical={false} />
                                 <XAxis
@@ -79,7 +83,13 @@ const WorkloadChart = ({ semester = '1', termYear = '2568', chartData = [], onFi
                                     tickLine={false}
                                     axisLine={false}
                                     tickMargin={8}
-                                    tickFormatter={(value) => `สัปดาห์ ${value}`}
+                                    label={{ value: 'สัปดาห์', position: 'insideBottom', offset: -12 }}
+                                />
+                                <YAxis
+                                    tickLine={false}
+                                    axisLine={false}
+                                    width={44}
+                                    label={{ value: 'ชั่วโมง', angle: -90, position: 'insideLeft' }}
                                 />
                                 <ChartTooltip
                                     cursor={false}
@@ -87,9 +97,9 @@ const WorkloadChart = ({ semester = '1', termYear = '2568', chartData = [], onFi
                                 />
                                 <Area
                                     dataKey="totalHours"
-                                    type="natural"
+                                    type="linear"
                                     fill="var(--color-total_hours)"
-                                    fillOpacity={0.4}
+                                    fillOpacity={0}
                                     stroke="var(--color-total_hours)"
                                     strokeWidth={2}
                                 />

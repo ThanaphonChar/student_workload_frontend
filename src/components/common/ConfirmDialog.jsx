@@ -24,11 +24,11 @@ export function ConfirmDialog({
             size="sm"
         >
             <div className="space-y-6">
-                <p className="text-xl text-gray-700">{message}</p>
+                <p className="text-center text-2xl text-gray-700">{message}</p>
 
                 <div className="flex gap-3 justify-end">
                     <Button
-                        variant="outline"
+                        variant="secondary"
                         onClick={onClose}
                     >
                         {cancelText}

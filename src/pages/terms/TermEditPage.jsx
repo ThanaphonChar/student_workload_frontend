@@ -151,14 +151,14 @@ export const TermEditPage = () => {
                     <div className="flex items-center gap-2 text-2xl text-gray-600">
                         <button
                             onClick={() => navigate('/terms')}
-                            className="hover:text-blue-600 transition-colors"
+                            className="hover:text-[#040A8C] transition-colors"
                         >
                             จัดการปีการศึกษา
                         </button>
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
-                        <span className="text-blue-600 font-bold">แก้ไขภาคการศึกษา</span>
+                        <span className="text-[#050C9C] font-bold">แก้ไขภาคการศึกษา</span>
                     </div>
 
                     {/* Success Alert */}
@@ -210,7 +210,7 @@ export const TermEditPage = () => {
                             </p>
                             <button
                                 onClick={() => navigate('/terms')}
-                                className="bg-blue-600 text-white px-4 sm:px-6 py-2 text-2xl rounded-lg hover:bg-blue-700 transition-colors"
+                                className="bg-[#050C9C] text-white px-4 sm:px-6 py-2 text-2xl rounded-lg hover:bg-[#040A8C] transition-colors"
                             >
                                 กลับไปหน้ารายการ
                             </button>

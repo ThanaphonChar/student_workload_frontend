@@ -23,7 +23,10 @@ export const Navbar = () => {
 
     // ตรวจสอบว่าเมนูไหน active
     const isActive = (path) => {
-        return location.pathname.startsWith(path);
+        if (path === '/') {
+            return location.pathname === '/';
+        }
+        return location.pathname === path || location.pathname.startsWith(path + '/');
     };
 
     return (
@@ -43,9 +46,10 @@ export const Navbar = () => {
                                 <button
                                     key={item.id}
                                     onClick={() => navigate(item.path)}
-                                    className={`shrink-0 px-3 py-5 text-xl font-medium transition-colors relative whitespace-nowrap ${isActive(item.path)
-                                        ? 'text-[#050C9C]'
-                                        : 'text-gray-600 hover:text-[#050C9C]'
+                                    className={`shrink-0 px-3 py-5 text-xl transition-colors relative whitespace-nowrap 
+                                        ${isActive(item.path)
+                                            ? 'font-bold text-[#050C9C]'
+                                            : 'text-gray-600 hover:text-[#050C9C]'
                                         }`}
                                 >
                                     {item.label}

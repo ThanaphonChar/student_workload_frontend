@@ -19,7 +19,7 @@ export const SubjectToolbar = ({
         <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between">
             {/* หัวข้อ */}
             <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 m-0">
+                <h1 className="text-4xl font-bold text-gray-900 m-0">
                     ข้อมูลรายวิชา
                 </h1>
             </div>

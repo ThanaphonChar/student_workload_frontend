@@ -56,7 +56,7 @@ const WorkloadList = ({ workloads = [], termSubjectData, onEdit, onRefresh }) =>
                     onClick={() => onEdit && onEdit(work)}
                     variant="secondary"
                     size="sm"
-                    className="px-2 py-1 border-0 bg-transparent hover:bg-gray-100 text-[#050C9C] hover:text-[#040a7a]"
+                    className="px-2 py-1 border-0 bg-transparent hover:bg-gray-100 !text-[#050C9C] hover:!text-[#040a7a]"
                     title="แก้ไข"
                 >
                     <FiEdit2 className="w-5 h-5 mx-auto" />

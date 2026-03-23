@@ -6,6 +6,7 @@
 export { Alert } from './Alert';
 export { ToastProvider, useToast } from './Toast';
 export { Button } from './Button';
+export { Breadcrumb } from './Breadcrumb';
 export { Card, CardHeader, CardBody, CardFooter } from './Card';
 export { Checkbox } from './Checkbox';
 export { DateInputField } from '../DateInputField';
@@ -20,4 +21,5 @@ export { ActionButton } from './ActionButton';
 export { StatusBadge } from './StatusBadge';
 export { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from './Table';
 export { TextField } from './TextField';
+export { TextAreaInput } from './TextAreaInput';
 export { WarningBox } from './WarningBox';

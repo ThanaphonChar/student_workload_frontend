@@ -77,7 +77,7 @@ export function StudentYearDropdown({ subjectId, currentYears = [], onSuccess, t
 
             {/* Dropdown Menu */}
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
                     <div className="py-2">
                         {[1, 2, 3, 4].map((year) => (
                             <div

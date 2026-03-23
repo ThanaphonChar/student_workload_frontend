@@ -13,7 +13,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { AlertDialog as Dialog } from '../../components/common/AlertDialog.jsx';
+import { AlertDialog as Dialog } from '../components/common/AlertDialog.jsx';
 
 export function useAlert() {
     const [dialogState, setDialogState] = useState({
