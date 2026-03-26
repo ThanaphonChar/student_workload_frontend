@@ -77,39 +77,46 @@ const DashboardPage = () => {
 
     return (
         <AppShell title="แดชบอร์ด">
-            <div className="mb-6 flex items-center gap-4">
-                <label className="text-2xl text-gray-700 whitespace-nowrap">
-                    เลือกภาคการศึกษา:
-                </label>
-                <div className="flex-1 flex items-center gap-4">
-                    <DropdownMenu
-                        trigger={
-                            <button className="flex-none w-64 px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between">
-                                <span className="text-gray-900 text-xl truncate">
-                                    {currentTerm
-                                        ? `ภาคการศึกษา ${currentTerm.academic_sector}/${currentTerm.academic_year}${currentTerm.is_active ? ' (ปัจจุบัน)' : ''}`
-                                        : 'เลือกภาคการศึกษา'
-                                    }
-                                </span>
-                                <span className="material-symbols-outlined text-gray-500">
-                                    expand_more
-                                </span>
-                            </button>
-                        }
-                        items={allTerms.map(term => ({
-                            id: term.id,
-                            label: `ภาคการศึกษา ${term.academic_sector}/${term.academic_year}${term.is_active ? ' (ปัจจุบัน)' : ''}`,
-                            onClick: () => handleTermChange(term.id)
-                        }))}
-                        position="left"
-                        className="w-96 max-h-96 overflow-y-auto"
-                    />
-                    {currentTerm && (
-                        <span className="text-2xl text-gray-600">
-                            {formatThaiDate(currentTerm.term_start_date)} - {formatThaiDate(currentTerm.term_end_date)}
-                        </span>
-                    )}
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">
+                        แดชบอร์ด
+                    </h1>
+
                 </div>
+                <div className="w-full md:w-auto md:ml-auto">
+
+                    <div className="flex-1 flex items-center gap-4">
+                        <DropdownMenu
+                            trigger={
+                                <button className="flex-none w-64 px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between">
+                                    <span className="text-gray-900 text-xl truncate">
+                                        {currentTerm
+                                            ? `ภาคการศึกษา ${currentTerm.academic_sector}/${currentTerm.academic_year}${currentTerm.is_active ? ' (ปัจจุบัน)' : ''}`
+                                            : 'เลือกภาคการศึกษา'
+                                        }
+                                    </span>
+                                    <span className="material-symbols-outlined text-gray-500">
+                                        expand_more
+                                    </span>
+                                </button>
+                            }
+                            items={allTerms.map(term => ({
+                                id: term.id,
+                                label: `ภาคการศึกษา ${term.academic_sector}/${term.academic_year}${term.is_active ? ' (ปัจจุบัน)' : ''}`,
+                                onClick: () => handleTermChange(term.id)
+                            }))}
+                            position="left"
+                            className="w-96 max-h-96 overflow-y-auto"
+                        />
+                        {currentTerm && (
+                            <span className="text-2xl text-gray-600">
+                                {formatThaiDate(currentTerm.term_start_date)} - {formatThaiDate(currentTerm.term_end_date)}
+                            </span>
+                        )}
+                    </div>
+                </div>
+
             </div>
 
             <div className="space-y-6">

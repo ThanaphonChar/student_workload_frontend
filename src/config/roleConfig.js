@@ -78,7 +78,7 @@ export const MENU_CONFIG = [
         id: 'my_subjects',
         label: 'รายวิชาของฉัน',
         path: '/my-subjects',
-        allowedRoles: [ROLES.ACADEMIC_OFFICER, ROLES.PROFESSOR],
+        allowedRoles: [ROLES.PROFESSOR],
     },
     {
         id: 'role_management',

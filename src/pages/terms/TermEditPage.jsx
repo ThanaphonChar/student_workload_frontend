@@ -47,7 +47,7 @@ export const TermEditPage = () => {
             }
         } catch (error) {
             console.error('Error loading term:', error);
-            setErrorMessage(error.response?.data?.message || 'ไม่สามารถโหลดข้อมูลภาคการศึกษาได้');
+            setErrorMessage(error?.data?.message || error?.message || 'ไม่สามารถโหลดข้อมูลภาคการศึกษาได้');
         } finally {
             setLoading(false);
         }
@@ -107,12 +107,12 @@ export const TermEditPage = () => {
             console.error('[TermEditPage] ❌ Error updating term:', error);
             console.error('[TermEditPage] Error details:', {
                 message: error.message,
-                response: error.response?.data,
-                status: error.response?.status
+                response: error?.data,
+                status: error?.status
             });
 
-            if (error.response?.data?.message) {
-                setErrorMessage(error.response.data.message);
+            if (error?.data?.message) {
+                setErrorMessage(error.data.message);
             } else if (error.message) {
                 setErrorMessage(`เกิดข้อผิดพลาด: ${error.message}`);
             } else {

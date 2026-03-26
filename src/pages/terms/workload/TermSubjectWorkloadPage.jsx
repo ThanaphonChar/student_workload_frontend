@@ -25,6 +25,7 @@ import { formatThaiDate, parseDate } from '../../../utils/dateUtils';
 import * as termSubjectService from '../../../services/termSubjectService';
 import * as workloadService from '../../../services/workloadService';
 import * as uploadService from '../../../services/uploadService';
+import * as submissionService from '../../../services/submission.service';
 
 const APPROVE_STEPS = ['ยืนยันเอกสาร', 'ตรวจสอบข้อมูล', 'เสร็จสิ้น'];
 const REJECT_STEPS = ['ระบุเหตุผล', 'ตรวจสอบก่อนส่ง', 'เสร็จสิ้น'];
@@ -321,15 +322,34 @@ const TermSubjectWorkloadPage = () => {
     const handleDocumentApproval = async (documentType, nextStatus) => {
         if (!isAcademicOfficer) return false;
 
-        const fieldName = documentType === 'outline' ? 'outline_approved' : 'report_approved';
-
         try {
             setDocumentLoading(documentType, true);
-            const response = await termSubjectService.updateTermSubject(termSubjectId, {
-                [fieldName]: nextStatus,
+
+            if (!termSubject?.term_id) {
+                toast.error('ไม่พบข้อมูลภาคการศึกษาของรายวิชา');
+                return false;
+            }
+
+            const latestSubmission = await submissionService.getLatestSubmissionWithFallback(
+                termSubjectId,
+                documentType,
+                termSubject.term_id
+            );
+
+            if (!latestSubmission?.submission_id) {
+                toast.error('ไม่พบเอกสารที่ต้องการตรวจสอบ');
+                return false;
+            }
+
+            await submissionService.reviewDocument(latestSubmission.submission_id, {
+                action: nextStatus,
+                note: approvalFlow.note || undefined,
+                reason: approvalFlow.reason || undefined,
             });
 
-            setTermSubject(response.data);
+            const updated = await termSubjectService.getTermSubjectById(termSubjectId);
+
+            setTermSubject(updated.data);
             toast.success(nextStatus === 'approved' ? 'อนุมัติเอกสารสำเร็จ' : 'ปฏิเสธเอกสารสำเร็จ');
             return true;
         } catch (err) {

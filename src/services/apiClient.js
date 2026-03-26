@@ -42,8 +42,12 @@ export const apiRequest = async (path, options = {}) => {
             headers,
         });
 
-        // Parse response
-        const data = await response.json();
+        // Parse response (รองรับทั้ง JSON และ empty/non-JSON response)
+        const contentType = response.headers.get('content-type') || '';
+        const isJsonResponse = contentType.includes('application/json');
+        const data = isJsonResponse
+            ? await response.json()
+            : null;
 
         // ตรวจสอบ HTTP status
         if (!response.ok) {
@@ -59,7 +63,7 @@ export const apiRequest = async (path, options = {}) => {
             }
 
             // สร้าง error object พร้อม status และ message
-            const error = new Error(data.message || `HTTP ${response.status}`);
+            const error = new Error(data?.message || `HTTP ${response.status}`);
             error.status = response.status;
             error.data = data;
             throw error;
@@ -97,6 +101,14 @@ export const put = (path, body, options = {}) => {
     });
 };
 
+export const patch = (path, body, options = {}) => {
+    return apiRequest(path, {
+        ...options,
+        method: 'PATCH',
+        body: JSON.stringify(body),
+    });
+};
+
 export const deleteRequest = (path, options = {}) => {
     return apiRequest(path, { ...options, method: 'DELETE' });
 };
@@ -109,6 +121,7 @@ export default {
     get,
     post,
     put,
+    patch,
     delete: deleteRequest,
     del
 };
