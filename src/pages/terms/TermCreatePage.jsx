@@ -72,12 +72,12 @@ export default function TermCreatePage() {
             console.error('[TermCreatePage] ❌ Error creating term:', error);
             console.error('[TermCreatePage] Error details:', {
                 message: error.message,
-                response: error.response?.data,
-                status: error.response?.status
+                response: error?.data,
+                status: error?.status
             });
 
-            if (error.response?.data?.message) {
-                setErrorMessage(error.response.data.message);
+            if (error?.data?.message) {
+                setErrorMessage(error.data.message);
             } else if (error.message) {
                 setErrorMessage(`เกิดข้อผิดพลาด: ${error.message}`);
             } else {

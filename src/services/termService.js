@@ -94,7 +94,7 @@ export async function updateTerm(termId, termData) {
  * @returns {Promise<void>}
  */
 export async function deleteTerm(termId) {
-    const response = await apiClient.delete(`/terms/${termId}`);
+    const response = await apiClient.del(`/terms/${termId}`);
     return response.data;
 }
 
@@ -106,11 +106,52 @@ export async function deleteTerm(termId) {
 export async function validateSubjectIds(subjectIds) {
     try {
         console.log('[termService] Validating subject IDs:', subjectIds);
-        const response = await apiClient.post('/subjects/validate-ids', {
-            subject_ids: subjectIds
-        });
-        console.log('[termService] Validation result:', response.data);
-        return response.data;
+
+        if (!Array.isArray(subjectIds) || subjectIds.length === 0) {
+            return {
+                valid: true,
+                invalid_ids: [],
+            };
+        }
+
+        const response = await apiClient.get('/subjects');
+
+        // Support multiple response shapes:
+        // - Array<Subject>
+        // - { data: Array<Subject> }
+        // - { subjects: Array<Subject> }
+        // - { data: { subjects: Array<Subject> } }
+        const subjects = Array.isArray(response)
+            ? response
+            : Array.isArray(response?.data)
+                ? response.data
+                : Array.isArray(response?.subjects)
+                    ? response.subjects
+                    : Array.isArray(response?.data?.subjects)
+                        ? response.data.subjects
+                        : [];
+
+        // If response shape is unexpected, avoid false negative blocking on the client.
+        // Backend remains the source of truth and will validate again.
+        if (subjects.length === 0 && subjectIds.length > 0) {
+            console.warn('[termService] Unable to resolve subject list from /subjects response. Skipping client-side subject ID validation.');
+            return {
+                valid: true,
+                invalid_ids: [],
+            };
+        }
+
+        const subjectIdSet = new Set(subjects.map((subject) => Number(subject.id)));
+
+        const invalidIds = subjectIds.filter((id) => !subjectIdSet.has(Number(id)));
+
+        const result = {
+            valid: invalidIds.length === 0,
+            invalid_ids: invalidIds,
+        };
+
+        console.log('[termService] Validation result:', result);
+        return result;
     } catch (error) {
         console.error('[termService] Validation error:', error);
         throw error;
@@ -181,7 +222,7 @@ export async function updateTermSubject(termSubjectId, data) {
  * @returns {Promise<void>}
  */
 export async function removeSubjectFromTerm(termSubjectId) {
-    const response = await apiClient.delete(`/term-subjects/${termSubjectId}`);
+    const response = await apiClient.del(`/term-subjects/${termSubjectId}`);
     return response.data;
 }
 
@@ -257,6 +298,6 @@ export async function updateLecturerNotes(assignmentId, notes) {
  * @returns {Promise<void>}
  */
 export async function removeLecturer(assignmentId) {
-    const response = await apiClient.delete(`/term-subjects/lecturers/${assignmentId}`);
+    const response = await apiClient.del(`/term-subjects/lecturers/${assignmentId}`);
     return response.data;
 }

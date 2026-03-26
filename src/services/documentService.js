@@ -6,7 +6,7 @@
  * - ดึงรายการเอกสารที่อัปโหลดแล้ว
  */
 
-import apiClient from './api';
+import * as apiClient from './apiClient';
 
 /**
  * อัปโหลดเอกสารสำหรับ term subject
@@ -22,17 +22,12 @@ export async function uploadDocument(termSubjectId, documentType, file) {
     formData.append('file', file);
     formData.append('document_type', documentType);
 
-    const response = await apiClient.post(
-        `/term-subjects/${termSubjectId}/upload`,
-        formData,
-        {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        }
-    );
+    const response = await apiClient.apiRequest(`/term-subjects/${termSubjectId}/upload`, {
+        method: 'POST',
+        body: formData,
+    });
 
-    return response.data;
+    return response?.data || response;
 }
 
 /**
@@ -43,7 +38,7 @@ export async function uploadDocument(termSubjectId, documentType, file) {
  */
 export async function getDocuments(termSubjectId) {
     const response = await apiClient.get(`/term-subjects/${termSubjectId}/documents`);
-    return response.data;
+    return response?.data || response;
 }
 
 const documentService = {

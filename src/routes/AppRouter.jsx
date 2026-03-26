@@ -11,7 +11,7 @@ import { FontTestPage } from '../pages/test/FontTestPage';
 import { SubjectListPage } from '../pages/subjects/SubjectListPage';
 import { SubjectCreatePage } from '../pages/subjects/SubjectCreatePage';
 import { SubjectEditPage } from '../pages/subjects/SubjectEditPage';
-import MySubjectsPage from '../pages/subjects/MySubjectsPage';
+import MySubjectsPage from '../pages/MySubjects';
 import TermListPage from '../pages/terms/TermListPage';
 import TermCreatePage from '../pages/terms/TermCreatePage';
 import { TermEditPage } from '../pages/terms/TermEditPage';

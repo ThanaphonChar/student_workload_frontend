@@ -47,7 +47,7 @@ export const SubjectTable = ({ subjects, onEdit, onDelete }) => {
             width: '12%',
             align: 'center',
             renderCell: (subject) => (
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-3xl font-bold text-gray-900 mb-6">
                     {subject.code_eng || subject.code_th}
                 </div>
             )
@@ -58,7 +58,7 @@ export const SubjectTable = ({ subjects, onEdit, onDelete }) => {
             align: 'left',
             renderCell: (subject) => (
                 <div>
-                    <div className="ml-6 text-xl font-bold text-gray-900">{subject.name_th}</div>
+                    <div className="ml-6 text-2xl font-bold text-gray-900">{subject.name_th}</div>
                     {subject.name_eng && (
                         <div className="ml-6 text-xl text-gray-500 uppercase">{subject.name_eng}</div>
                     )}
