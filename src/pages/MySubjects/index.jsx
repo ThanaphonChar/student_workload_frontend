@@ -8,6 +8,7 @@ import { Button } from '../../components/common/Button';
 import { DocumentStatusBadge } from '../../components/MySubjects/DocumentStatusBadge';
 import { UploadModal } from '../../components/MySubjects/UploadModal';
 import { HistoryModal } from '../../components/MySubjects/HistoryModal';
+import { DeadlineBanner } from '../../components/MySubjects/DeadlineBanner';
 import { getAssignedSubjects, getMySubjects } from '../../services/submission.service';
 
 const sortTermsDesc = (a, b) => {
@@ -88,6 +89,10 @@ export default function MySubjectsIndexPage() {
             };
         });
     }, [selectedTerm, statusMap]);
+
+    const termStartDate = useMemo(() => {
+        return statusRows[0]?.term_start_date || null;
+    }, [statusRows]);
 
     const loadAssignedSubjects = async () => {
         setLoadingBase(true);
@@ -299,9 +304,9 @@ export default function MySubjectsIndexPage() {
                                                     },
                                                 });
                                             }}
-                                            className="text-xl"
+                                            className="text-xl font-bold px-4 bg-[#dadbf0] text-[#050C9C] hover:bg-[#c0c2e8]"
                                         >
-                                            กรอกภาระงาน
+                                            <span className="text-[#050C9C]">ดูภาระงาน</span>
                                         </Button>
                                     ),
                                 },
@@ -322,6 +327,12 @@ export default function MySubjectsIndexPage() {
                         />
                     )}
                 />
+
+                <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 px-4">
+                    <div className="pointer-events-auto mx-auto max-w-7xl">
+                        <DeadlineBanner termStartDate={termStartDate} offsetDays={7} />
+                    </div>
+                </div>
             </div>
 
             <UploadModal

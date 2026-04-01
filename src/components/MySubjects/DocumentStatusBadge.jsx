@@ -12,7 +12,7 @@ export const DocumentStatusBadge = ({ status = null, roundNumber = null, onClick
             <button
                 type="button"
                 onClick={onClick}
-                className="inline-flex items-center gap-2 rounded-lg bg-[#DADBF0] px-4 py-1 text-[#050C9C] text-xl font-bold hover:bg-[#C8C9E0] transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#DADBF0] px-4 py-1 text-[#050C9C] text-xl font-bold hover:bg-[#c0c2e8] transition-colors"
             >
                 <VerticalAlignTopRoundedIcon fontSize="small" className="text-[#050C9C]" />
                 <span>อัปโหลด</span>
