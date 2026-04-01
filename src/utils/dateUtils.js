@@ -137,6 +137,31 @@ export const getDaysUntilDeadline = (deadlineDate) => {
 };
 
 /**
+ * คำนวณวัน deadline จากวันเริ่มเทอม + offset วัน
+ * @param {string} startDateStr - ISO date string
+ * @param {number} offsetDays
+ * @returns {Date}
+ */
+export function calcDeadline(startDateStr, offsetDays) {
+  const date = new Date(startDateStr);
+  date.setDate(date.getDate() + offsetDays);
+  return date;
+}
+
+/**
+ * คำนวณจำนวนวันที่เหลือจนถึง deadline
+ * @param {Date} deadline
+ * @returns {number} จำนวนวัน (ลบ = เลยแล้ว)
+ */
+export function daysUntil(deadline) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const d = new Date(deadline);
+  d.setHours(0, 0, 0, 0);
+  return Math.ceil((d - today) / (1000 * 60 * 60 * 24));
+}
+
+/**
  * คำนวณ deadline สำหรับส่งคำโครงรายวิชา
  * ต้องส่งก่อนสอบกลางภาค 7 วัน
  * @param {Date|string} midtermStartDate - วันเริ่มสอบกลางภาค
