@@ -31,7 +31,7 @@ export const SubjectCreatePage = () => {
             const response = await subjectService.createSubject(formData);
 
             if (response.success) {
-                setSuccessMessage('✅ เพิ่มรายวิชาสำเร็จ!');
+                setSuccessMessage('เพิ่มรายวิชาสำเร็จ!');
 
                 // Navigate back to list after short delay
                 setTimeout(() => {
@@ -105,7 +105,7 @@ export const SubjectCreatePage = () => {
                     {errorMessage && (
                         <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
                             <p className="text-2xl font-bold text-red-800">
-                                ❌ {errorMessage}
+                                {errorMessage}
                             </p>
                         </div>
                     )}

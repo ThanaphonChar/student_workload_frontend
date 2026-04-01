@@ -20,6 +20,8 @@ import CourseStatusByTermPage from '../pages/courseStatus/CourseStatusByTermPage
 import ActiveTermCourseStatusPage from '../pages/courseStatus/ActiveTermCourseStatusPage';
 import TermSubjectWorkloadPage from '../pages/terms/workload/TermSubjectWorkloadPage';
 import DashboardPage from '../pages/dashboard/DashboardPage';
+import ProfessorDashboardPage from '../pages/dashboard/ProfessorDashboardPage';
+import StudentDashboardPage from '../pages/dashboard/StudentDashboardPage';
 import PermissionManagementPage from '../pages/PermissionManagement/PermissionManagementPage';
 import { UnauthorizedPage } from '../pages/UnauthorizedPage';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -114,7 +116,7 @@ export const AppRouter = () => {
                 <Route
                     path="/course-status"
                     element={
-                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
+                        <ProtectedRoute allowedRoles={[ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
                             <ActiveTermCourseStatusPage />
                         </ProtectedRoute>
                     }
@@ -122,18 +124,48 @@ export const AppRouter = () => {
                 <Route
                     path="/course-status/term/:termId"
                     element={
-                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
+                        <ProtectedRoute allowedRoles={[ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
                             <CourseStatusByTermPage />
                         </ProtectedRoute>
                     }
                 />
 
-                {/* Dashboard Route - Academic Officer Only */}
+                {/* My Subjects Route - Professor Only */}
+                <Route
+                    path="/my-subjects"
+                    element={
+                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR]}>
+                            <MySubjectsPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Dashboard Route - Academic Officer + Program Chair */}
                 <Route
                     path="/dashboard"
                     element={
-                        <ProtectedRoute allowedRoles={[ROLES.ACADEMIC_OFFICER, ROLES.PROGRAM_CHAIR, ROLES.PROFESSOR, ROLES.STUDENT]}>
+                        <ProtectedRoute allowedRoles={[ROLES.ACADEMIC_OFFICER, ROLES.PROGRAM_CHAIR]}>
                             <DashboardPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Professor Dashboard Route - Professor only */}
+                <Route
+                    path="/dashboard/professor"
+                    element={
+                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR]}>
+                            <ProfessorDashboardPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Student Dashboard Route - Student only */}
+                <Route
+                    path="/dashboard/student"
+                    element={
+                        <ProtectedRoute allowedRoles={[ROLES.STUDENT]}>
+                            <StudentDashboardPage />
                         </ProtectedRoute>
                     }
                 />
@@ -148,15 +180,7 @@ export const AppRouter = () => {
                     }
                 />
 
-                {/* My Subjects Route - Professor Only */}
-                <Route
-                    path="/my-subjects"
-                    element={
-                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR]}>
-                            <MySubjectsPage />
-                        </ProtectedRoute>
-                    }
-                />
+
 
                 {/* Workload Management Route - Academic Officer can create/edit, others can view */}
                 <Route

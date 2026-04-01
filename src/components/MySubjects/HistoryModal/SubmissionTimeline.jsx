@@ -78,7 +78,7 @@ export const SubmissionTimeline = ({ events = [], totalRounds = 0 }) => {
     const hasPendingReview = buildPendingState(events);
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 pl-3">
             {events.map((event, index) => {
                 const theme = getEventTheme(event);
 
@@ -91,12 +91,12 @@ export const SubmissionTimeline = ({ events = [], totalRounds = 0 }) => {
                             <FiberManualRecordIcon className={theme.dot} fontSize="small" />
                         </div>
 
-                        <div className="overflow-x-auto pb-1">
-                            <div className="flex min-w-max items-center gap-3">
-                                <p className="whitespace-nowrap text-2xl text-gray-900">รอบที่ {event.round_number}</p>
-                                <span className={`whitespace-nowrap rounded-full px-3 py-1 text-xl font-bold ${theme.badge}`}>{theme.badgeLabel}</span>
+                        <div className="pb-1">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <p className="text-xl text-gray-900">รอบที่ {event.round_number}</p>
+                                <span className={`whitespace-nowrap rounded-full px-4 py-0.5 text-xl font-bold ${theme.badge}`}>{theme.badgeLabel}</span>
                                 {theme.timestamp ? (
-                                    <span className="ml-auto whitespace-nowrap text-xl text-gray-500">{formatThaiDate(theme.timestamp)}</span>
+                                    <span className="text-lg text-[#a1a1a1] sm:ml-auto">{formatThaiDate(theme.timestamp)}</span>
                                 ) : null}
                             </div>
                         </div>
@@ -119,8 +119,8 @@ export const SubmissionTimeline = ({ events = [], totalRounds = 0 }) => {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
-                        <p className="text-2xl text-gray-900">รอบที่ {totalRounds || '-'}</p>
-                        <span className="rounded-full bg-[#FFF5EA] px-3 py-1 text-xl font-bold text-[#FF8D28]">รอการตรวจสอบ</span>
+                        <p className="text-xl text-gray-900">รอบที่ {totalRounds || '-'}</p>
+                        <span className="rounded-full bg-[#FFF5EA] px-4 py-0.5 text-xl font-bold text-[#FF8D28]">รอการตรวจสอบ</span>
                     </div>
 
                     <p className="mt-2 text-xl text-[#FF8D28]">เอกสารอยู่ระหว่างการตรวจสอบโดยเจ้าหน้าที่</p>

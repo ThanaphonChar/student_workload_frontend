@@ -25,6 +25,9 @@ export const ROUTE_PERMISSIONS = {
     '/subjects/create': [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
     '/subjects/:id': [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
     '/subjects/:id/edit': [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
+    '/dashboard': [ROLES.ACADEMIC_OFFICER, ROLES.PROGRAM_CHAIR],
+    '/dashboard/professor': [ROLES.PROFESSOR],
+    '/dashboard/student': [ROLES.STUDENT],
     '/permissions': [ROLES.ACADEMIC_OFFICER],
 };
 
@@ -66,19 +69,31 @@ export const MENU_CONFIG = [
         id: 'course_status',
         label: 'สถานะรายวิชา',
         path: '/course-status',
-        allowedRoles: [ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
-    },
-    {
-        id: 'dashboard',
-        label: 'แดชบอร์ด',
-        path: '/dashboard',
-        allowedRoles: [ROLES.ACADEMIC_OFFICER, ROLES.PROGRAM_CHAIR, ROLES.PROFESSOR, ROLES.STUDENT],
+        allowedRoles: [ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER],
     },
     {
         id: 'my_subjects',
         label: 'รายวิชาของฉัน',
         path: '/my-subjects',
         allowedRoles: [ROLES.PROFESSOR],
+    },
+    {
+        id: 'dashboard_admin',
+        label: 'แดชบอร์ด',
+        path: '/dashboard',
+        allowedRoles: [ROLES.ACADEMIC_OFFICER, ROLES.PROGRAM_CHAIR],
+    },
+    {
+        id: 'dashboard_professor',
+        label: 'แดชบอร์ด',
+        path: '/dashboard/professor',
+        allowedRoles: [ROLES.PROFESSOR],
+    },
+    {
+        id: 'dashboard_student',
+        label: 'แดชบอร์ด',
+        path: '/dashboard/student',
+        allowedRoles: [ROLES.STUDENT],
     },
     {
         id: 'role_management',
@@ -136,11 +151,23 @@ export function getFilteredMenu(userRole) {
 
     const userRoles = Array.isArray(userRole) ? userRole : [userRole];
 
+    // Priority: Program Chair > Academic Officer > Professor > Student
+    // ถ้า user มี Program Chair role ให้ซ่อน Professor dashboard
+    const hasProgramChair = userRoles.includes(ROLES.PROGRAM_CHAIR);
+    const hasProfessor = userRoles.includes(ROLES.PROFESSOR);
+
     return MENU_CONFIG.filter(item => {
         // ตรวจสอบว่า user มีสิทธิ์เห็น menu item หลักหรือไม่
         const hasAccess = item.allowedRoles.some(role => userRoles.includes(role));
 
         if (!hasAccess) return false;
+
+        // ถ้า user มี Program Chair role เลือก Admin dashboard ซ่อน Professor dashboard
+        if (hasProgramChair && hasProfessor) {
+            if (item.id === 'dashboard_professor') {
+                return false; // ซ่อน Professor dashboard
+            }
+        }
 
         // ถ้ามี children ให้กรองด้วย
         if (item.children) {
