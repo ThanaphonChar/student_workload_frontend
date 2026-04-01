@@ -28,6 +28,7 @@ export default function MySubjectsIndexPage() {
     const [uploadModal, setUploadModal] = useState({
         isOpen: false,
         termSubjectId: null,
+        subjectCode: '',
         subjectName: '',
         documentType: 'outline',
     });
@@ -35,6 +36,7 @@ export default function MySubjectsIndexPage() {
     const [historyModal, setHistoryModal] = useState({
         isOpen: false,
         termSubjectId: null,
+        subjectCode: '',
         subjectName: '',
         documentType: 'outline',
     });
@@ -137,6 +139,7 @@ export default function MySubjectsIndexPage() {
         setUploadModal({
             isOpen: true,
             termSubjectId: row.term_subject_id,
+            subjectCode: row.subject_code,
             subjectName: row.subject_name,
             documentType,
         });
@@ -146,6 +149,7 @@ export default function MySubjectsIndexPage() {
         setHistoryModal({
             isOpen: true,
             termSubjectId: row.term_subject_id,
+            subjectCode: row.subject_code,
             subjectName: row.subject_name,
             documentType,
         });
@@ -247,8 +251,8 @@ export default function MySubjectsIndexPage() {
                                     align: 'left',
                                     renderCell: (row) => (
                                         <div>
-                                            <div className="text-2xl text-gray-900">{row.subject_code}</div>
-                                            <div className="text-xl text-gray-600">{row.subject_name}</div>
+                                            <div className="text-2xl font-bold text-black">{row.subject_code}</div>
+                                            <div className="text-xl text-[#757575]">{row.subject_name}</div>
                                         </div>
                                     ),
                                 },
@@ -322,8 +326,9 @@ export default function MySubjectsIndexPage() {
 
             <UploadModal
                 isOpen={uploadModal.isOpen}
-                onClose={() => setUploadModal({ isOpen: false, termSubjectId: null, subjectName: '', documentType: 'outline' })}
+                onClose={() => setUploadModal({ isOpen: false, termSubjectId: null, subjectCode: '', subjectName: '', documentType: 'outline' })}
                 termSubjectId={uploadModal.termSubjectId}
+                subjectCode={uploadModal.subjectCode}
                 subjectName={uploadModal.subjectName}
                 documentType={uploadModal.documentType}
                 onSuccess={() => {
@@ -335,14 +340,16 @@ export default function MySubjectsIndexPage() {
 
             <HistoryModal
                 isOpen={historyModal.isOpen}
-                onClose={() => setHistoryModal({ isOpen: false, termSubjectId: null, subjectName: '', documentType: 'outline' })}
+                onClose={() => setHistoryModal({ isOpen: false, termSubjectId: null, subjectCode: '', subjectName: '', documentType: 'outline' })}
                 termSubjectId={historyModal.termSubjectId}
+                subjectCode={historyModal.subjectCode}
                 subjectName={historyModal.subjectName}
                 documentType={historyModal.documentType}
                 onReupload={() => {
                     setUploadModal({
                         isOpen: true,
                         termSubjectId: historyModal.termSubjectId,
+                        subjectCode: historyModal.subjectCode,
                         subjectName: historyModal.subjectName,
                         documentType: historyModal.documentType,
                     });

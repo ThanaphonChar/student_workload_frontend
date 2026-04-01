@@ -1,7 +1,7 @@
 import { Button } from '../../common/Button';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 
-export const RejectStep3 = ({ onClose }) => {
+export const RejectSuccess = ({ onClose }) => {
     return (
         <div className="space-y-5 text-center">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#FBE9E9]">
@@ -14,7 +14,7 @@ export const RejectStep3 = ({ onClose }) => {
             </div>
 
             <div className="flex justify-center">
-                <Button type="button" variant="primary" size="sm" onClick={onClose} className="text-xl">
+                <Button type="button" variant="primary" size="md" onClick={onClose} className="text-xl">
                     ปิด
                 </Button>
             </div>
@@ -22,4 +22,4 @@ export const RejectStep3 = ({ onClose }) => {
     );
 };
 
-export default RejectStep3;
+export default RejectSuccess;

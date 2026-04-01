@@ -17,7 +17,7 @@ import ApproveStep2 from '../../../components/terms/workload/ApproveStep2';
 import ApproveStep3 from '../../../components/terms/workload/ApproveStep3';
 import RejectStep1 from '../../../components/terms/workload/RejectStep1';
 import RejectStep2 from '../../../components/terms/workload/RejectStep2';
-import RejectStep3 from '../../../components/terms/workload/RejectStep3';
+import RejectSuccess from '../../../components/terms/workload/RejectSuccess';
 import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { useAuth } from '../../../hooks/useAuth';
@@ -458,7 +458,7 @@ const TermSubjectWorkloadPage = () => {
             );
         }
 
-        return <RejectStep3 onClose={closeApprovalFlow} />;
+        return <RejectSuccess onClose={closeApprovalFlow} />;
     };
 
     const renderDocumentCard = (documentType, title) => {
@@ -482,7 +482,7 @@ const TermSubjectWorkloadPage = () => {
                             type="button"
                             onClick={() => handleViewDocument(documentType)}
                             disabled={isBusy}
-                            className="w-full text-left bg-[#F1F1F1] rounded-lg p-4 hover:bg-gray-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="w-full text-left bg-[#F1F1F1] rounded-lg p-4 hover:bg-[#DCDCDC] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                             title="คลิกเพื่อดูไฟล์"
                         >
                             <div className="flex items-center justify-between gap-4">

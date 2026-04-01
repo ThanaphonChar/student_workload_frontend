@@ -1,7 +1,7 @@
 import TaskAltRoundedIcon from '@mui/icons-material/TaskAltRounded';
 import { Button } from '../../common/Button';
 
-export const Step3Done = ({ onClose }) => {
+export const UploadSuccess = ({ onClose }) => {
     return (
         <div className="space-y-5 text-center">
             <div className="mx-auto p-4 rounded-full flex items-center justify-center">
@@ -27,4 +27,4 @@ export const Step3Done = ({ onClose }) => {
     );
 };
 
-export default Step3Done;
+export default UploadSuccess;

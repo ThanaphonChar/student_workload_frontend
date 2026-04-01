@@ -1,5 +1,5 @@
 
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import VerticalAlignTopRoundedIcon from '@mui/icons-material/VerticalAlignTopRounded';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
@@ -12,9 +12,9 @@ export const DocumentStatusBadge = ({ status = null, roundNumber = null, onClick
             <button
                 type="button"
                 onClick={onClick}
-                className="inline-flex items-center gap-2 rounded-lg bg-[#050C9C] px-4 py-2 text-white text-xl hover:bg-[#040a85] transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#DADBF0] px-4 py-1 text-[#050C9C] text-xl font-bold hover:bg-[#C8C9E0] transition-colors"
             >
-                <CloudUploadIcon fontSize="small" />
+                <VerticalAlignTopRoundedIcon fontSize="small" className="text-[#050C9C]" />
                 <span>อัปโหลด</span>
             </button>
         );
@@ -25,9 +25,9 @@ export const DocumentStatusBadge = ({ status = null, roundNumber = null, onClick
             <button
                 type="button"
                 onClick={onClick}
-                className="inline-flex items-center gap-2 rounded-full bg-[#FFF5EA] px-4 py-2 text-[#FF8D28] text-xl font-bold hover:bg-[#FFE7CD] transition-colors"
+                className="inline-flex items-center gap-2 rounded-full bg-[#FFF5EA] px-4 py-1 text-[#FF8D28] text-xl font-bold hover:bg-[#FFE7CD] transition-colors"
             >
-                <HourglassTopIcon fontSize="small" />
+
                 <span>รออนุมัติ · รอบ {roundNumber || '-'}</span>
             </button>
         );
