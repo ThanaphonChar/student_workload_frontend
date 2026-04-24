@@ -3,7 +3,10 @@
  * Single source of truth for colors, icons, and configuration
  */
 
-import { FiBookOpen, FiFileText, FiClipboard, FiCheckCircle } from 'react-icons/fi';
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 export const COLORS = {
     primary: '#050C9C',
@@ -20,28 +23,28 @@ export const STAT_CARD_CONFIG = [
     {
         key: 'totalSubjects',
         title: 'รายวิชาทั้งหมด',
-        icon: FiBookOpen,
+        icon: MenuBookOutlinedIcon,
         color: 'blue',
         valueKey: 'totalSubjects'
     },
     {
         key: 'outline',
         title: 'เค้าโครงรายวิชา',
-        icon: FiFileText,
+        icon: DescriptionOutlinedIcon,
         color: 'green',
         valueKey: 'outlineSubmitted'
     },
     {
         key: 'workload',
         title: 'ภาระงาน',
-        icon: FiClipboard,
+        icon: AssignmentOutlinedIcon,
         color: 'yellow',
         valueKey: 'workloadFilled'
     },
     {
         key: 'report',
         title: 'รายงานผล',
-        icon: FiCheckCircle,
+        icon: CheckCircleOutlineIcon,
         color: 'purple',
         valueKey: 'reportSubmitted'
     }

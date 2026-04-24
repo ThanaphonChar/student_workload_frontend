@@ -32,7 +32,8 @@ export const getWorkloadByTermSubject = async (termSubjectId) => {
  * @returns {Promise} Workload data
  */
 export const getWorkloadById = async (workId) => {
-    throw new Error('ยังไม่รองรับการดึงภาระงานแบบรายรายการ (GET /works/:workId)');
+    const response = await apiClient.get(`/works/${workId}`);
+    return response;
 };
 
 /**
@@ -64,5 +65,6 @@ export const deleteWorkload = async (termSubjectId, workId) => {
  * @returns {Promise} Array of workloads
  */
 export const getWorkloadsByTerm = async (termId) => {
-    throw new Error('ยังไม่รองรับการดึงภาระงานทั้งเทอม (GET /terms/:termId/works)');
+    const response = await apiClient.get(`/terms/${termId}/works`);
+    return response;
 };

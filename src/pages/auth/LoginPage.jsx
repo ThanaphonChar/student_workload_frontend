@@ -65,8 +65,8 @@ export const LoginPage = () => {
 
         try {
             await login(formData.username, formData.password);
-            // Login สำเร็จ - navigate ไป home
-            navigate('/home');
+            // Login สำเร็จ - navigate ไป profile
+            navigate('/profile');
         } catch (error) {
             // Error จะแสดงผ่าน authError จาก context
             console.error('Login failed:', error);

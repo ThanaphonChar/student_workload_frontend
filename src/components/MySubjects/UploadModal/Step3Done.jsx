@@ -10,7 +10,6 @@ export const Step3Done = ({ onClose }) => {
 
             <div>
                 <p className="text-2xl text-gray-900">ส่งเอกสารสำเร็จ</p>
-                <p className="mt-2 text-xl text-gray-700">สถานะเปลี่ยนเป็น รออนุมัติ แล้ว</p>
             </div>
 
             <div className="flex justify-center">

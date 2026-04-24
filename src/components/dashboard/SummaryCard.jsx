@@ -45,8 +45,8 @@ const SummaryCard = ({ title, count, total, icon: Icon, color = 'green' }) => {
                 </div>
 
                 {/* Icon */}
-                <div className={`${bgClass} rounded-full `}>
-                    {Icon && <Icon className="mt-10 w-24 h-24" />}
+                <div className={`${bgClass} w-32 h-32 flex items-end justify-center`}>
+                    {Icon && <Icon sx={{ fontSize: 94, color: 'currentColor' }} />}
                 </div>
             </div>
         </div>

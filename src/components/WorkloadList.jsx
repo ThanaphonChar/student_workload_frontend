@@ -3,7 +3,7 @@
  * แสดงรายการภาระงานทั้งหมด
  */
 
-import { FiEdit2 } from 'react-icons/fi';
+import EditIcon from '@mui/icons-material/Edit';
 import { PaginatedTable } from './common/PaginatedTable';
 import TableRow from './common/TableRow';
 import { Button } from './common/Button';
@@ -59,7 +59,7 @@ const WorkloadList = ({ workloads = [], termSubjectData, onEdit, onRefresh }) =>
                     className="px-2 py-1 border-0 bg-transparent hover:bg-gray-100 !text-[#050C9C] hover:!text-[#040a7a]"
                     title="แก้ไข"
                 >
-                    <FiEdit2 className="w-5 h-5 mx-auto" />
+                    <EditIcon className="w-5 h-5 mx-auto" />
                 </Button>
             ),
         },
