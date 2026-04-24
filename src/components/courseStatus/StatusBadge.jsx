@@ -19,9 +19,9 @@ export function ApprovalBadge({ status }) {
     };
 
     const labels = {
-        pending: 'รออนุมัติ',
-        approved: 'อนุมัติแล้ว',
-        rejected: 'ไม่อนุมัติ',
+        pending: 'รอตรวจสอบ',
+        approved: 'ผ่าน',
+        rejected: 'ไม่ผ่าน',
     };
 
     return (

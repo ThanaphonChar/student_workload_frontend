@@ -28,7 +28,7 @@ export const DocumentStatusBadge = ({ status = null, roundNumber = null, onClick
                 className="inline-flex items-center gap-2 rounded-full bg-[#FFF5EA] px-4 py-1 text-[#FF8D28] text-xl font-bold hover:bg-[#FFE7CD] transition-colors"
             >
 
-                <span>รออนุมัติ · รอบ {roundNumber || '-'}</span>
+                <span>รอตรวจสอบ</span>
             </button>
         );
     }
@@ -41,7 +41,7 @@ export const DocumentStatusBadge = ({ status = null, roundNumber = null, onClick
                 className="inline-flex items-center gap-2 rounded-full bg-[#E7F8F2] px-4 py-2 text-[#10B981] text-xl font-bold hover:bg-[#D6FFF0] transition-colors"
             >
                 <CheckCircleIcon fontSize="small" />
-                <span>อนุมัติแล้ว</span>
+                <span>ผ่าน</span>
             </button>
         );
     }
@@ -53,7 +53,7 @@ export const DocumentStatusBadge = ({ status = null, roundNumber = null, onClick
             className="inline-flex items-center gap-2 rounded-full bg-[#FBE9E9] px-4 py-2 text-[#DC2626] text-xl font-bold hover:bg-[#FFD6D6] transition-colors"
         >
             <HighlightOffIcon fontSize="small" />
-            <span>ไม่อนุมัติ</span>
+            <span>ไม่ผ่าน</span>
         </button>
     );
 };

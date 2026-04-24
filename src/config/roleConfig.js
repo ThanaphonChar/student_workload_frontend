@@ -171,9 +171,12 @@ export function getFilteredMenu(userRole) {
 
         // ถ้ามี children ให้กรองด้วย
         if (item.children) {
-            item.children = item.children.filter(child =>
-                child.allowedRoles.some(role => userRoles.includes(role))
-            );
+            return {
+                ...item,
+                children: item.children.filter(child =>
+                    child.allowedRoles.some(role => userRoles.includes(role))
+                ),
+            };
         }
 
         return true;
