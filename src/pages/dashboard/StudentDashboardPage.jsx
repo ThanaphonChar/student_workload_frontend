@@ -1,242 +1,344 @@
 /**
  * StudentDashboardPage
- * Read-only dashboard for student role with local subject selection only.
+ * Clean, simple student dashboard with subject chip filtering
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import AppShell from '../../components/layout/AppShell';
-import SummaryCard from '../../components/dashboard/SummaryCard';
-import WorkloadAveragePanel from '../../components/dashboard/WorkloadAveragePanel';
-import WorkloadChart from '../../components/dashboard/WorkloadChart';
-import { useDashboardData } from '../../hooks/useDashboardData';
-import { STAT_CARD_CONFIG } from '../../constants/dashboard';
 import { DropdownMenu } from '../../components/common/DropdownMenu';
-import { useAuth } from '../../hooks/useAuth';
-import * as subjectService from '../../services/subjectService';
-import * as termSubjectService from '../../services/termSubjectService';
+import { getAllTerms } from '../../services/termService';
+import * as dashboardService from '../../services/dashboardService';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
+import {
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+} from '@/components/ui/chart';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-function getStudentCode(user) {
-    const candidates = [
-        user?.username,
-        user?.student_id,
-        user?.studentId,
-        user?.student_code,
-        user?.studentCode,
+const COLORS = ['#050C9C', '#1D9E75', '#D85A30', '#D4537E', '#BA7517'];
+const BG_COLORS = ['#E6F1FB', '#E1F5EE', '#FAECE7', '#FBEAF0', '#FAEEDA'];
+const TEXT_COLORS = ['#0C447C', '#085041', '#712B13', '#72243E', '#633806'];
+
+const CHART_CONFIG = {
+    hours: { label: 'ชั่วโมง', color: '#050C9C' },
+};
+
+const STUDENT_YEARS = [1, 2, 3, 4];
+
+/**
+ * Subject chips for filtering
+ */
+const SubjectChips = ({ termSubjects, selectedIds, onSelectionChange }) => {
+    const allSelected = selectedIds.size === termSubjects.length && termSubjects.length > 0;
+
+    const handleSelectAll = () => {
+        onSelectionChange(
+            allSelected
+                ? new Set()
+                : new Set(termSubjects.map(ts => ts.id))
+        );
+    };
+
+    const handleToggle = (subjectId) => {
+        const next = new Set(selectedIds);
+        next.has(subjectId) ? next.delete(subjectId) : next.add(subjectId);
+        onSelectionChange(next);
+    };
+
+    return (
+        <div className="bg-white rounded-xl shadow px-6 py-4">
+            <div className="flex flex-wrap gap-2">
+                <button
+                    onClick={handleSelectAll}
+                    className={`px-4 py-2 rounded-full text-base font-medium transition-colors ${allSelected
+                        ? 'bg-[#050C9C] text-white'
+                        : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                        }`}
+                >
+                    ทั้งหมด
+                </button>
+
+                {termSubjects.map((subject, index) => {
+                    const isSelected = selectedIds.has(subject.id);
+                    const colorIdx = index % COLORS.length;
+                    return (
+                        <button
+                            key={subject.id}
+                            onClick={() => handleToggle(subject.id)}
+                            className={`px-4 py-2 rounded-full text-base font-medium transition-colors ${isSelected
+                                ? ''
+                                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                                }`}
+                            style={isSelected ? {
+                                backgroundColor: BG_COLORS[colorIdx],
+                                color: TEXT_COLORS[colorIdx],
+                            } : {}}
+                        >
+                            {subject.code_eng || subject.code_th}
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
+/**
+ * Stat cards — styled like SummaryCard
+ */
+const StatCards = ({ selectedSubjects, weeks = 15 }) => {
+    const selectedCount = selectedSubjects.length;
+
+    const totalWeeklyHours = useMemo(() => {
+        return selectedSubjects.reduce((sum, s) => {
+            return sum + (s.weekly_hours || []).reduce((a, b) => a + b, 0);
+        }, 0);
+    }, [selectedSubjects]);
+
+    const avgHoursPerWeek = weeks > 0 ? (totalWeeklyHours / weeks).toFixed(1) : '0.0';
+
+    const totalWorkloadCount = useMemo(() => {
+        return selectedSubjects.reduce((sum, s) => sum + (s.workload_count || 0), 0);
+    }, [selectedSubjects]);
+
+    const cards = [
+        { label: 'รายวิชาที่เลือก', value: selectedCount, suffix: 'รายวิชา' },
+        { label: 'ชั่วโมง/สัปดาห์เฉลี่ย', value: avgHoursPerWeek, suffix: 'ชั่วโมง' },
+        { label: 'ภาระงานทั้งหมด', value: totalWorkloadCount, suffix: 'รายการ' },
     ];
 
-    const found = candidates.find((value) => typeof value === 'string' && /^\d{2,}$/.test(value));
-    return found || '';
-}
+    return (
+        <div className="grid grid-cols-3 gap-6">
+            {cards.map((card) => (
+                <div key={card.label} className="bg-white rounded-xl shadow p-6">
+                    <p className="text-gray-600 text-2xl font-bold">{card.label}</p>
+                    <div className="text-7xl font-bold text-[#050C9C] mt-1">{card.value}</div>
+                    <p className="text-gray-500 text-xl mt-1">{card.suffix}</p>
+                </div>
+            ))}
+        </div>
+    );
+};
 
-function deriveStudentYear(studentCode) {
-    if (!studentCode || studentCode.length < 2) {
-        return 1;
-    }
+/**
+ * Subject list — styled like WorkloadAveragePanel
+ */
+const SubjectList = ({ termSubjects, selectedIds, onSelectionChange }) => {
+    const handleRowClick = (subjectId) => {
+        const next = new Set(selectedIds);
+        next.has(subjectId) ? next.delete(subjectId) : next.add(subjectId);
+        onSelectionChange(next);
+    };
 
-    const entryYearPrefix = parseInt(studentCode.slice(0, 2), 10);
-    if (Number.isNaN(entryYearPrefix)) {
-        return 1;
-    }
+    return (
+        <div className="bg-white rounded-xl shadow p-6 h-[420px] flex flex-col">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-4 flex-shrink-0">รายวิชา</h3>
+            <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+                {termSubjects.map((subject, index) => {
+                    const isSelected = selectedIds.has(subject.id);
+                    const colorIdx = index % COLORS.length;
+                    const dotColor = isSelected ? COLORS[colorIdx] : '#D1D5DB';
 
-    const buddhistYear = new Date().getFullYear() + 543;
-    const currentYearPrefix = buddhistYear % 100;
-    let year = currentYearPrefix - entryYearPrefix;
+                    return (
+                        <div
+                            key={subject.id}
+                            onClick={() => handleRowClick(subject.id)}
+                            className={`bg-white shadow rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-opacity ${isSelected ? 'opacity-100' : 'opacity-50'
+                                }`}
+                        >
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div
+                                    className="w-3 h-3 rounded-full flex-shrink-0"
+                                    style={{ backgroundColor: dotColor }}
+                                />
+                                <div className="min-w-0">
+                                    <div className="text-gray-700 text-2xl font-bold">
+                                        {subject.code_eng || subject.code_th}
+                                    </div>
+                                    <div className="text-gray-600 text-lg truncate mr-4">
+                                        {subject.name_th || subject.name_eng}
+                                    </div>
+                                    <div className="text-gray-400 text-md">
+                                        {subject.workload_count || 0} งาน
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="text-right mr-2">
+                                <div className="text-5xl font-bold text-[#050C9C]">
+                                    {subject.total_hours || 0}
+                                </div>
+                                <div className="text-md text-gray-400">ชั่วโมง</div>
+                            </div>
+                        </div>
+                    );
+                })}
 
-    if (year <= 0) {
-        year += 100;
-    }
+                {termSubjects.length === 0 && (
+                    <div className="text-center text-gray-400 py-8 text-lg">
+                        ไม่มีข้อมูลรายวิชา
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
 
-    if (year < 1) return 1;
-    if (year > 8) return 8;
-    return year;
-}
+/**
+ * Workload chart — styled like WorkloadChart component
+ */
+const WorkloadChart = ({ selectedSubjects, weeks = 15, currentTerm }) => {
+    const chartData = useMemo(() => {
+        const totals = Array(weeks).fill(0);
+        selectedSubjects.forEach(subject => {
+            (subject.weekly_hours || []).forEach((h, i) => {
+                if (i < weeks) totals[i] += h;
+            });
+        });
+        return Array.from({ length: weeks }, (_, i) => ({
+            week: i + 1,
+            hours: totals[i],
+        }));
+    }, [selectedSubjects, weeks]);
 
-function getStudentSubjectKey(userId) {
-    return `student_dashboard_subjects_${userId || 'anonymous'}`;
-}
+    return (
+        <Card className="bg-white rounded-xl shadow p-1">
+            <CardHeader>
+                <CardTitle>
+                    ภาระงานภาคการศึกษา
+                    {currentTerm ? ` ${currentTerm.academic_sector}/${currentTerm.academic_year}` : ''}
+                </CardTitle>
+                <CardDescription>แสดงภาระงานรวมต่อสัปดาห์ (15 สัปดาห์)</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="w-full h-[280px]">
+                    <ChartContainer config={CHART_CONFIG} className="h-full w-full aspect-auto">
+                        <AreaChart
+                            data={chartData}
+                            margin={{ top: 8, right: 12, left: 12, bottom: 24 }}
+                        >
+                            <CartesianGrid vertical={false} />
+                            <XAxis
+                                dataKey="week"
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={8}
+                                label={{ value: 'สัปดาห์', position: 'insideBottom', offset: -12 }}
+                            />
+                            <YAxis
+                                tickLine={false}
+                                axisLine={false}
+                                width={44}
+                                label={{ value: 'ชั่วโมง', angle: -90, position: 'insideLeft' }}
+                            />
+                            <ChartTooltip
+                                cursor={false}
+                                content={<ChartTooltipContent indicator="line" />}
+                            />
+                            <Area
+                                dataKey="hours"
+                                type="linear"
+                                fill="var(--color-hours)"
+                                fillOpacity={0.15}
+                                stroke="var(--color-hours)"
+                                strokeWidth={2}
+                            />
+                        </AreaChart>
+                    </ChartContainer>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
 
+/**
+ * Main StudentDashboardPage
+ */
 const StudentDashboardPage = () => {
-    const { user, userId } = useAuth();
-    const studentCode = getStudentCode(user);
-    const studentYear = deriveStudentYear(studentCode);
+    const [allTerms, setAllTerms] = useState([]);
+    const [selectedTermId, setSelectedTermId] = useState(null);
+    const [termSubjects, setTermSubjects] = useState([]);
+    const [selectedIds, setSelectedIds] = useState(new Set());
+    const [selectedYear, setSelectedYear] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    const [selectedYears, setSelectedYears] = useState([studentYear]);
-    const [availableSubjects, setAvailableSubjects] = useState([]);
-    const [availableSubjectsInTerm, setAvailableSubjectsInTerm] = useState([]);
-    const [defaultSubjectsForYear, setDefaultSubjectsForYear] = useState([]);
-    const [selectedSubjectIds, setSelectedSubjectIds] = useState([]);
-    const [subjectsInCurrentTerm, setSubjectsInCurrentTerm] = useState([]);
-    const [subjectToAdd, setSubjectToAdd] = useState('');
-    const [subjectError, setSubjectError] = useState('');
-    const [subjectLoading, setSubjectLoading] = useState(false);
+    const currentTerm = useMemo(
+        () => allTerms.find(t => t.id === selectedTermId),
+        [allTerms, selectedTermId]
+    );
 
-    const {
-        stats,
-        averageWorkload,
-        chartData,
-        allTerms,
-        selectedTermId,
-        setSelectedTermId,
-        isLoading,
-        error,
-    } = useDashboardData(selectedYears);
+    // Filter subjects by selected year level
+    const yearFilteredSubjects = useMemo(() => {
+        if (!selectedYear) return termSubjects;
+        return termSubjects.filter(s => (s.student_year_ids || []).includes(selectedYear));
+    }, [termSubjects, selectedYear]);
+
+    const selectedSubjects = useMemo(
+        () => yearFilteredSubjects.filter(ts => selectedIds.has(ts.id)),
+        [yearFilteredSubjects, selectedIds]
+    );
+
+    // When year changes, reset selectedIds to all subjects in that year
+    const handleYearChange = (year) => {
+        setSelectedYear(year);
+        const filtered = year
+            ? termSubjects.filter(s => (s.student_year_ids || []).includes(year))
+            : termSubjects;
+        setSelectedIds(new Set(filtered.map(s => s.id)));
+    };
 
     useEffect(() => {
-        setSelectedYears([studentYear]);
-    }, [studentYear]);
-
-    useEffect(() => {
-        const fetchAllSubjects = async () => {
+        const fetchTerms = async () => {
             try {
-                const response = await subjectService.getSubjects({
-                    is_active: true,
-                });
-
-                const subjects = Array.isArray(response)
-                    ? response
-                    : Array.isArray(response?.subjects)
-                        ? response.subjects
-                        : Array.isArray(response?.data?.subjects)
-                            ? response.data.subjects
-                            : [];
-
-                setAvailableSubjects(subjects);
-            } catch (fetchError) {
-                setAvailableSubjects([]);
+                setLoading(true);
+                const terms = await getAllTerms();
+                if (!terms || terms.length === 0) {
+                    setError('ไม่พบข้อมูลภาคการศึกษา');
+                    return;
+                }
+                setAllTerms(terms);
+                const activeTerm = terms.find(t => t.is_active);
+                setSelectedTermId(activeTerm ? activeTerm.id : terms[0].id);
+            } catch (err) {
+                setError(err?.message || 'ไม่สามารถโหลดข้อมูลภาคการศึกษา');
+            } finally {
+                setLoading(false);
             }
         };
-
-        fetchAllSubjects();
+        fetchTerms();
     }, []);
 
     useEffect(() => {
-        const storageKey = getStudentSubjectKey(userId);
-        localStorage.setItem(storageKey, JSON.stringify(selectedSubjectIds));
-    }, [selectedSubjectIds, userId]);
-
-    // Fetch subjects available in current term and determine defaults by year
-    useEffect(() => {
-        const fetchTermSubjectsAndDefaults = async () => {
-            if (!selectedTermId) {
-                setSubjectsInCurrentTerm([]);
-                setAvailableSubjectsInTerm([]);
-                setDefaultSubjectsForYear([]);
-                return;
-            }
-
-            setSubjectLoading(true);
-            setSubjectError('');
-
+        if (!selectedTermId) return;
+        const fetchTermSubjects = async () => {
             try {
-                const response = await termSubjectService.getTermSubjectsByTermId(selectedTermId);
-                const termSubjects = Array.isArray(response)
-                    ? response
-                    : Array.isArray(response?.termSubjects)
-                        ? response.termSubjects
-                        : Array.isArray(response?.data?.termSubjects)
-                            ? response.data.termSubjects
-                            : [];
-
-                // All subject IDs available in current term (active)
-                const subjectIdsInTerm = termSubjects
-                    .filter((ts) => ts.is_active !== false)
-                    .map((ts) => ts.subject_id);
-
-                // Subject IDs for student's year in current term (defaults)
-                const defaultIds = termSubjects
-                    .filter(
-                        (ts) => ts.is_active !== false
-                            && ts.student_year_id === studentYear,
-                    )
-                    .map((ts) => ts.subject_id);
-
-                setSubjectsInCurrentTerm(subjectIdsInTerm);
-                setAvailableSubjectsInTerm(subjectIdsInTerm);
-                setDefaultSubjectsForYear(defaultIds);
-
-                // Restore from localStorage if exists, otherwise use defaults
-                const storageKey = getStudentSubjectKey(userId);
-                const stored = localStorage.getItem(storageKey);
-                if (stored) {
-                    const storedIds = JSON.parse(stored);
-                    // Validate stored IDs exist in current term
-                    const validIds = storedIds.filter((id) => subjectIdsInTerm.includes(id));
-                    setSelectedSubjectIds(validIds.length > 0 ? validIds : defaultIds);
-                } else {
-                    // First time: use defaults for this year in this term
-                    setSelectedSubjectIds(defaultIds);
-                }
+                setLoading(true);
+                setError('');
+                const data = await dashboardService.getStudentTermSubjects(selectedTermId);
+                const subjects = Array.isArray(data) ? data : (data?.subjects || []);
+                setTermSubjects(subjects);
+                setSelectedIds(new Set(subjects.map(ts => ts.id)));
+                setSelectedYear(null);
             } catch (err) {
-                setSubjectError(err?.message || 'ไม่สามารถโหลดข้อมูลรายวิชาของเทอมได้');
-                setSubjectsInCurrentTerm([]);
-                setAvailableSubjectsInTerm([]);
-                setDefaultSubjectsForYear([]);
-                setSelectedSubjectIds([]);
+                setError(err?.message || 'ไม่สามารถโหลดข้อมูลรายวิชา');
+                setTermSubjects([]);
+                setSelectedIds(new Set());
             } finally {
-                setSubjectLoading(false);
+                setLoading(false);
             }
         };
+        fetchTermSubjects();
+    }, [selectedTermId]);
 
-        fetchTermSubjectsAndDefaults();
-    }, [selectedTermId, studentYear, userId]);
-
-    const currentTerm = allTerms.find((t) => t.id === selectedTermId);
-
-    // Only count selected subjects that are active in current term
-    const effectiveSelectedSubjectIds = useMemo(() => {
-        if (subjectsInCurrentTerm.length === 0) {
-            return [];
-        }
-        return selectedSubjectIds.filter((id) => subjectsInCurrentTerm.includes(id));
-    }, [selectedSubjectIds, subjectsInCurrentTerm]);
-
-    const selectedSubjects = useMemo(() => {
-        return availableSubjects.filter((subject) => effectiveSelectedSubjectIds.includes(subject.id));
-    }, [availableSubjects, effectiveSelectedSubjectIds]);
-
-    // Addable subjects are those in current term but not yet selected
-    const addableSubjects = useMemo(() => {
-        return availableSubjects.filter(
-            (subject) => availableSubjectsInTerm.includes(subject.id)
-                && !selectedSubjectIds.includes(subject.id),
-        );
-    }, [availableSubjects, availableSubjectsInTerm, selectedSubjectIds]);
-
-    const handleTermChange = (termId) => {
-        setSelectedTermId(parseInt(termId, 10));
-    };
-
-    const handleYearFilterChange = (newYears) => {
-        // Student sees dashboard by own year only.
-        setSelectedYears(newYears.length > 0 ? [newYears[0]] : [studentYear]);
-    };
-
-    const handleAddSubject = () => {
-        const subjectId = parseInt(subjectToAdd, 10);
-        if (!subjectId) return;
-
-        if (!selectedSubjectIds.includes(subjectId)) {
-            setSelectedSubjectIds((prev) => [...prev, subjectId]);
-        }
-
-        setSubjectToAdd('');
-    };
-
-    const handleRemoveSubject = (subjectId) => {
-        setSelectedSubjectIds((prev) => prev.filter((id) => id !== subjectId));
-    };
-
-    const formatThaiDate = (dateValue) => {
-        if (!dateValue) return '-';
-
-        return new Date(dateValue).toLocaleDateString('th-TH', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-        });
-    };
-
-    if (isLoading) {
+    if (loading) {
         return (
             <AppShell title="แดชบอร์ดนักศึกษา">
                 <div className="flex items-center justify-center h-96">
@@ -265,158 +367,76 @@ const StudentDashboardPage = () => {
 
     return (
         <AppShell title="แดชบอร์ดนักศึกษา">
-            <div className="space-y-6">
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900">แดชบอร์ดนักศึกษา</h1>
-                        <p className="text-xl text-gray-600 mt-1">
-                            รหัสนักศึกษา: {studentCode || '-'} | ชั้นปีที่คำนวณได้: {studentYear}
-                        </p>
-                    </div>
-                    <div className="w-full md:w-auto md:ml-auto">
-                        <div className="flex-1 flex items-center gap-4">
-                            <DropdownMenu
-                                trigger={(
-                                    <button className="flex-none w-64 px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between">
-                                        <span className="text-gray-900 text-xl truncate">
-                                            {currentTerm
-                                                ? `ภาคการศึกษา ${currentTerm.academic_sector}/${currentTerm.academic_year}${currentTerm.is_active ? ' (ปัจจุบัน)' : ''}`
-                                                : 'เลือกภาคการศึกษา'}
-                                        </span>
-                                        <span className="material-symbols-outlined text-gray-500">expand_more</span>
-                                    </button>
-                                )}
-                                items={allTerms.map((term) => ({
-                                    id: term.id,
-                                    label: `ภาคการศึกษา ${term.academic_sector}/${term.academic_year}${term.is_active ? ' (ปัจจุบัน)' : ''}`,
-                                    onClick: () => handleTermChange(term.id),
-                                }))}
-                                position="left"
-                                className="w-96 max-h-96 overflow-y-auto"
-                            />\
-                        </div>
-                    </div>
-                </div>
-
-                <div className="rounded-xl border border-[#DDE3FF] bg-[#F8FAFF] p-4 space-y-4">
-                    <div className="flex flex-col lg:flex-row lg:items-end gap-3">
-                        <div className="flex-1">
-                            <p className="text-xl font-semibold text-[#050C9C]">จัดการรายวิชาส่วนตัวสำหรับการดูแดชบอร์ด</p>
-                            <p className="text-lg text-gray-600">
-                                ดึงรายวิชาของชั้นปี {studentYear} ในเทอมนี้เป็น default
-                                แต่สามารถเพิ่มรายวิชาอื่นในเทอมนี้ได้ตามต้องการ
-                                และบันทึกเฉพาะบัญชีของคุณเท่านั้น
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <select
-                                className="min-w-[260px] rounded-lg border border-gray-300 bg-white px-3 py-2 text-lg"
-                                value={subjectToAdd}
-                                onChange={(event) => setSubjectToAdd(event.target.value)}
-                                disabled={subjectLoading || addableSubjects.length === 0}
-                            >
-                                <option value="">เลือกรายวิชาเพื่อเพิ่ม</option>
-                                {addableSubjects.map((subject) => (
-                                    <option key={subject.id} value={subject.id}>
-                                        {(subject.code_eng || subject.code_th || '-')} - {(subject.name_th || subject.name_eng || '-')}
-                                    </option>
-                                ))}
-                            </select>
-                            <button
-                                type="button"
-                                className="rounded-lg bg-[#050C9C] px-4 py-2 text-lg font-medium text-white disabled:opacity-50"
-                                onClick={handleAddSubject}
-                                disabled={!subjectToAdd}
-                            >
-                                เพิ่ม
+            {/* Header — matches DashboardPage */}
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <h1 className="text-3xl font-bold text-gray-900">แดชบอร์ดนักศึกษา</h1>
+                <div className="flex items-center gap-3">
+                    <DropdownMenu
+                        trigger={
+                            <button className="px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between min-w-[130px]">
+                                <span className="text-gray-900 text-xl">
+                                    {selectedYear ? `ชั้นปี ${selectedYear}` : 'ทุกชั้นปี'}
+                                </span>
+                                <ExpandMoreIcon className="text-gray-500 ml-2" fontSize="small" />
                             </button>
-                        </div>
-                    </div>
-
-                    {subjectError ? <p className="text-red-600 text-lg">{subjectError}</p> : null}
-
-                    <div className="flex flex-wrap gap-2">
-                        {selectedSubjectIds.length === 0 ? (
-                            <p className="text-lg text-gray-500">ยังไม่มีรายวิชาที่เลือก</p>
-                        ) : (
-                            <>
-                                {selectedSubjects.length > 0 && (
-                                    <>
-                                        <p className="w-full text-sm text-gray-600">
-                                            <strong>รายวิชาที่คำนวณในภาคการศึกษานี้:</strong>
-                                        </p>
-                                        {selectedSubjects.map((subject) => {
-                                            const isDefault = defaultSubjectsForYear.includes(subject.id);
-                                            return (
-                                                <div
-                                                    key={subject.id}
-                                                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 ${isDefault
-                                                            ? 'border-[#B9C6FF] bg-white'
-                                                            : 'border-blue-400 bg-blue-50'
-                                                        }`}
-                                                >
-                                                    <span className="text-lg text-gray-800">
-                                                        {(subject.code_eng || subject.code_th || '-')} - {(subject.name_th || subject.name_eng || '-')}
-                                                    </span>
-                                                    {!isDefault && (
-                                                        <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">
-                                                            เพิ่มเอง
-                                                        </span>
-                                                    )}
-                                                    <button
-                                                        type="button"
-                                                        className="text-red-600 text-base font-medium"
-                                                        onClick={() => handleRemoveSubject(subject.id)}
-                                                    >
-                                                        ลบ
-                                                    </button>
-                                                </div>
-                                            );
-                                        })}
-                                    </>
-                                )}
-                                {selectedSubjectIds.filter((id) => !subjectsInCurrentTerm.includes(id)).length > 0 && (
-                                    <>
-                                        <p className="w-full text-sm text-gray-500 mt-2">
-                                            <strong>รายวิชาที่เลือกแต่ไม่เปิดในภาคการศึกษานี้ (ไม่นำมาคำนวณ):</strong>
-                                        </p>
-                                        {availableSubjects
-                                            .filter((subject) => selectedSubjectIds.includes(subject.id) && !subjectsInCurrentTerm.includes(subject.id))
-                                            .map((subject) => (
-                                                <div
-                                                    key={subject.id}
-                                                    className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-gray-50 px-3 py-1.5 opacity-60"
-                                                >
-                                                    <span className="text-lg text-gray-600">
-                                                        {(subject.code_eng || subject.code_th || '-')} - {(subject.name_th || subject.name_eng || '-')}
-                                                    </span>
-                                                    <button
-                                                        type="button"
-                                                        className="text-gray-500 text-base font-medium"
-                                                        onClick={() => handleRemoveSubject(subject.id)}
-                                                    >
-                                                        ลบ
-                                                    </button>
-                                                </div>
-                                            ))}
-                                    </>
-                                )}
-                            </>
-                        )}
-                    </div>
+                        }
+                        items={[
+                            { id: null, label: 'ทุกชั้นปี', onClick: () => handleYearChange(null) },
+                            ...STUDENT_YEARS.map(y => ({
+                                id: y,
+                                label: `ชั้นปี ${y}`,
+                                onClick: () => handleYearChange(y),
+                            })),
+                        ]}
+                        position="left"
+                    />
+                    <DropdownMenu
+                        trigger={
+                            <button className="flex-none w-64 px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none text-left flex items-center justify-between">
+                                <span className="text-gray-900 text-xl truncate">
+                                    {currentTerm
+                                        ? `ภาคการศึกษา ${currentTerm.academic_sector}/${currentTerm.academic_year}${currentTerm.is_active ? ' (ปัจจุบัน)' : ''}`
+                                        : 'เลือกภาคการศึกษา'}
+                                </span>
+                                <ExpandMoreIcon className="text-gray-500" fontSize="small" />
+                            </button>
+                        }
+                        items={allTerms.map(term => ({
+                            id: term.id,
+                            label: `ภาคการศึกษา ${term.academic_sector}/${term.academic_year}${term.is_active ? ' (ปัจจุบัน)' : ''}`,
+                            onClick: () => setSelectedTermId(term.id),
+                        }))}
+                        position="left"
+                        className="w-96 max-h-96 overflow-y-auto"
+                    />
                 </div>
+            </div>
 
+            <div className="space-y-6">
+                {/* Stat cards */}
+                <StatCards selectedSubjects={selectedSubjects} weeks={15} />
+
+                {/* Subject chips */}
+                <SubjectChips
+                    termSubjects={yearFilteredSubjects}
+                    selectedIds={selectedIds}
+                    onSelectionChange={setSelectedIds}
+                />
+
+                {/* Subject list + chart — matches DashboardPage col-span-1 / col-span-3 */}
                 <div className="grid grid-cols-4 gap-6">
                     <div className="col-span-1">
-                        <WorkloadAveragePanel averageData={averageWorkload} />
+                        <SubjectList
+                            termSubjects={yearFilteredSubjects}
+                            selectedIds={selectedIds}
+                            onSelectionChange={setSelectedIds}
+                        />
                     </div>
                     <div className="col-span-3">
                         <WorkloadChart
-                            semester={currentTerm?.academic_sector || 'ภาคการศึกษา'}
-                            termYear={currentTerm?.academic_year || 'ปีการศึกษา'}
-                            chartData={chartData}
-                            selectedYear={selectedYears[0]}
-                            onFilterChange={handleYearFilterChange}
+                            selectedSubjects={selectedSubjects}
+                            weeks={15}
+                            currentTerm={currentTerm}
                         />
                     </div>
                 </div>
