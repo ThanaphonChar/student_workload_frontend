@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppShell from '../../components/layout/AppShell';
 import { DropdownMenu } from '../../components/common/DropdownMenu';
 import { getAllTerms } from '../../services/termService';
@@ -132,10 +133,16 @@ const StatCards = ({ selectedSubjects, weeks = 15 }) => {
  * Subject list — styled like WorkloadAveragePanel
  */
 const SubjectList = ({ termSubjects, selectedIds, onSelectionChange }) => {
-    const handleRowClick = (subjectId) => {
-        const next = new Set(selectedIds);
-        next.has(subjectId) ? next.delete(subjectId) : next.add(subjectId);
-        onSelectionChange(next);
+    const navigate = useNavigate();
+
+    const handleRowClick = (subject) => {
+        navigate(`/term-subjects/${subject.id}/workload`, {
+            state: {
+                fromPath: '/dashboard/student',
+                fromLabel: 'แดชบอร์ดนักศึกษา',
+                subjectCode: subject.code_eng || subject.code_th,
+            },
+        });
     };
 
     return (
@@ -150,7 +157,7 @@ const SubjectList = ({ termSubjects, selectedIds, onSelectionChange }) => {
                     return (
                         <div
                             key={subject.id}
-                            onClick={() => handleRowClick(subject.id)}
+                            onClick={() => handleRowClick(subject)}
                             className={`bg-white shadow rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-opacity ${isSelected ? 'opacity-100' : 'opacity-50'
                                 }`}
                         >
@@ -171,11 +178,16 @@ const SubjectList = ({ termSubjects, selectedIds, onSelectionChange }) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="text-right mr-2">
-                                <div className="text-5xl font-bold text-[#050C9C]">
-                                    {subject.total_hours || 0}
+                            <div className="flex items-center gap-2">
+                                <div className="text-right">
+                                    <div className="text-5xl font-bold text-[#050C9C]">
+                                        {subject.total_hours || 0}
+                                    </div>
+                                    <div className="text-md text-gray-400">ชั่วโมง</div>
                                 </div>
-                                <div className="text-md text-gray-400">ชั่วโมง</div>
+                                <span className="material-symbols-outlined text-gray-400 text-2xl">
+                                    chevron_right
+                                </span>
                             </div>
                         </div>
                     );

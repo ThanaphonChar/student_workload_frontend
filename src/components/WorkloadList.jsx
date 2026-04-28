@@ -9,7 +9,7 @@ import TableRow from './common/TableRow';
 import { Button } from './common/Button';
 import { formatThaiDate, parseDate } from '../utils/dateUtils';
 
-const WorkloadList = ({ workloads = [], termSubjectData, onEdit, onRefresh }) => {
+const WorkloadList = ({ workloads = [], termSubjectData, onEdit, onRefresh, isReadOnly = false }) => {
     const columns = [
         {
             label: 'ชื่องาน',
@@ -47,7 +47,7 @@ const WorkloadList = ({ workloads = [], termSubjectData, onEdit, onRefresh }) =>
                 <div className="text-xl text-gray-900">{work.hours_per_week}</div>
             ),
         },
-        {
+        ...(isReadOnly ? [] : [{
             label: 'จัดการ',
             width: '10%',
             align: 'center',
@@ -62,7 +62,7 @@ const WorkloadList = ({ workloads = [], termSubjectData, onEdit, onRefresh }) =>
                     <EditIcon className="w-5 h-5 mx-auto" />
                 </Button>
             ),
-        },
+        }]),
     ];
 
     return (
