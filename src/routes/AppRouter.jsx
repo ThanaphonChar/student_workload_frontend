@@ -182,11 +182,11 @@ export const AppRouter = () => {
 
 
 
-                {/* Workload Management Route - Academic Officer can create/edit, others can view */}
+                {/* Workload Management Route - Academic Officer can create/edit, others view only */}
                 <Route
                     path="/term-subjects/:termSubjectId/workload"
                     element={
-                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER]}>
+                        <ProtectedRoute allowedRoles={[ROLES.PROFESSOR, ROLES.PROGRAM_CHAIR, ROLES.ACADEMIC_OFFICER, ROLES.STUDENT]}>
                             <TermSubjectWorkloadPage />
                         </ProtectedRoute>
                     }

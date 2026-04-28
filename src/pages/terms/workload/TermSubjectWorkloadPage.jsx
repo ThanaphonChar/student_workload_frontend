@@ -37,6 +37,8 @@ const TermSubjectWorkloadPage = () => {
     const toast = useToast();
     const { roles } = useAuth();
     const isAcademicOfficer = roles?.includes('Academic Officer');
+    const isStudent = roles?.includes('Student');
+    const isReadOnly = isStudent;
 
     const [loading, setLoading] = useState(true);
     const [termSubject, setTermSubject] = useState(null);
@@ -651,11 +653,13 @@ const TermSubjectWorkloadPage = () => {
                     </div>
                 </div>
 
-                {/* Document Status Cards */}
-                <div className="grid grid-cols-2 gap-4">
-                    {renderDocumentCard('outline', 'เอกสารเค้าโครงรายวิชา')}
-                    {renderDocumentCard('report', 'เอกสารรายงานผลการดำเนินงาน')}
-                </div>
+                {/* Document Status Cards - ซ่อนจากนักศึกษา */}
+                {!isStudent && (
+                    <div className="grid grid-cols-2 gap-4">
+                        {renderDocumentCard('outline', 'เอกสารเค้าโครงรายวิชา')}
+                        {renderDocumentCard('report', 'เอกสารรายงานผลการดำเนินงาน')}
+                    </div>
+                )}
 
                 <ApprovalFlowModal
                     isOpen={approvalFlow.isOpen}
@@ -673,16 +677,18 @@ const TermSubjectWorkloadPage = () => {
                     {/* Section Header */}
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-3xl font-bold text-gray-900">ภาระงาน</h2>
-                        <Button
-                            onClick={handleAddWorkload}
-                            className="px-6 py-2 bg-[#050C9C] hover:bg-[#040879] text-white rounded-lg font-bold text-xl flex items-center justify-center gap-2 whitespace-nowrap transition-colors"
-                        >
-                            <span className="material-symbols-outlined text-xl">
-                                add
-                            </span>
+                        {!isReadOnly && (
+                            <Button
+                                onClick={handleAddWorkload}
+                                className="px-6 py-2 bg-[#050C9C] hover:bg-[#040879] text-white rounded-lg font-bold text-xl flex items-center justify-center gap-2 whitespace-nowrap transition-colors"
+                            >
+                                <span className="material-symbols-outlined text-xl">
+                                    add
+                                </span>
 
-                            เพิ่มภาระงาน
-                        </Button>
+                                เพิ่มภาระงาน
+                            </Button>
+                        )}
                     </div>
 
                     {/* Workload Table Card */}
@@ -692,6 +698,7 @@ const TermSubjectWorkloadPage = () => {
                             termSubjectData={termSubject}
                             onEdit={handleEditWorkload}
                             onRefresh={fetchData}
+                            isReadOnly={isReadOnly}
                         />
                     </div>
                 </div>
