@@ -1,223 +1,262 @@
-// import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-// import { UploadModal } from '../../components/MySubjects/UploadModal/index';
+import { describe, test, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import React from 'react';
 
-// vi.mock('../../services/submission.service', () => ({
-//     submitDocument: vi.fn(),
-// }));
+// ── Service mock ──────────────────────────────────────────────────────────────
+vi.mock('../../services/submission.service', () => ({
+    submitDocument: vi.fn(),
+}));
 
-// vi.mock('@mui/icons-material/UploadFileRounded', () => ({
-//     default: () => <span data-testid="icon-upload-file" />,
-// }));
-// vi.mock('@mui/icons-material/CloseRounded', () => ({
-//     default: () => <span data-testid="icon-close" />,
-// }));
+// ── MUI icon mocks ────────────────────────────────────────────────────────────
+vi.mock('@mui/icons-material/UploadFileRounded', () => ({
+    default: () => <span data-testid="icon-upload-file" />,
+}));
+vi.mock('@mui/icons-material/CloseRounded', () => ({
+    default: () => <span data-testid="icon-close" />,
+}));
 
-// // Mock LoadingSpinner so we can detect it in the DOM
-// vi.mock('../../components/common/LoadingSpinner', () => ({
-//     LoadingSpinner: () => <span data-testid="loading-spinner" />,
-// }));
+// ── Minimal Modal — renders children when open, null when closed ──────────────
+vi.mock('../../components/common/Modal', () => ({
+    Modal: ({ isOpen, children, title }) =>
+        isOpen ? (
+            <div data-testid="modal">
+                {title && <div data-testid="modal-title">{title}</div>}
+                {children}
+            </div>
+        ) : null,
+}));
 
-// // Mock UploadSuccess
-// vi.mock('../../components/MySubjects/UploadModal/UploadSuccess', () => ({
-//     UploadSuccess: ({ onClose }) => (
-//         <div data-testid="upload-success">
-//             <button onClick={onClose}>Close</button>
-//         </div>
-//     ),
-// }));
+// ── LoadingSpinner mock ───────────────────────────────────────────────────────
+vi.mock('../../components/common/LoadingSpinner', () => ({
+    LoadingSpinner: () => <span data-testid="loading-spinner" />,
+}));
 
-// import { submitDocument } from '../../services/submission.service';
+// ── UploadSuccess mock ────────────────────────────────────────────────────────
+vi.mock('../../components/MySubjects/UploadModal/UploadSuccess', () => ({
+    UploadSuccess: ({ onClose }) => (
+        <div data-testid="upload-success">
+            <button onClick={onClose}>Close</button>
+        </div>
+    ),
+}));
 
-// const defaultProps = {
-//     isOpen: true,
-//     onClose: vi.fn(),
-//     termSubjectId: 1,
-//     subjectCode: 'CS101',
-//     subjectName: 'Intro to CS',
-//     documentType: 'outline',
-//     onSuccess: vi.fn(),
-// };
+import { submitDocument } from '../../services/submission.service';
+import { UploadModal } from '../../components/MySubjects/UploadModal/index';
 
-// const makePdfFile = (name = 'test.pdf', size = 1024) =>
-//     new File(['content'], name, { type: 'application/pdf' });
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const makePdfFile = (name = 'test.pdf') =>
+    new File(['content'], name, { type: 'application/pdf' });
 
-// const makeOversizedFile = () =>
-//     Object.defineProperty(new File(['x'], 'big.pdf', { type: 'application/pdf' }), 'size', {
-//         value: 11 * 1024 * 1024,
-//     });
+const makeOversizedFile = () => {
+    const file = new File(['x'], 'big.pdf', { type: 'application/pdf' });
+    Object.defineProperty(file, 'size', { value: 11 * 1024 * 1024 });
+    return file;
+};
 
-// beforeEach(() => {
-//     vi.clearAllMocks();
-//     defaultProps.onClose.mockReset();
-//     defaultProps.onSuccess.mockReset();
-// });
+const defaultProps = {
+    isOpen: true,
+    onClose: vi.fn(),
+    termSubjectId: 1,
+    subjectCode: 'CS101',
+    subjectName: 'Intro to CS',
+    documentType: 'outline',
+    onSuccess: vi.fn(),
+};
 
-// describe('UploadModal', () => {
-//     test('does not render modal content when isOpen is false', () => {
-//         render(<UploadModal {...defaultProps} isOpen={false} />);
-//         expect(screen.queryByText('CS101')).not.toBeInTheDocument();
-//     });
+const selectFile = (file) => {
+    const input = document.querySelector('input[type="file"]');
+    fireEvent.change(input, { target: { files: [file] } });
+};
 
-//     test('renders modal with document type label when isOpen is true', () => {
-//         render(<UploadModal {...defaultProps} />);
-//         expect(screen.getByText(/ส่งเอกสาร/)).toBeInTheDocument();
-//     });
+beforeEach(() => {
+    vi.clearAllMocks();
+});
 
-//     test('shows เค้าโครงรายวิชา label when documentType is outline', () => {
-//         render(<UploadModal {...defaultProps} documentType="outline" />);
-//         expect(screen.getByText(/เค้าโครงรายวิชา/)).toBeInTheDocument();
-//     });
+// ── Tests ─────────────────────────────────────────────────────────────────────
+describe('UploadModal', () => {
+    test('does not render when isOpen is false', () => {
+        render(<UploadModal {...defaultProps} isOpen={false} />);
+        expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
+    });
 
-//     test('shows รายงานผล label when documentType is report', () => {
-//         render(<UploadModal {...defaultProps} documentType="report" />);
-//         expect(screen.getByText(/รายงานผล/)).toBeInTheDocument();
-//     });
+    test('renders modal content when isOpen is true', () => {
+        render(<UploadModal {...defaultProps} />);
+        expect(screen.getByTestId('modal')).toBeInTheDocument();
+    });
 
-//     test('shows subject code and name in modal', () => {
-//         render(<UploadModal {...defaultProps} />);
-//         expect(screen.getByText('CS101')).toBeInTheDocument();
-//         expect(screen.getByText('Intro to CS')).toBeInTheDocument();
-//     });
+    test("shows 'เค้าโครงรายวิชา' label when documentType is 'outline'", () => {
+        render(<UploadModal {...defaultProps} documentType="outline" />);
+        expect(screen.getByText(/เค้าโครงรายวิชา/)).toBeInTheDocument();
+    });
 
-//     test('shows error when submit clicked with no file selected', async () => {
-//         render(<UploadModal {...defaultProps} />);
-//         const submitBtn = screen.getByText('ส่งเอกสาร');
-//         fireEvent.click(submitBtn);
-//         await waitFor(() => {
-//             expect(screen.getByText('กรุณาเลือกไฟล์ก่อน')).toBeInTheDocument();
-//         });
-//     });
+    test("shows 'รายงานผล' label when documentType is 'report'", () => {
+        render(<UploadModal {...defaultProps} documentType="report" />);
+        expect(screen.getByText(/รายงานผล/)).toBeInTheDocument();
+    });
 
-//     test('shows error when file type is not PDF/DOC/DOCX', async () => {
-//         render(<UploadModal {...defaultProps} />);
-//         const input = document.querySelector('input[type="file"]');
-//         const badFile = new File(['x'], 'image.png', { type: 'image/png' });
-//         fireEvent.change(input, { target: { files: [badFile] } });
+    test('displays subject code and name', () => {
+        render(<UploadModal {...defaultProps} />);
+        expect(screen.getByText('CS101')).toBeInTheDocument();
+        expect(screen.getByText('Intro to CS')).toBeInTheDocument();
+    });
 
-//         const submitBtn = screen.getByText('ส่งเอกสาร');
-//         fireEvent.click(submitBtn);
-//         await waitFor(() => {
-//             expect(screen.getByText(/PDF, DOC, DOCX/)).toBeInTheDocument();
-//         });
-//     });
+    test('submit button is disabled when no file is selected', () => {
+        render(<UploadModal {...defaultProps} />);
+        const submitBtn = screen.getByText('ส่งเอกสาร').closest('button');
+        expect(submitBtn).toBeDisabled();
+    });
 
-//     test('shows error when file size exceeds 10MB', async () => {
-//         render(<UploadModal {...defaultProps} />);
-//         const input = document.querySelector('input[type="file"]');
-//         fireEvent.change(input, { target: { files: [makeOversizedFile()] } });
+    test('shows error when file type is .exe', async () => {
+        render(<UploadModal {...defaultProps} />);
+        const exeFile = new File(['x'], 'malware.exe', { type: 'application/octet-stream' });
+        selectFile(exeFile);
 
-//         const submitBtn = screen.getByText('ส่งเอกสาร');
-//         fireEvent.click(submitBtn);
-//         await waitFor(() => {
-//             expect(screen.getByText(/10MB/)).toBeInTheDocument();
-//         });
-//     });
+        fireEvent.click(screen.getByText('ส่งเอกสาร').closest('button'));
 
-//     test('calls submitDocument with correct params when valid file selected', async () => {
-//         submitDocument.mockResolvedValueOnce({ id: 1 });
-//         render(<UploadModal {...defaultProps} />);
+        await waitFor(() => {
+            expect(screen.getByText(/รองรับเฉพาะไฟล์/)).toBeInTheDocument();
+        });
+    });
 
-//         const input = document.querySelector('input[type="file"]');
-//         const file = makePdfFile();
-//         fireEvent.change(input, { target: { files: [file] } });
+    test('shows error when file exceeds 10MB', async () => {
+        render(<UploadModal {...defaultProps} />);
+        selectFile(makeOversizedFile());
 
-//         fireEvent.click(screen.getByText('ส่งเอกสาร'));
+        fireEvent.click(screen.getByText('ส่งเอกสาร').closest('button'));
 
-//         await waitFor(() => {
-//             expect(submitDocument).toHaveBeenCalledWith({
-//                 termSubjectId: 1,
-//                 documentType: 'outline',
-//                 file,
-//             });
-//         });
-//     });
+        await waitFor(() => {
+            expect(screen.getByText(/ไฟล์มีขนาดเกิน/)).toBeInTheDocument();
+        });
+    });
 
-//     test('shows loading spinner during submission', async () => {
-//         let resolveSubmit;
-//         submitDocument.mockReturnValueOnce(new Promise((res) => { resolveSubmit = res; }));
+    test('calls submitDocument with correct args on valid file', async () => {
+        submitDocument.mockResolvedValueOnce({ id: 1 });
+        render(<UploadModal {...defaultProps} />);
 
-//         render(<UploadModal {...defaultProps} />);
-//         const input = document.querySelector('input[type="file"]');
-//         fireEvent.change(input, { target: { files: [makePdfFile()] } });
+        const file = makePdfFile();
+        selectFile(file);
 
-//         fireEvent.click(screen.getByText('ส่งเอกสาร'));
+        fireEvent.click(screen.getByText('ส่งเอกสาร').closest('button'));
 
-//         await waitFor(() => {
-//             expect(screen.getByText('กำลังส่ง...')).toBeInTheDocument();
-//         });
+        await waitFor(() => {
+            expect(submitDocument).toHaveBeenCalledWith({
+                termSubjectId: 1,
+                documentType: 'outline',
+                file,
+            });
+        });
+    });
 
-//         await act(async () => { resolveSubmit({ id: 1 }); });
-//     });
+    test('shows loading text during submission', async () => {
+        let resolveSubmit;
+        submitDocument.mockReturnValueOnce(new Promise((res) => { resolveSubmit = res; }));
 
-//     test('calls onSuccess after successful submission', async () => {
-//         vi.useFakeTimers();
-//         submitDocument.mockResolvedValueOnce({ id: 1 });
+        render(<UploadModal {...defaultProps} />);
+        selectFile(makePdfFile());
+        fireEvent.click(screen.getByText('ส่งเอกสาร').closest('button'));
 
-//         render(<UploadModal {...defaultProps} />);
-//         const input = document.querySelector('input[type="file"]');
-//         fireEvent.change(input, { target: { files: [makePdfFile()] } });
-//         fireEvent.click(screen.getByText('ส่งเอกสาร'));
+        await waitFor(() => {
+            expect(screen.getByText('กำลังส่ง...')).toBeInTheDocument();
+        });
 
-//         await act(async () => {
-//             await Promise.resolve(); // flush microtasks
-//             vi.advanceTimersByTime(1500);
-//         });
+        await act(async () => { resolveSubmit({ id: 1 }); });
+    });
 
-//         expect(defaultProps.onSuccess).toHaveBeenCalledTimes(1);
-//         vi.useRealTimers();
-//     });
+    test('calls onSuccess after successful submission', async () => {
+        vi.useFakeTimers();
+        submitDocument.mockResolvedValueOnce({ id: 1 });
 
-//     test('calls onClose after successful submission', async () => {
-//         vi.useFakeTimers();
-//         submitDocument.mockResolvedValueOnce({ id: 1 });
+        render(<UploadModal {...defaultProps} />);
+        selectFile(makePdfFile());
+        fireEvent.click(screen.getByText('ส่งเอกสาร').closest('button'));
 
-//         render(<UploadModal {...defaultProps} />);
-//         const input = document.querySelector('input[type="file"]');
-//         fireEvent.change(input, { target: { files: [makePdfFile()] } });
-//         fireEvent.click(screen.getByText('ส่งเอกสาร'));
+        await act(async () => {
+            await Promise.resolve();
+            vi.advanceTimersByTime(1500);
+        });
 
-//         await act(async () => {
-//             await Promise.resolve();
-//             vi.advanceTimersByTime(1500);
-//         });
+        expect(defaultProps.onSuccess).toHaveBeenCalledTimes(1);
+        vi.useRealTimers();
+    });
 
-//         expect(defaultProps.onClose).toHaveBeenCalled();
-//         vi.useRealTimers();
-//     });
+    test('calls onClose after successful submission', async () => {
+        vi.useFakeTimers();
+        submitDocument.mockResolvedValueOnce({ id: 1 });
 
-//     test('shows error message when submitDocument throws', async () => {
-//         submitDocument.mockRejectedValueOnce({ message: 'เกิดข้อผิดพลาดในการส่งเอกสาร' });
+        render(<UploadModal {...defaultProps} />);
+        selectFile(makePdfFile());
+        fireEvent.click(screen.getByText('ส่งเอกสาร').closest('button'));
 
-//         render(<UploadModal {...defaultProps} />);
-//         const input = document.querySelector('input[type="file"]');
-//         fireEvent.change(input, { target: { files: [makePdfFile()] } });
-//         fireEvent.click(screen.getByText('ส่งเอกสาร'));
+        await act(async () => {
+            await Promise.resolve();
+            vi.advanceTimersByTime(1500);
+        });
 
-//         await waitFor(() => {
-//             expect(screen.getByText('เกิดข้อผิดพลาดในการส่งเอกสาร')).toBeInTheDocument();
-//         });
-//     });
+        expect(defaultProps.onClose).toHaveBeenCalled();
+        vi.useRealTimers();
+    });
 
-//     test('resets state when modal is closed and reopened', async () => {
-//         const { rerender } = render(<UploadModal {...defaultProps} isOpen={true} />);
+    test('shows error message when submitDocument throws', async () => {
+        submitDocument.mockRejectedValueOnce({ message: 'เกิดข้อผิดพลาดในการส่งเอกสาร' });
 
-//         // Select a file
-//         const input = document.querySelector('input[type="file"]');
-//         fireEvent.change(input, { target: { files: [makePdfFile()] } });
-//         expect(screen.getByText('test.pdf')).toBeInTheDocument();
+        render(<UploadModal {...defaultProps} />);
+        selectFile(makePdfFile());
+        fireEvent.click(screen.getByText('ส่งเอกสาร').closest('button'));
 
-//         // Close modal
-//         rerender(<UploadModal {...defaultProps} isOpen={false} />);
-//         // Reopen modal
-//         rerender(<UploadModal {...defaultProps} isOpen={true} />);
+        await waitFor(() => {
+            expect(screen.getByText('เกิดข้อผิดพลาดในการส่งเอกสาร')).toBeInTheDocument();
+        });
+    });
 
-//         // File preview should be gone
-//         expect(screen.queryByText('test.pdf')).not.toBeInTheDocument();
-//     });
+    test('shows generic error when submitDocument throws error without message', async () => {
+        submitDocument.mockRejectedValueOnce(new Error('network failure'));
 
-//     test('ยกเลิก button calls onClose', () => {
-//         render(<UploadModal {...defaultProps} />);
-//         fireEvent.click(screen.getByText('ยกเลิก'));
-//         expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
-//     });
-// });
+        render(<UploadModal {...defaultProps} />);
+        selectFile(makePdfFile());
+        fireEvent.click(screen.getByText('ส่งเอกสาร').closest('button'));
+
+        await waitFor(() => {
+            expect(
+                screen.getByText(/network failure|เกิดข้อผิดพลาด/)
+            ).toBeInTheDocument();
+        });
+    });
+
+    test('resets state when modal closes and reopens', async () => {
+        const { rerender } = render(<UploadModal {...defaultProps} isOpen={true} />);
+
+        selectFile(makePdfFile('test.pdf'));
+        expect(screen.getByText('test.pdf')).toBeInTheDocument();
+
+        // close
+        rerender(<UploadModal {...defaultProps} isOpen={false} />);
+        // reopen
+        rerender(<UploadModal {...defaultProps} isOpen={true} />);
+
+        expect(screen.queryByText('test.pdf')).not.toBeInTheDocument();
+    });
+
+    test('ยกเลิก button calls onClose', () => {
+        render(<UploadModal {...defaultProps} />);
+        fireEvent.click(screen.getByText('ยกเลิก'));
+        expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
+    });
+
+    test('shows file name and size preview after selecting a valid file', () => {
+        render(<UploadModal {...defaultProps} />);
+        selectFile(makePdfFile('document.pdf'));
+        expect(screen.getByText('document.pdf')).toBeInTheDocument();
+    });
+
+    test('removes file preview after clicking the X button', async () => {
+        render(<UploadModal {...defaultProps} />);
+        selectFile(makePdfFile('document.pdf'));
+        expect(screen.getByText('document.pdf')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('icon-close').closest('button'));
+
+        await waitFor(() => {
+            expect(screen.queryByText('document.pdf')).not.toBeInTheDocument();
+        });
+    });
+});

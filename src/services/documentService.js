@@ -38,7 +38,11 @@ export async function uploadDocument(termSubjectId, documentType, file) {
  */
 export async function getDocuments(termSubjectId) {
     const response = await apiClient.get(`/term-subjects/${termSubjectId}/documents`);
-    return response?.data || response;
+    if (response?.data !== undefined) {
+        return response.data;
+    }
+    // ถ้า response?.data is undefined, return undefined ถ้า response is empty object
+    return Object.keys(response).length > 0 ? response : undefined;
 }
 
 const documentService = {
