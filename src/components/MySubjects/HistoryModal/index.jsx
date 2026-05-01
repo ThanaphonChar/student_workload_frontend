@@ -55,11 +55,34 @@ export const HistoryModal = ({
         return uniqueRounds.size;
     }, [events]);
 
-    const latestReview = useMemo(() => {
-        return [...events].filter((event) => event.event_type === 'reviewed').pop() || null;
+    const latestSubmittedEvent = useMemo(() => {
+        const submitted = events.filter((event) => event.event_type === 'submitted');
+        return submitted[submitted.length - 1] || null;
     }, [events]);
 
-    const showReupload = latestReview?.action === 'rejected';
+    const latestReviewedEvent = useMemo(() => {
+        const reviewed = events.filter((event) => event.event_type === 'reviewed');
+        return reviewed[reviewed.length - 1] || null;
+    }, [events]);
+
+    const latestStatus = useMemo(() => {
+        if (!latestSubmittedEvent) return null;
+
+        if (latestReviewedEvent && new Date(latestReviewedEvent.event_time) > new Date(latestSubmittedEvent.event_time)) {
+            return latestReviewedEvent.action;
+        }
+
+        return 'pending';
+    }, [latestSubmittedEvent, latestReviewedEvent]);
+
+    const showReupload = !!latestSubmittedEvent;
+
+    const getReuploadButtonText = () => {
+        if (latestStatus === 'pending') return 'ส่งเอกสารใหม่ (แทนที่รอบนี้)';
+        if (latestStatus === 'approved') return 'ส่งเอกสารเพิ่มเติม';
+        if (latestStatus === 'rejected') return 'ส่งเอกสารใหม่';
+        return 'ส่งเอกสารใหม่';
+    };
 
     return (
         <Modal
@@ -106,7 +129,7 @@ export const HistoryModal = ({
                             className=""
                         >
                             <VerticalAlignTopRoundedIcon fontSize="small" className="text-white" />
-                            อัปโหลดใหม่
+                            {getReuploadButtonText()}
                         </Button>
                     ) : null}
 
